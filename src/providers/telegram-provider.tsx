@@ -4,47 +4,75 @@ import { useEffect } from "react";
 
 import { useAuthStore } from "@/stores/auth-store";
 
+async function fetchSession(): Promise<boolean> {
+  const response = await fetch("/api/auth/session", {
+    method: "GET",
+    credentials: "include",
+  });
+
+  if (response.status === 401) {
+    return false;
+  }
+
+  if (!response.ok) {
+    throw new Error("Failed to load session");
+  }
+
+  const { user } = await response.json();
+  useAuthStore.getState().setUser(user);
+  return true;
+}
+
+async function authenticateWithInitData(initData: string): Promise<void> {
+  const response = await fetch("/api/auth/telegram", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ initData }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Telegram authentication failed");
+  }
+
+  const { user } = await response.json();
+  useAuthStore.getState().setUser(user);
+}
+
 export function TelegramProvider({ children }: { children: React.ReactNode }) {
-  const setUser = useAuthStore((state) => state.setUser);
   const setLoading = useAuthStore((state) => state.setLoading);
 
   useEffect(() => {
-    async function authenticate() {
+    async function bootstrapAuth() {
       try {
-        const initData =
-          typeof window !== "undefined" &&
-          window.Telegram?.WebApp?.initData;
+        const hasSession = await fetchSession();
+
+        if (hasSession) {
+          return;
+        }
+
+        const initData = window.Telegram?.WebApp?.initData;
 
         if (!initData) {
           setLoading(false);
           return;
         }
 
-        const response = await fetch("/api/auth/telegram", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ initData }),
-        });
-
-        if (!response.ok) {
-          setLoading(false);
-          return;
-        }
-
-        const { user } = await response.json();
-        setUser(user);
+        await authenticateWithInitData(initData);
       } catch {
+        useAuthStore.getState().setUser(null);
+      } finally {
         setLoading(false);
       }
     }
 
-    if (typeof window !== "undefined" && window.Telegram?.WebApp) {
+    if (window.Telegram?.WebApp) {
       window.Telegram.WebApp.ready();
       window.Telegram.WebApp.expand();
     }
 
-    authenticate();
-  }, [setUser, setLoading]);
+    bootstrapAuth();
+  }, [setLoading]);
 
   return <>{children}</>;
 }

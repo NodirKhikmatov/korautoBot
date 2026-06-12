@@ -1,0 +1,31 @@
+import { NextResponse } from "next/server";
+import { ZodError } from "zod";
+
+import {
+  AuthConfigError,
+  AuthError,
+} from "@/lib/auth/errors";
+
+export function handleAuthRouteError(
+  error: unknown,
+  logLabel = "Request error",
+  fallbackMessage = "Request failed",
+): NextResponse {
+  if (error instanceof AuthError) {
+    return NextResponse.json({ error: error.message }, { status: 401 });
+  }
+
+  if (error instanceof AuthConfigError) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  if (error instanceof ZodError) {
+    return NextResponse.json(
+      { error: "Invalid request", details: error.flatten() },
+      { status: 400 },
+    );
+  }
+
+  console.error(logLabel, error);
+  return NextResponse.json({ error: fallbackMessage }, { status: 500 });
+}

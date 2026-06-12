@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
-import { getCurrentUser } from "@/lib/auth/get-current-user";
+import { handleAuthRouteError } from "@/lib/auth/handle-auth-route-error";
+import { requireAuth } from "@/lib/auth/require-auth";
 import { carFiltersSchema, createCarSchema } from "@/schemas/car";
 import { createCar, getCars } from "@/services/cars";
 
@@ -24,23 +25,13 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const user = await getCurrentUser();
-
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
+    const user = await requireAuth();
     const body = await request.json();
     const input = createCarSchema.parse(body);
-
     const car = await createCar(user.id, input);
 
     return NextResponse.json({ car }, { status: 201 });
   } catch (error) {
-    console.error("Create car error:", error);
-    return NextResponse.json(
-      { error: "Failed to create car listing" },
-      { status: 500 },
-    );
+    return handleAuthRouteError(error, "Create car error");
   }
 }

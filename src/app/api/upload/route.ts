@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
+import { z } from "zod";
 
-import { getCurrentUser } from "@/lib/auth/get-current-user";
+import { handleAuthRouteError } from "@/lib/auth/handle-auth-route-error";
+import { requireAuth } from "@/lib/auth/require-auth";
 import {
   ALLOWED_IMAGE_TYPES,
   MAX_IMAGE_SIZE_BYTES,
@@ -10,7 +12,6 @@ import {
   generateImageKey,
   getPublicImageUrl,
 } from "@/lib/r2/client";
-import { z } from "zod";
 
 const uploadRequestSchema = z.object({
   filename: z.string().min(1),
@@ -20,12 +21,7 @@ const uploadRequestSchema = z.object({
 
 export async function POST(request: Request) {
   try {
-    const user = await getCurrentUser();
-
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
+    const user = await requireAuth();
     const body = await request.json();
     const { filename, contentType } = uploadRequestSchema.parse(body);
 
@@ -39,10 +35,6 @@ export async function POST(request: Request) {
       key,
     });
   } catch (error) {
-    console.error("Upload error:", error);
-    return NextResponse.json(
-      { error: "Failed to create upload URL" },
-      { status: 500 },
-    );
+    return handleAuthRouteError(error, "Upload error");
   }
 }

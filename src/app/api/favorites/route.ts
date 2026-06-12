@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
-import { getCurrentUser } from "@/lib/auth/get-current-user";
+import { handleAuthRouteError } from "@/lib/auth/handle-auth-route-error";
+import { requireAuth } from "@/lib/auth/require-auth";
 import {
   addFavorite,
   getUserFavorites,
@@ -14,32 +15,18 @@ const favoriteSchema = z.object({
 
 export async function GET() {
   try {
-    const user = await getCurrentUser();
-
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
+    const user = await requireAuth();
     const favorites = await getUserFavorites(user.id);
 
     return NextResponse.json({ favorites });
   } catch (error) {
-    console.error("Get favorites error:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch favorites" },
-      { status: 500 },
-    );
+    return handleAuthRouteError(error, "Get favorites error");
   }
 }
 
 export async function POST(request: Request) {
   try {
-    const user = await getCurrentUser();
-
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
+    const user = await requireAuth();
     const body = await request.json();
     const { carId } = favoriteSchema.parse(body);
 
@@ -47,22 +34,13 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true }, { status: 201 });
   } catch (error) {
-    console.error("Add favorite error:", error);
-    return NextResponse.json(
-      { error: "Failed to add favorite" },
-      { status: 500 },
-    );
+    return handleAuthRouteError(error, "Add favorite error");
   }
 }
 
 export async function DELETE(request: Request) {
   try {
-    const user = await getCurrentUser();
-
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
+    const user = await requireAuth();
     const body = await request.json();
     const { carId } = favoriteSchema.parse(body);
 
@@ -70,10 +48,6 @@ export async function DELETE(request: Request) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Remove favorite error:", error);
-    return NextResponse.json(
-      { error: "Failed to remove favorite" },
-      { status: 500 },
-    );
+    return handleAuthRouteError(error, "Remove favorite error");
   }
 }
