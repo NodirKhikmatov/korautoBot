@@ -36,6 +36,13 @@
       "when": 1740400000000,
       "tag": "0004_featured_list_index",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1740500000000,
+      "tag": "0005_listing_analytics",
+      "breakpoints": true
     }
   ]
 }

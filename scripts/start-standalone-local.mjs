@@ -22,7 +22,10 @@ nodeArgs.push("server.js");
 const child = spawn(process.execPath, nodeArgs, {
   cwd: standaloneDir,
   stdio: "inherit",
-  env: process.env,
+  env: {
+    ...process.env,
+    ALLOW_DEV_AUTH: "true",
+  },
 });
 
 child.on("exit", (code, signal) => {

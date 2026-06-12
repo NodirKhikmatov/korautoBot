@@ -127,6 +127,8 @@
     "noPhotos": "Rasm yo'q",
     "photoAlt": "{title} — {index}/{total} rasm",
     "carPhotoAlt": "Avtomobil rasmi {index}/{total}",
+    "viewCount": "{count, plural, one {# ko'rish} other {# ko'rish}}",
+    "contactCount": "{count, plural, one {# yozgan} other {# yozgan}}",
     "uploadFailed": "Yuklash muvaffaqiyatsiz",
     "noFilesSelected": "Fayl tanlanmagan",
     "maxImagesAllowed": "Maksimal {max} rasm ruxsat etilgan",

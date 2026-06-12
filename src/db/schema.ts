@@ -77,6 +77,8 @@ export const cars = pgTable(
     location: text("location"),
     isActive: boolean("is_active").notNull().default(true),
     isFeatured: boolean("is_featured").notNull().default(false),
+    viewCount: integer("view_count").notNull().default(0),
+    contactCount: integer("contact_count").notNull().default(0),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -127,6 +129,54 @@ export const cars = pgTable(
     check("cars_title_not_empty", sql`length(trim(${table.title})) > 0`),
     check("cars_brand_not_empty", sql`length(trim(${table.brand})) > 0`),
     check("cars_model_not_empty", sql`length(trim(${table.model})) > 0`),
+    check("cars_view_count_non_negative", sql`${table.viewCount} >= 0`),
+    check(
+      "cars_contact_count_non_negative",
+      sql`${table.contactCount} >= 0`,
+    ),
+  ],
+);
+
+export const carViews = pgTable(
+  "car_views",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    carId: uuid("car_id")
+      .notNull()
+      .references(() => cars.id, { onDelete: "cascade" }),
+    viewerKey: text("viewer_key").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    unique("car_views_car_id_viewer_key_unique").on(table.carId, table.viewerKey),
+    index("idx_car_views_car_id").on(table.carId),
+    check(
+      "car_views_viewer_key_not_empty",
+      sql`length(trim(${table.viewerKey})) > 0`,
+    ),
+  ],
+);
+
+export const carContacts = pgTable(
+  "car_contacts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    carId: uuid("car_id")
+      .notNull()
+      .references(() => cars.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    unique("car_contacts_car_id_user_id_unique").on(table.carId, table.userId),
+    index("idx_car_contacts_car_id").on(table.carId),
+    index("idx_car_contacts_user_id").on(table.userId),
   ],
 );
 
@@ -193,6 +243,26 @@ export const carsRelations = relations(cars, ({ one, many }) => ({
   }),
   carImages: many(carImages),
   favorites: many(favorites),
+  views: many(carViews),
+  contacts: many(carContacts),
+}));
+
+export const carViewsRelations = relations(carViews, ({ one }) => ({
+  car: one(cars, {
+    fields: [carViews.carId],
+    references: [cars.id],
+  }),
+}));
+
+export const carContactsRelations = relations(carContacts, ({ one }) => ({
+  car: one(cars, {
+    fields: [carContacts.carId],
+    references: [cars.id],
+  }),
+  user: one(users, {
+    fields: [carContacts.userId],
+    references: [users.id],
+  }),
 }));
 
 export const carImagesRelations = relations(carImages, ({ one }) => ({

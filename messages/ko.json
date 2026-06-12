@@ -127,6 +127,8 @@
     "noPhotos": "사진 없음",
     "photoAlt": "{title} — {index}/{total} 사진",
     "carPhotoAlt": "차량 사진 {index}/{total}",
+    "viewCount": "{count, plural, other {조회 {count}회}}",
+    "contactCount": "{count, plural, other {문의 {count}명}}",
     "uploadFailed": "업로드 실패",
     "noFilesSelected": "선택된 파일 없음",
     "maxImagesAllowed": "최대 {max}장까지 허용",

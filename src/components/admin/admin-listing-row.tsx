@@ -5,6 +5,7 @@ import { Pencil, Sparkles, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { CarImage } from "@/components/cars/car-image";
+import { ListingStats } from "@/components/cars/listing-stats";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getDisplayName } from "@/lib/format";
@@ -40,11 +41,11 @@ export function AdminListingRow({
         <div className="relative h-20 w-24 shrink-0 overflow-hidden rounded-xl bg-muted">
           {cover ? (
             <CarImage
-              src={cover.thumbnailUrl ?? cover.url}
+              src={cover.url ?? cover.thumbnailUrl}
               alt={t("coverPhotoAlt", { title: car.title })}
               width={96}
               height={80}
-              className="h-full w-full object-cover"
+              className="h-full w-full object-contain"
               sizes="96px"
             />
           ) : (
@@ -75,6 +76,11 @@ export function AdminListingRow({
             {sellerName}
             {car.user.username ? ` · @${car.user.username}` : ""}
           </p>
+          <ListingStats
+            viewCount={car.viewCount}
+            contactCount={car.contactCount}
+            size="xs"
+          />
         </div>
       </div>
 
