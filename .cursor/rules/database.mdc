@@ -1,5 +1,5 @@
 ---
-description: Neon PostgreSQL schema, Drizzle ORM, and query conventions
+description: PostgreSQL schema, Drizzle ORM, and query conventions
 globs: drizzle/**,src/db/**,src/**/services/**
 alwaysApply: false
 ---
@@ -8,11 +8,12 @@ alwaysApply: false
 
 ## Database Provider
 
-Neon PostgreSQL
+PostgreSQL on Vultr VPS (self-hosted or Vultr Managed PostgreSQL)
 
-## ORM
+## ORM & Driver
 
-Drizzle ORM
+- Drizzle ORM
+- `pg` (node-postgres) connection pool via `drizzle-orm/node-postgres`
 
 ## Primary Keys
 
@@ -31,7 +32,8 @@ Drizzle ORM
 - Store images inside database
 - Store large files inside database
 - Duplicate user data
-- Use Supabase client or raw SQL without Drizzle (except migrations)
+- Use Supabase, Neon, or Firebase clients
+- Use raw SQL without Drizzle (except migrations and RLS setup)
 
 ## Images
 
@@ -51,3 +53,8 @@ Drizzle ORM
 - Low cost
 
 All queries must be optimized and indexed. Use Drizzle relational queries where appropriate.
+
+## Connection pool
+
+- Configure via `DATABASE_POOL_MAX` (default 10 per Node process)
+- With PM2 single instance, one pool is sufficient

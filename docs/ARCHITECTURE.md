@@ -2,7 +2,7 @@
 
 ## Overview
 
-Telegram Mini App marketplace for used cars in South Korea. Mobile-first, low-cost, scalable to 100k+ users.
+Telegram Mini App marketplace for used cars in South Korea. Mobile-first, self-hosted on Vultr VPS.
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -11,21 +11,24 @@ Telegram Mini App marketplace for used cars in South Korea. Mobile-first, low-co
 └─────────────────────────┬───────────────────────────────┘
                           │
 ┌─────────────────────────▼───────────────────────────────┐
-│              Next.js 15 App Router (Vercel)             │
+│                    Nginx (TLS / proxy)                  │
+└─────────────────────────┬───────────────────────────────┘
+                          │
+┌─────────────────────────▼───────────────────────────────┐
+│    Next.js 15 (Docker / standalone) via Compose       │
 │  ┌─────────────┐  ┌──────────────┐  ┌───────────────┐  │
 │  │   Pages     │  │  API Routes  │  │  Providers    │  │
-│  │  (Phase 1)  │  │  /api/*      │  │  Query/Zustand│  │
 │  └──────┬──────┘  └──────┬───────┘  └───────────────┘  │
 │         │                │                              │
 │  ┌──────▼────────────────▼──────────────────────────┐   │
 │  │              Services Layer                      │   │
-│  │   users · cars · favorites                       │   │
+│  │   users · cars · favorites · admin               │   │
 │  └──────┬─────────────────────┬────────────────────┘   │
 └─────────┼─────────────────────┼────────────────────────┘
           │                     │
    ┌──────▼──────┐       ┌──────▼──────┐
-   │    Neon     │       │ Cloudflare  │
-   │ PostgreSQL  │       │     R2      │
+   │ PostgreSQL  │       │ Cloudflare  │
+   │ Vultr VPS   │       │     R2      │
    │ + Drizzle   │       │  (images)   │
    └─────────────┘       └─────────────┘
 ```
@@ -35,7 +38,7 @@ Telegram Mini App marketplace for used cars in South Korea. Mobile-first, low-co
 | Layer | Location | Responsibility |
 |-------|----------|----------------|
 | **Config** | `src/config/` | Validated environment variables (Zod) |
-| **Database** | `src/db/` | Drizzle schema, Neon client, relations |
+| **Database** | `src/db/` | Drizzle schema, `pg` pool, relations |
 | **Types** | `src/types/` | Domain TypeScript types (from Drizzle) |
 | **Schemas** | `src/schemas/` | Request/response validation (Zod) |
 | **Lib** | `src/lib/` | Clients & utilities (R2, Telegram, auth) |
@@ -45,6 +48,7 @@ Telegram Mini App marketplace for used cars in South Korea. Mobile-first, low-co
 | **Providers** | `src/providers/` | React context providers |
 | **Components** | `src/components/` | UI components (Shadcn + domain) |
 | **App** | `src/app/` | Routes, layouts, API handlers |
+| **Deploy** | `deploy/` | Docker CI/CD, Nginx, Certbot configs |
 
 ## Authentication Flow
 
@@ -70,10 +74,9 @@ Schema: `src/db/schema.ts` · Migrations: `drizzle/migrations/`
 
 ## Image Upload Flow
 
-1. Client requests presigned URL: `POST /api/upload`
-2. Server generates R2 key + presigned PUT URL
-3. Client uploads directly to R2
-4. Client includes public URL when creating listing
+1. Client uploads images via `POST /api/upload` (multipart)
+2. Server validates, compresses to WebP, uploads to R2
+3. Client includes public URLs when creating listing
 
 ## Folder Structure
 
@@ -81,51 +84,34 @@ Schema: `src/db/schema.ts` · Migrations: `drizzle/migrations/`
 src/
 ├── app/
 │   ├── api/                    # REST API routes
-│   └── (main)/                 # Page routes — Phase 1 (placeholders)
+│   ├── (main)/                 # Public app pages
+│   └── (admin)/                # Admin dashboard
 ├── components/
-│   ├── ui/                     # Shadcn primitives
-│   ├── cars/                   # Car domain components
-│   ├── layout/                 # Header, footer, nav
-│   └── telegram/               # Telegram SDK integration
 ├── config/
-│   └── env.ts                  # Environment validation
 ├── db/
 │   ├── schema.ts               # Drizzle table definitions
-│   └── index.ts                # Neon + Drizzle client
-├── hooks/
-├── lib/
-│   ├── auth/                   # Session management
-│   ├── r2/                     # Cloudflare R2 client
-│   └── telegram/               # initData validation
-├── providers/
-├── schemas/
+│   └── index.ts                # pg Pool + Drizzle client
 ├── services/
-├── stores/
-└── types/
-drizzle/
-└── migrations/                 # Drizzle SQL migrations
+deploy/
+├── ci/                         # deploy.sh (GitHub Actions only)
+├── nginx/                      # Nginx + upstream configs
+└── postgres/                   # DB bootstrap SQL
+docker-compose.yml              # App + Nginx + Certbot
+.github/workflows/              # CI/CD pipelines
+drizzle/migrations/             # Versioned SQL migrations
+database/                       # Canonical SQL reference
 ```
-
-## API Routes
-
-| Route | Methods | Auth | Description |
-|-------|---------|------|-------------|
-| `/api/auth/telegram` | POST | — | Validate initData, create session |
-| `/api/auth/logout` | POST | — | Clear session |
-| `/api/cars` | GET, POST | POST | List / create listings |
-| `/api/cars/[id]` | GET, DELETE | DELETE | Get / soft-delete listing |
-| `/api/favorites` | GET, POST, DELETE | All | Manage favorites |
-| `/api/upload` | POST | Yes | R2 presigned upload URL |
 
 ## Environment Variables
 
-See `.env.example`. Validated at runtime via `src/config/env.ts`.
+See `.env.example` and `.env.production.example`.
 
 | Variable | Scope | Service |
 |----------|-------|---------|
-| `NEXT_PUBLIC_APP_URL` | Client | App URL |
-| `DATABASE_URL` | Server | Neon PostgreSQL |
+| `NEXT_PUBLIC_APP_URL` | Client | Public app URL |
+| `DATABASE_URL` | Server | PostgreSQL on Vultr |
 | `TELEGRAM_BOT_TOKEN` | Server | Telegram auth |
+| `SESSION_SECRET` | Server | Session signing (required in prod) |
 | `R2_*` | Server | Cloudflare R2 |
 
 ## Database Commands
@@ -133,16 +119,20 @@ See `.env.example`. Validated at runtime via `src/config/env.ts`.
 | Command | Description |
 |---------|-------------|
 | `npm run db:generate` | Generate migration from schema changes |
-| `npm run db:migrate` | Apply migrations to Neon |
-| `npm run db:push` | Push schema directly (dev) |
+| `npm run db:migrate` | Apply migrations to PostgreSQL |
+| `npm run db:push` | Push schema directly (dev only) |
 | `npm run db:studio` | Open Drizzle Studio |
 
 ## Deployment
 
-- **Platform:** Vercel
-- **Database:** Neon (serverless PostgreSQL)
+- **Platform:** Vultr VPS (Ubuntu)
+- **Containers:** Docker + Docker Compose
+- **CI/CD:** GitHub Actions (push to `main`)
+- **Reverse proxy:** Nginx + Let's Encrypt
+- **Database:** PostgreSQL (Vultr VPS or Managed)
 - **Storage:** Cloudflare R2
-- **Target budget:** under $20/month MVP
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for full setup guide. **Never deploy manually.**
 
 ## Development Phases
 

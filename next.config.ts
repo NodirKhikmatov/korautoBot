@@ -17,6 +17,7 @@ function getR2ImageHostname(): string | undefined {
 const r2Hostname = getR2ImageHostname();
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   outputFileTracingRoot: process.cwd(),
   poweredByHeader: false,
   images: {
