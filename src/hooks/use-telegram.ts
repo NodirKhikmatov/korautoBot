@@ -1,11 +1,9 @@
 "use client";
 
-import { useAuthStore } from "@/stores/auth-store";
+import { useAuth } from "@/hooks/use-auth";
 
 export function useTelegram() {
-  const user = useAuthStore((state) => state.user);
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  const isLoading = useAuthStore((state) => state.isLoading);
+  const { user, isAuthenticated, isLoading, logout } = useAuth();
 
   const webApp =
     typeof window !== "undefined" ? window.Telegram?.WebApp : undefined;
@@ -14,6 +12,7 @@ export function useTelegram() {
     user,
     isAuthenticated,
     isLoading,
+    logout,
     webApp,
     initData: webApp?.initData ?? "",
     colorScheme: webApp?.colorScheme ?? "light",

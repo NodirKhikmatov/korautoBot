@@ -1,5 +1,3 @@
-import { eq } from "drizzle-orm";
-
 import { withBypassRls } from "@/db/context";
 import { users } from "@/db/schema";
 import type { User } from "@/types";

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
-import { getCurrentUser } from "@/lib/auth/get-current-user";
+import { handleAuthRouteError } from "@/lib/auth/handle-auth-route-error";
+import { requireAuth } from "@/lib/auth/require-auth";
 import { getCarById, softDeleteCar } from "@/services/cars";
 
 interface RouteContext {
@@ -28,21 +29,12 @@ export async function GET(_request: Request, context: RouteContext) {
 
 export async function DELETE(_request: Request, context: RouteContext) {
   try {
-    const user = await getCurrentUser();
-
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
+    const user = await requireAuth();
     const { id } = await context.params;
     await softDeleteCar(id, user.id);
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Delete car error:", error);
-    return NextResponse.json(
-      { error: "Failed to delete car listing" },
-      { status: 500 },
-    );
+    return handleAuthRouteError(error, "Delete car error");
   }
 }
