@@ -55,7 +55,8 @@ services:
       - "443:443"
     volumes:
       - ./deploy/nginx/docker/default.conf.active:/etc/nginx/conf.d/default.conf:ro
-      - ./deploy/nginx/upstream/active.conf:/etc/nginx/conf.d/upstream-active.conf:ro
+      # Outside conf.d — nginx auto-loads conf.d/*.conf; upstream snippets must not live there.
+      - ./deploy/nginx/upstream/active.conf:/etc/nginx/kam-upstream.inc:ro
       - certbot-www:/var/www/certbot:ro
       - certbot-conf:/etc/letsencrypt:ro
     networks:
