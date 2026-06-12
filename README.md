@@ -65,6 +65,7 @@ src/
 ├── hooks/            # Custom hooks
 └── types/            # TypeScript types
 drizzle/migrations/   # SQL migrations
+database/             # Canonical SQL schema + RLS reference
 ```
 
 ## License
