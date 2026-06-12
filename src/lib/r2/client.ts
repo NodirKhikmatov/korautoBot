@@ -3,12 +3,8 @@ import {
   PutObjectCommand,
   S3Client,
 } from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
-import {
-  ALLOWED_IMAGE_TYPES,
-  MAX_IMAGE_SIZE_BYTES,
-} from "@/lib/constants";
+import { WEBP_CONTENT_TYPE } from "@/lib/images/constants";
 
 function getR2Config() {
   const accountId = process.env.R2_ACCOUNT_ID;
@@ -17,7 +13,13 @@ function getR2Config() {
   const bucketName = process.env.R2_BUCKET_NAME;
   const publicUrl = process.env.R2_PUBLIC_URL;
 
-  if (!accountId || !accessKeyId || !secretAccessKey || !bucketName || !publicUrl) {
+  if (
+    !accountId ||
+    !accessKeyId ||
+    !secretAccessKey ||
+    !bucketName ||
+    !publicUrl
+  ) {
     throw new Error("R2 environment variables are not configured");
   }
 
@@ -45,38 +47,30 @@ export function createR2Client() {
 
 export function getPublicImageUrl(key: string): string {
   const { publicUrl } = getR2Config();
-  return `${publicUrl}/${key}`;
+  const base = publicUrl.replace(/\/$/, "");
+  return `${base}/${key}`;
 }
 
-export function generateImageKey(userId: string, filename: string): string {
-  const extension = filename.split(".").pop() ?? "jpg";
-  const timestamp = Date.now();
-  const random = Math.random().toString(36).slice(2, 10);
-  return `cars/${userId}/${timestamp}-${random}.${extension}`;
-}
-
-export async function createUploadUrl(
+export async function uploadObject(
   key: string,
-  contentType: string,
-): Promise<string> {
-  if (!ALLOWED_IMAGE_TYPES.includes(contentType as typeof ALLOWED_IMAGE_TYPES[number])) {
-    throw new Error("Invalid image type");
-  }
-
+  body: Buffer,
+  contentType = WEBP_CONTENT_TYPE,
+): Promise<void> {
   const { bucketName } = getR2Config();
   const client = createR2Client();
 
-  const command = new PutObjectCommand({
-    Bucket: bucketName,
-    Key: key,
-    ContentType: contentType,
-    ContentLength: MAX_IMAGE_SIZE_BYTES,
-  });
-
-  return getSignedUrl(client, command, { expiresIn: 300 });
+  await client.send(
+    new PutObjectCommand({
+      Bucket: bucketName,
+      Key: key,
+      Body: body,
+      ContentType: contentType,
+      CacheControl: "public, max-age=31536000, immutable",
+    }),
+  );
 }
 
-export async function deleteImage(key: string): Promise<void> {
+export async function deleteObject(key: string): Promise<void> {
   const { bucketName } = getR2Config();
   const client = createR2Client();
 
@@ -86,4 +80,8 @@ export async function deleteImage(key: string): Promise<void> {
       Key: key,
     }),
   );
+}
+
+export async function deleteObjects(keys: string[]): Promise<void> {
+  await Promise.all(keys.map((key) => deleteObject(key)));
 }

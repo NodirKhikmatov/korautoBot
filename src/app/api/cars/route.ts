@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { handleAuthRouteError } from "@/lib/auth/handle-auth-route-error";
+import { handleRouteError } from "@/lib/api/handle-route-error";
 import { requireAuth } from "@/lib/auth/require-auth";
 import { carFiltersSchema, createCarSchema } from "@/schemas/car";
 import { createCar, getCars } from "@/services/cars";
@@ -32,6 +32,6 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ car }, { status: 201 });
   } catch (error) {
-    return handleAuthRouteError(error, "Create car error");
+    return handleRouteError(error, "Create car error");
   }
 }

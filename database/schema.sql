@@ -115,13 +115,15 @@ CREATE INDEX idx_cars_brand_trgm ON cars USING GIN (brand gin_trgm_ops);
 -- -----------------------------------------------------------------------------
 
 CREATE TABLE car_images (
-  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  car_id      UUID NOT NULL REFERENCES cars (id) ON DELETE CASCADE,
-  url         TEXT NOT NULL,
-  sort_order  INTEGER NOT NULL DEFAULT 0,
-  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  car_id         UUID NOT NULL REFERENCES cars (id) ON DELETE CASCADE,
+  url            TEXT NOT NULL,
+  thumbnail_url  TEXT NOT NULL,
+  sort_order     INTEGER NOT NULL DEFAULT 0,
+  created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
   CONSTRAINT car_images_url_not_empty CHECK (length(trim(url)) > 0),
+  CONSTRAINT car_images_thumbnail_url_not_empty CHECK (length(trim(thumbnail_url)) > 0),
   CONSTRAINT car_images_sort_order_non_negative CHECK (sort_order >= 0)
 );
 

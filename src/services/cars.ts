@@ -17,6 +17,7 @@ import { carImages, cars } from "@/db/schema";
 import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
 import type { createCarSchema } from "@/schemas/car";
 import type { CarFilters, CarWithImages, CarWithSeller } from "@/types";
+import { validateUserImagePair } from "@/services/image-upload";
 
 type CreateCarInput = z.infer<typeof createCarSchema>;
 
@@ -146,7 +147,11 @@ export async function createCar(
   input: CreateCarInput,
 ): Promise<CarWithSeller> {
   return withBypassRls(async (tx) => {
-    const { imageUrls, ...carData } = input;
+    const { images, ...carData } = input;
+
+    for (const image of images) {
+      validateUserImagePair(userId, image.url, image.thumbnailUrl);
+    }
 
     const [car] = await tx
       .insert(cars)
@@ -171,9 +176,10 @@ export async function createCar(
     }
 
     await tx.insert(carImages).values(
-      imageUrls.map((url, index) => ({
+      images.map((image, index) => ({
         carId: car.id,
-        url,
+        url: image.url,
+        thumbnailUrl: image.thumbnailUrl,
         sortOrder: index,
       })),
     );

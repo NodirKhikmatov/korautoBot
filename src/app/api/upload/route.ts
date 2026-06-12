@@ -1,40 +1,69 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
-import { handleAuthRouteError } from "@/lib/auth/handle-auth-route-error";
+import { handleRouteError } from "@/lib/api/handle-route-error";
 import { requireAuth } from "@/lib/auth/require-auth";
+import { MAX_IMAGES_PER_LISTING } from "@/lib/constants";
+import { ImageUploadError } from "@/lib/images/errors";
 import {
-  ALLOWED_IMAGE_TYPES,
-  MAX_IMAGE_SIZE_BYTES,
-} from "@/lib/constants";
-import {
-  createUploadUrl,
-  generateImageKey,
-  getPublicImageUrl,
-} from "@/lib/r2/client";
+  deleteCarImageByUrl,
+  uploadCarImages,
+} from "@/services/image-upload";
 
-const uploadRequestSchema = z.object({
-  filename: z.string().min(1),
-  contentType: z.enum(ALLOWED_IMAGE_TYPES),
-  contentLength: z.number().int().positive().max(MAX_IMAGE_SIZE_BYTES),
+export const runtime = "nodejs";
+
+const deleteImageSchema = z.object({
+  url: z.string().url(),
 });
+
+async function readUploadFiles(
+  formData: FormData,
+): Promise<Array<{ buffer: Buffer; contentType: string | null }>> {
+  const entries = [...formData.getAll("files"), ...formData.getAll("file")];
+
+  const files = entries.filter((entry): entry is File => entry instanceof File);
+
+  if (files.length === 0) {
+    throw new ImageUploadError("No image files provided");
+  }
+
+  if (files.length > MAX_IMAGES_PER_LISTING) {
+    throw new ImageUploadError(
+      `Maximum ${MAX_IMAGES_PER_LISTING} images per request`,
+    );
+  }
+
+  return Promise.all(
+    files.map(async (file) => ({
+      buffer: Buffer.from(await file.arrayBuffer()),
+      contentType: file.type || null,
+    })),
+  );
+}
 
 export async function POST(request: Request) {
   try {
     const user = await requireAuth();
-    const body = await request.json();
-    const { filename, contentType } = uploadRequestSchema.parse(body);
+    const formData = await request.formData();
+    const files = await readUploadFiles(formData);
+    const images = await uploadCarImages(user.id, files);
 
-    const key = generateImageKey(user.id, filename);
-    const uploadUrl = await createUploadUrl(key, contentType);
-    const publicUrl = getPublicImageUrl(key);
-
-    return NextResponse.json({
-      uploadUrl,
-      publicUrl,
-      key,
-    });
+    return NextResponse.json({ images }, { status: 201 });
   } catch (error) {
-    return handleAuthRouteError(error, "Upload error");
+    return handleRouteError(error, "Upload error", "Failed to upload image");
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const user = await requireAuth();
+    const body = await request.json();
+    const { url } = deleteImageSchema.parse(body);
+
+    await deleteCarImageByUrl(user.id, url);
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    return handleRouteError(error, "Delete image error", "Failed to delete image");
   }
 }

@@ -2,7 +2,7 @@ export const APP_NAME = "Korea Auto Market";
 
 export const DEFAULT_PAGE_SIZE = 20;
 
-export const MAX_IMAGES_PER_LISTING = 10;
+export const MAX_IMAGES_PER_LISTING = 12;
 
 export const MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024;
 

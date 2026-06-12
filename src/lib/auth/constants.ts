@@ -7,7 +7,7 @@ export const PROTECTED_API_ROUTES: {
   pattern: RegExp;
   methods: string[];
 }[] = [
-  { pattern: /^\/api\/upload$/, methods: ["POST"] },
+  { pattern: /^\/api\/upload$/, methods: ["POST", "DELETE"] },
   { pattern: /^\/api\/favorites$/, methods: ["GET", "POST", "DELETE"] },
   { pattern: /^\/api\/cars$/, methods: ["POST"] },
   { pattern: /^\/api\/cars\/[^/]+$/, methods: ["DELETE"] },
