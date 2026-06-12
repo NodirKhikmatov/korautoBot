@@ -127,6 +127,8 @@
     "noPhotos": "Нет фото",
     "photoAlt": "{title} — фото {index} из {total}",
     "carPhotoAlt": "Фото автомобиля {index} из {total}",
+    "viewCount": "{count, plural, one {# просмотр} few {# просмотра} other {# просмотров}}",
+    "contactCount": "{count, plural, one {# написал} few {# написали} other {# написали}}",
     "uploadFailed": "Загрузка не выполнена",
     "noFilesSelected": "Файлы не выбраны",
     "maxImagesAllowed": "Максимум {max} изображений",

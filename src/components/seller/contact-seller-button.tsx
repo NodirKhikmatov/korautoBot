@@ -9,17 +9,19 @@ import { cn } from "@/lib/utils";
 
 export function ContactSellerButton({
   username,
+  carId,
   className,
   size = "lg",
   fullWidth = true,
 }: {
   username?: string | null;
+  carId?: string;
   className?: string;
   size?: "default" | "lg" | "sm";
   fullWidth?: boolean;
 }) {
   const t = useTranslations("seller");
-  const { canContact, contactSeller } = useContactSeller(username);
+  const { canContact, contactSeller } = useContactSeller(username, carId);
 
   if (!canContact) {
     return (

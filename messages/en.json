@@ -127,6 +127,8 @@
     "noPhotos": "No photos",
     "photoAlt": "{title} — photo {index} of {total}",
     "carPhotoAlt": "Car photo {index} of {total}",
+    "viewCount": "{count, plural, one {# view} other {# views}}",
+    "contactCount": "{count, plural, one {# contacted} other {# contacted}}",
     "uploadFailed": "Upload failed",
     "noFilesSelected": "No files selected",
     "maxImagesAllowed": "Maximum {max} images allowed",

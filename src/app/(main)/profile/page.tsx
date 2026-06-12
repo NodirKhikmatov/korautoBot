@@ -122,7 +122,9 @@ function ProfileContent() {
           />
         )}
 
-        {!isLoading && myCars.length > 0 && <CarGrid cars={myCars} />}
+        {!isLoading && myCars.length > 0 && (
+          <CarGrid cars={myCars} />
+        )}
       </section>
 
       <Button

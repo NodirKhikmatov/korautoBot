@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 
 import { CarImageGallery } from "@/components/cars/car-image-gallery";
 import { FavoriteButton } from "@/components/cars/favorite-button";
+import { ListingStats } from "@/components/cars/listing-stats";
 import { CarSpecs } from "@/components/cars/car-specs";
 import { ContactSellerButton } from "@/components/seller/contact-seller-button";
 import { SellerProfileCard } from "@/components/seller/seller-profile-card";
@@ -14,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/hooks/use-auth";
 import { useCar } from "@/hooks/use-car";
+import { useRecordCarView } from "@/hooks/use-record-car-view";
 import { useTelegramBackButton } from "@/hooks/use-telegram-back-button";
 
 export function CarDetailView({ carId }: { carId: string }) {
@@ -23,6 +25,9 @@ export function CarDetailView({ carId }: { carId: string }) {
   const router = useRouter();
   const { data, isLoading, isError } = useCar(carId);
   const { isAuthenticated } = useAuth();
+  const car = data?.car;
+
+  useRecordCarView(carId, car?.userId);
 
   const handleBack = useCallback(() => router.back(), [router]);
   useTelegramBackButton(handleBack);
@@ -46,30 +51,34 @@ export function CarDetailView({ carId }: { carId: string }) {
     );
   }
 
-  const car = data.car;
-
+  const listing = data.car;
   function handleShare() {
-    const url = `${window.location.origin}/car/${car.id}`;
+    const url = `${window.location.origin}/car/${listing.id}`;
     if (navigator.share) {
-      navigator.share({ title: car.title, url });
+      navigator.share({ title: listing.title, url });
     }
   }
 
   return (
     <div className="space-y-5 pb-4">
-      <CarImageGallery images={car.carImages} carTitle={car.title} />
+      <CarImageGallery images={listing.carImages} carTitle={listing.title} />
 
       <div className="space-y-3">
         <div className="flex items-start justify-between gap-3">
           <div className="space-y-1 min-w-0">
-            <h1 className="text-xl font-bold leading-tight">{car.title}</h1>
+            <h1 className="text-xl font-bold leading-tight">{listing.title}</h1>
             <p className="text-sm text-muted-foreground">
-              {car.brand} {car.model} · {car.year}
+              {listing.brand} {listing.model} · {listing.year}
             </p>
+            <ListingStats
+              viewCount={listing.viewCount}
+              contactCount={listing.contactCount}
+              className="pt-1"
+            />
           </div>
           <div className="flex shrink-0 gap-1">
             {isAuthenticated && (
-              <FavoriteButton carId={car.id} className="h-10 w-10" />
+              <FavoriteButton carId={listing.id} className="h-10 w-10" />
             )}
             <Button
               variant="outline"
@@ -83,13 +92,13 @@ export function CarDetailView({ carId }: { carId: string }) {
         </div>
       </div>
 
-      <CarSpecs car={car} />
+      <CarSpecs car={listing} />
 
-      {car.description && (
+      {listing.description && (
         <div className="space-y-2">
           <h2 className="text-sm font-semibold">{t("description")}</h2>
           <p className="text-sm leading-relaxed text-muted-foreground">
-            {car.description}
+            {listing.description}
           </p>
         </div>
       )}
@@ -98,8 +107,11 @@ export function CarDetailView({ carId }: { carId: string }) {
 
       <div className="space-y-3">
         <h2 className="text-sm font-semibold">{tSeller("title")}</h2>
-        <SellerProfileCard seller={car.user} />
-        <ContactSellerButton username={car.user.username} />
+        <SellerProfileCard seller={listing.user} />
+        <ContactSellerButton
+          username={listing.user.username}
+          carId={listing.id}
+        />
       </div>
     </div>
   );

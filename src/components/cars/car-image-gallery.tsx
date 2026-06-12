@@ -30,7 +30,7 @@ export function CarImageGallery({
 
   return (
     <div className="space-y-3">
-      <div className="relative aspect-[16/10] overflow-hidden rounded-2xl bg-muted">
+      <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-muted">
         <CarImageView
           src={active.url}
           alt={
@@ -45,9 +45,8 @@ export function CarImageGallery({
                   total: sorted.length,
                 })
           }
-          width={1280}
-          height={800}
-          className="h-full w-full object-cover"
+          fill
+          className="object-contain"
           sizes="100vw"
           priority
         />
@@ -84,7 +83,7 @@ export function CarImageGallery({
                 }
                 width={96}
                 height={64}
-                className="h-full w-full object-cover"
+                className="h-full w-full object-contain"
                 sizes="96px"
               />
             </button>

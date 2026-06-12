@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Calendar, Gauge, MapPin } from "lucide-react";
 
 import { CarImage } from "@/components/cars/car-image";
+import { ListingStats } from "@/components/cars/listing-stats";
 import { FavoriteButton } from "@/components/cars/favorite-button";
 import { Badge } from "@/components/ui/badge";
 import { formatMileage, formatPrice } from "@/lib/utils";
@@ -12,15 +13,17 @@ import type { CarWithImages } from "@/types";
 function getCoverImage(car: CarWithImages): string | null {
   const sorted = [...car.carImages].sort((a, b) => a.sortOrder - b.sortOrder);
   const first = sorted[0];
-  return first?.thumbnailUrl ?? first?.url ?? null;
+  return first?.url ?? first?.thumbnailUrl ?? null;
 }
 
 export function CarCard({
   car,
   priority = false,
+  showStats = true,
 }: {
   car: CarWithImages;
   priority?: boolean;
+  showStats?: boolean;
 }) {
   const cover = getCoverImage(car);
   const coverAlt = `${car.title} — ${car.brand} ${car.model} ${car.year}`;
@@ -38,7 +41,7 @@ export function CarCard({
               width={640}
               height={400}
               priority={priority}
-              className="h-full w-full object-cover"
+              className="h-full w-full object-contain"
               sizes="(max-width: 768px) 50vw, 33vw"
             />
           ) : (
@@ -46,7 +49,6 @@ export function CarCard({
               <CarPlaceholderIcon />
             </div>
           )}
-          <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-foreground/50 to-transparent" />
           <div className="absolute right-2 top-2">
             <FavoriteButton
               carId={car.id}
@@ -54,20 +56,17 @@ export function CarCard({
               variant="ghost"
             />
           </div>
-          <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between gap-2">
-            <Badge
-              className="border-0 bg-foreground/50 text-background backdrop-blur-sm"
-              variant="secondary"
-            >
-              {car.brand}
-            </Badge>
-            <span className="text-sm font-bold text-background drop-shadow">
-              {formatPrice(car.price)}
-            </span>
-          </div>
         </div>
 
         <div className="space-y-2 p-3">
+          <div className="flex items-start justify-between gap-2">
+            <p className="text-sm font-bold tabular-nums leading-tight text-primary">
+              {formatPrice(car.price)}
+            </p>
+            <Badge variant="secondary" className="shrink-0 text-[10px]">
+              {car.brand}
+            </Badge>
+          </div>
           <h3 className="line-clamp-1 font-semibold leading-tight">
             {car.title}
           </h3>
@@ -90,6 +89,13 @@ export function CarCard({
               </span>
             )}
           </div>
+          {showStats && (
+            <ListingStats
+              viewCount={car.viewCount}
+              contactCount={car.contactCount}
+              size="xs"
+            />
+          )}
         </div>
       </article>
     </Link>

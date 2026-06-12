@@ -1,5 +1,12 @@
-/** Dev-only browser login — never enabled in production builds. */
+/**
+ * Dev browser login — enabled in development, or when ALLOW_DEV_AUTH=true
+ * (e.g. npm run start:local after a production build on localhost).
+ */
 export function isDevAuthEnabled(): boolean {
+  if (process.env.ALLOW_DEV_AUTH === "true") {
+    return true;
+  }
+
   return process.env.NODE_ENV !== "production";
 }
 
