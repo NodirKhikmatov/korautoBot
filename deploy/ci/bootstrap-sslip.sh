@@ -74,7 +74,8 @@ log "Updated .env.production (NEXT_PUBLIC_APP_URL, IMAGE_REGISTRY)"
 # Substitute domain only into runtime files — do not modify tracked nginx templates (keeps git pull clean).
 sed "s/YOUR_DOMAIN/${DOMAIN}/g" deploy/nginx/docker/default-http.conf \
   > deploy/nginx/docker/default.conf.active
-echo "server app-blue:3000 resolve;" > deploy/nginx/upstream/active.conf
+# Placeholder upstream — app containers do not exist yet during SSL bootstrap.
+echo "server 127.0.0.1:65535 down;" > deploy/nginx/upstream/active.conf
 
 export IMAGE_REGISTRY
 export BLUE_IMAGE_TAG="${BLUE_IMAGE_TAG:-latest}"
@@ -102,6 +103,13 @@ docker compose run --rm -p 80:80 --entrypoint certbot certbot certonly \
 log "Enabling HTTPS in Nginx..."
 sed "s/YOUR_DOMAIN/${DOMAIN}/g" deploy/nginx/docker/default.conf \
   > deploy/nginx/docker/default.conf.active
+echo "server 127.0.0.1:65535 down;" > deploy/nginx/upstream/active.conf
+
+if ! docker compose run --rm --no-deps nginx nginx -t; then
+  echo "ERROR: Nginx config invalid. Check deploy/nginx/docker/default.conf.active"
+  exit 1
+fi
+
 docker compose up -d nginx certbot --no-deps
 
 log "Pulling application images (if available on GHCR)..."
