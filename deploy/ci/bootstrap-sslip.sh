@@ -13,6 +13,28 @@ DEPLOY_DIR="${DEPLOY_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}"
 cd "$DEPLOY_DIR"
 
 log() { echo "==> $*"; }
+warn() { echo "WARN: $*" >&2; }
+
+stop_host_web_servers() {
+  if systemctl is-active --quiet nginx 2>/dev/null; then
+    log "Stopping host nginx (port 80 must be free for Docker)..."
+    systemctl stop nginx
+    systemctl disable nginx 2>/dev/null || true
+  fi
+  if systemctl is-active --quiet apache2 2>/dev/null; then
+    log "Stopping host apache2..."
+    systemctl stop apache2
+    systemctl disable apache2 2>/dev/null || true
+  fi
+}
+
+check_port_80_free() {
+  if ss -tlnH 'sport = :80' 2>/dev/null | grep -q .; then
+    warn "Port 80 is in use. Stop the service above, then re-run this script."
+    ss -tlnp | grep ':80 ' || true
+    exit 1
+  fi
+}
 
 if [ ! -f .env.production ]; then
   echo "ERROR: Create .env.production first (cp .env.production.example .env.production)"
@@ -53,18 +75,25 @@ sed -i "s/YOUR_DOMAIN/${DOMAIN}/g" deploy/nginx/docker/default.conf
 sed -i "s/YOUR_DOMAIN/${DOMAIN}/g" deploy/nginx/docker/default-http.conf
 
 cp deploy/nginx/docker/default-http.conf deploy/nginx/docker/default.conf.active
-echo "server app-blue:3000;" > deploy/nginx/upstream/active.conf
+echo "server app-blue:3000 resolve;" > deploy/nginx/upstream/active.conf
 
 export IMAGE_REGISTRY
 export BLUE_IMAGE_TAG="${BLUE_IMAGE_TAG:-latest}"
 export GREEN_IMAGE_TAG="${GREEN_IMAGE_TAG:-latest}"
 
-log "Starting Nginx + Certbot (HTTP only — apps start after SSL)..."
-docker compose up -d nginx certbot --no-deps
+stop_host_web_servers
 
-log "Requesting Let's Encrypt certificate..."
-docker compose run --rm --entrypoint certbot certbot certonly \
-  --webroot -w /var/www/certbot \
+log "Starting Certbot renewal sidecar..."
+docker compose up -d certbot --no-deps
+
+log "Stopping Docker nginx (if running) before certificate request..."
+docker compose stop nginx 2>/dev/null || true
+check_port_80_free
+
+log "Vultr panel: Firewall → allow inbound TCP 80 and 443 (if not already)."
+log "Requesting Let's Encrypt certificate (standalone on port 80)..."
+docker compose run --rm -p 80:80 --entrypoint certbot certbot certonly \
+  --standalone \
   -d "$DOMAIN" \
   --email "${CERTBOT_EMAIL:-admin@${DOMAIN}}" \
   --agree-tos \
@@ -73,14 +102,14 @@ docker compose run --rm --entrypoint certbot certbot certonly \
 
 log "Enabling HTTPS in Nginx..."
 cp deploy/nginx/docker/default.conf deploy/nginx/docker/default.conf.active
-docker compose restart nginx
+docker compose up -d nginx certbot --no-deps
 
 log "Pulling application images (if available on GHCR)..."
 if docker pull "${IMAGE_REGISTRY}:latest" 2>/dev/null; then
   log "Starting app containers..."
   docker compose --profile app up -d app-blue app-green
 else
-  log "WARN: No image on GHCR yet. Push to main branch, then GitHub Actions will deploy."
+  log "WARN: No image on GHCR yet. Push to main from your Mac — GitHub Actions will build and deploy."
 fi
 
 echo ""
@@ -96,5 +125,5 @@ echo ""
 echo " Telegram Bot → BotFather → Mini App URL:"
 echo "   ${PUBLIC_URL}"
 echo ""
-echo " Next: git push origin main (GitHub Actions deploy)"
+echo " Next: on your Mac (not VPS): git push origin main"
 echo "=============================================="

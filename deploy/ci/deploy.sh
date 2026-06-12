@@ -96,7 +96,7 @@ docker run --rm \
   "${IMAGE_REGISTRY}:${IMAGE_TAG}-migrate"
 
 log "[6/6] Switching traffic (zero-downtime) and stopping app-${ACTIVE}"
-echo "server app-${INACTIVE}:3000;" > "$UPSTREAM_FILE"
+echo "server app-${INACTIVE}:3000 resolve;" > "$UPSTREAM_FILE"
 docker compose exec -T nginx nginx -s reload
 docker compose stop "app-${ACTIVE}"
 

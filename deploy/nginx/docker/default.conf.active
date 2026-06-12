@@ -1,10 +1,5 @@
 # Temporary HTTP-only config for initial Let's Encrypt bootstrap.
-# Replaced by default.conf after certificates are issued.
-
-upstream kam_app {
-  include /etc/nginx/conf.d/upstream-active.conf;
-  keepalive 32;
-}
+# No app upstream — app-blue may not exist yet (avoids nginx crash on unresolved host).
 
 server {
   listen 80;
@@ -19,11 +14,7 @@ server {
   }
 
   location / {
-    proxy_pass http://kam_app;
-    proxy_http_version 1.1;
-    proxy_set_header Host $host;
-    proxy_set_header X-Real-IP $remote_addr;
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_set_header X-Forwarded-Proto $scheme;
+    return 200 "bootstrap\n";
+    add_header Content-Type text/plain;
   }
 }

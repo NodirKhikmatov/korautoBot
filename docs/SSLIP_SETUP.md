@@ -8,6 +8,16 @@ Free HTTPS subdomain for your Vultr VPS IP.
 
 Works with Let's Encrypt and Telegram Mini App.
 
+## Vultr firewall (panel — one time)
+
+In [Vultr](https://my.vultr.com) → your server → **Settings → Firewall**:
+
+- Allow inbound **TCP 22** (SSH)
+- Allow inbound **TCP 80** (HTTP — Let's Encrypt)
+- Allow inbound **TCP 443** (HTTPS)
+
+If you skip this, Certbot fails with **Connection refused**.
+
 ## VPS setup (one time)
 
 ```bash
