@@ -13,9 +13,11 @@ FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-ARG NEXT_PUBLIC_APP_URL
+ARG NEXT_PUBLIC_APP_URL=https://example.com
 ENV NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL}
 ENV NEXT_TELEMETRY_DISABLED=1
+# Build-time placeholders — real values are injected at runtime via .env.production on VPS.
+ENV DATABASE_URL=postgresql://build:build@127.0.0.1:5432/build
 
 RUN npm run build
 

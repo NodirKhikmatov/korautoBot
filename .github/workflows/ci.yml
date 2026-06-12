@@ -34,4 +34,6 @@ jobs:
           context: .
           target: runner
           push: false
+          build-args: |
+            NEXT_PUBLIC_APP_URL=${{ vars.NEXT_PUBLIC_APP_URL || 'https://example.com' }}
           tags: korea-auto-market:ci

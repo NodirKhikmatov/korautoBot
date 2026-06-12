@@ -1,7 +1,10 @@
 import { drizzle } from "drizzle-orm/node-postgres";
+import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 
 import * as schema from "./schema";
+
+type Database = NodePgDatabase<typeof schema>;
 
 function createPool(): Pool {
   const connectionString = process.env.DATABASE_URL;
@@ -23,12 +26,42 @@ function createPool(): Pool {
   });
 }
 
-const globalForDb = globalThis as unknown as { pgPool: Pool | undefined };
+const globalForDb = globalThis as unknown as {
+  pgPool?: Pool;
+  db?: Database;
+};
 
-const pool = globalForDb.pgPool ?? createPool();
+function getPool(): Pool {
+  if (globalForDb.pgPool) {
+    return globalForDb.pgPool;
+  }
 
-if (process.env.NODE_ENV !== "production") {
-  globalForDb.pgPool = pool;
+  const pool = createPool();
+  if (process.env.NODE_ENV !== "production") {
+    globalForDb.pgPool = pool;
+  }
+  return pool;
 }
 
-export const db = drizzle(pool, { schema });
+function getDb(): Database {
+  if (globalForDb.db) {
+    return globalForDb.db;
+  }
+
+  const database = drizzle(getPool(), { schema });
+  if (process.env.NODE_ENV !== "production") {
+    globalForDb.db = database;
+  }
+  return database;
+}
+
+/** Lazy DB handle — avoids connecting during Next.js production build. */
+export const db = new Proxy({} as Database, {
+  get(_target, prop, receiver) {
+    const value = Reflect.get(getDb(), prop, receiver);
+    if (typeof value === "function") {
+      return (value as (...args: unknown[]) => unknown).bind(getDb());
+    }
+    return value;
+  },
+});
