@@ -41,6 +41,14 @@ export function handleRouteError(
     );
   }
 
+  if (
+    error instanceof Error &&
+    (error.message.includes("R2") ||
+      error.message.includes("environment variables are not configured"))
+  ) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
   console.error(logLabel, error);
   return NextResponse.json({ error: fallbackMessage }, { status: 500 });
 }

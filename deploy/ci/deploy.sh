@@ -19,6 +19,37 @@ ROLLBACK="${ROLLBACK:-false}"
 
 log() { echo "==> $*"; }
 
+cleanup_docker_disk() {
+  log "Docker disk cleanup"
+  df -h / /var/lib/docker 2>/dev/null | tail -n +2 || df -h / | tail -n +2
+
+  docker container prune -f >/dev/null 2>&1 || true
+  docker image prune -f >/dev/null 2>&1 || true
+  docker builder prune -af >/dev/null 2>&1 || true
+
+  if [ -n "${IMAGE_REGISTRY:-}" ] && [ -f "$STATE_FILE" ]; then
+    KEEP_TAGS="$IMAGE_TAG ${IMAGE_TAG}-migrate"
+    for field in blue.tag green.tag previous.tag; do
+      tag=$(state_get "$field" 2>/dev/null || true)
+      if [ -n "$tag" ] && [ "$tag" != "latest" ]; then
+        KEEP_TAGS="$KEEP_TAGS $tag ${tag}-migrate"
+      fi
+    done
+
+    while IFS= read -r ref; do
+      [ -n "$ref" ] || continue
+      tag="${ref##*:}"
+      case " $KEEP_TAGS " in
+        *" $tag "*) continue ;;
+      esac
+      docker rmi "$ref" >/dev/null 2>&1 || true
+    done < <(docker images "${IMAGE_REGISTRY}" --format '{{.Repository}}:{{.Tag}}' 2>/dev/null \
+      | grep -v '<none>' || true)
+  fi
+
+  docker image prune -af >/dev/null 2>&1 || true
+}
+
 if [ ! -f .env.production ]; then
   echo "ERROR: .env.production not found on VPS"
   exit 1
@@ -118,6 +149,8 @@ if [ -n "${GHCR_TOKEN:-}" ]; then
   echo "$GHCR_TOKEN" | docker login ghcr.io -u "${GHCR_USER:-github}" --password-stdin
 fi
 
+cleanup_docker_disk
+
 log "[2/6] Pulling Docker images (tag: $IMAGE_TAG)"
 docker pull "${IMAGE_REGISTRY}:${IMAGE_TAG}"
 docker pull "${IMAGE_REGISTRY}:${IMAGE_TAG}-migrate"
@@ -159,8 +192,11 @@ echo "server app-${INACTIVE}:3000;" > "$UPSTREAM_FILE"
 log "Nginx upstream: app-${INACTIVE}:3000"
 docker compose up -d nginx --force-recreate --no-deps
 docker compose stop "app-${ACTIVE}"
+docker compose rm -f "app-${ACTIVE}" >/dev/null 2>&1 || true
 
 PREV_ACTIVE_TAG=$(state_get active.tag)
 state_write "$ACTIVE" "$INACTIVE" "$IMAGE_TAG" "$PREV_ACTIVE_TAG"
+
+cleanup_docker_disk
 
 log "Deploy complete — active: app-${INACTIVE} (${IMAGE_TAG})"

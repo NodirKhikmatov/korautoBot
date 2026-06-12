@@ -1,5 +1,6 @@
 "use client";
 
+import { DevAuthPrompt } from "@/components/auth/dev-auth-prompt";
 import { BottomNav } from "@/components/layout/bottom-nav";
 import { useTelegramTheme } from "@/hooks/use-telegram-theme";
 
@@ -20,6 +21,7 @@ export default function MainLayout({
         className="mx-auto max-w-lg px-4 pb-24 pt-4"
         style={{ paddingTop: "max(1rem, env(safe-area-inset-top))" }}
       >
+        <DevAuthPrompt />
         {children}
       </main>
       <BottomNav />

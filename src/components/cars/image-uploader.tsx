@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { ImagePlus, Loader2, X } from "lucide-react";
+import { useState } from "react";
 
 import { MAX_IMAGES_PER_LISTING } from "@/lib/constants";
 import { useImageUpload } from "@/hooks/use-image-upload";
@@ -15,6 +16,7 @@ export function ImageUploader({
   onChange: (images: UploadedCarImage[]) => void;
 }) {
   const { uploadImages, deleteImage, isUploading } = useImageUpload();
+  const [error, setError] = useState<string | null>(null);
 
   async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
@@ -27,8 +29,14 @@ export function ImageUploader({
 
     if (toUpload.length === 0) return;
 
-    const uploaded = await uploadImages(toUpload);
-    onChange([...images, ...uploaded]);
+    setError(null);
+
+    try {
+      const uploaded = await uploadImages(toUpload);
+      onChange([...images, ...uploaded]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Upload failed");
+    }
   }
 
   async function handleRemove(image: UploadedCarImage) {
@@ -79,7 +87,7 @@ export function ImageUploader({
             )}
             <input
               type="file"
-              accept="image/jpeg,image/png,image/webp"
+              accept="image/jpeg,image/png,image/webp,image/*"
               multiple
               className="hidden"
               disabled={isUploading}
@@ -88,6 +96,8 @@ export function ImageUploader({
           </label>
         )}
       </div>
+
+      {error ? <p className="text-xs text-destructive">{error}</p> : null}
 
       <p className="text-xs text-muted-foreground">
         {images.length}/{MAX_IMAGES_PER_LISTING} photos · JPEG, PNG, WebP
