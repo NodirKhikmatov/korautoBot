@@ -157,7 +157,7 @@ docker run --rm \
 log "[6/6] Switching traffic (zero-downtime) and stopping app-${ACTIVE}"
 echo "server app-${INACTIVE}:3000;" > "$UPSTREAM_FILE"
 log "Nginx upstream: app-${INACTIVE}:3000"
-docker compose exec -T nginx nginx -s reload
+docker compose up -d nginx --force-recreate --no-deps
 docker compose stop "app-${ACTIVE}"
 
 PREV_ACTIVE_TAG=$(state_get active.tag)
