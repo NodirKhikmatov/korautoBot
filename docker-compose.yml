@@ -56,11 +56,6 @@ services:
       - ./deploy/nginx/upstream/active.conf:/etc/nginx/conf.d/upstream-active.conf:ro
       - certbot-www:/var/www/certbot:ro
       - certbot-conf:/etc/letsencrypt:ro
-    depends_on:
-      app-blue:
-        condition: service_started
-      app-green:
-        condition: service_started
     networks:
       - kam
     logging:

@@ -32,19 +32,22 @@ else
 fi
 
 PUBLIC_URL="https://${DOMAIN}"
-IMAGE_REGISTRY="${IMAGE_REGISTRY:-ghcr.io/nodirkhikmatov/korautobot}"
+DEFAULT_REGISTRY="ghcr.io/nodirkhikmatov/korautobot"
+IMAGE_REGISTRY="${IMAGE_REGISTRY:-$DEFAULT_REGISTRY}"
+
+# GHCR requires lowercase; fix placeholder from .env.production.example
+if [[ "$IMAGE_REGISTRY" == *"YOUR_"* ]] || [[ "$IMAGE_REGISTRY" == *"korAvtotelegram"* ]]; then
+  IMAGE_REGISTRY="$DEFAULT_REGISTRY"
+fi
+IMAGE_REGISTRY="$(echo "$IMAGE_REGISTRY" | tr '[:upper:]' '[:lower:]')"
 
 log "Domain: $DOMAIN"
 log "Public URL: $PUBLIC_URL"
+log "Image registry: $IMAGE_REGISTRY"
 
-# Update .env.production NEXT_PUBLIC_APP_URL if placeholder
-if grep -q 'YOUR_DOMAIN' .env.production || grep -q 'http://158' .env.production; then
-  if command -v sed >/dev/null; then
-    sed -i "s|NEXT_PUBLIC_APP_URL=.*|NEXT_PUBLIC_APP_URL=${PUBLIC_URL}|" .env.production
-    sed -i "s|IMAGE_REGISTRY=.*|IMAGE_REGISTRY=${IMAGE_REGISTRY}|" .env.production
-    log "Updated NEXT_PUBLIC_APP_URL and IMAGE_REGISTRY in .env.production"
-  fi
-fi
+sed -i "s|NEXT_PUBLIC_APP_URL=.*|NEXT_PUBLIC_APP_URL=${PUBLIC_URL}|" .env.production
+sed -i "s|IMAGE_REGISTRY=.*|IMAGE_REGISTRY=${IMAGE_REGISTRY}|" .env.production
+log "Updated .env.production (NEXT_PUBLIC_APP_URL, IMAGE_REGISTRY)"
 
 sed -i "s/YOUR_DOMAIN/${DOMAIN}/g" deploy/nginx/docker/default.conf
 sed -i "s/YOUR_DOMAIN/${DOMAIN}/g" deploy/nginx/docker/default-http.conf
@@ -56,8 +59,8 @@ export IMAGE_REGISTRY
 export BLUE_IMAGE_TAG="${BLUE_IMAGE_TAG:-latest}"
 export GREEN_IMAGE_TAG="${GREEN_IMAGE_TAG:-latest}"
 
-log "Starting Nginx + Certbot (HTTP)..."
-docker compose up -d nginx certbot
+log "Starting Nginx + Certbot (HTTP only — apps start after SSL)..."
+docker compose up -d nginx certbot --no-deps
 
 log "Requesting Let's Encrypt certificate..."
 docker compose run --rm --entrypoint certbot certbot certonly \
