@@ -29,13 +29,56 @@ set -a && source .env.production && set +a
 
 mkdir -p deploy/ci deploy/nginx/upstream
 
-if [ -f "$STATE_FILE" ]; then
-  STATE_JSON=$(cat "$STATE_FILE")
-else
-  STATE_JSON='{"active":"blue","blue":{"tag":""},"green":{"tag":""},"previous":null}'
+if [ ! -f "$STATE_FILE" ]; then
+  echo '{"active":"blue","blue":{"tag":""},"green":{"tag":""},"previous":null}' > "$STATE_FILE"
 fi
 
-ACTIVE=$(echo "$STATE_JSON" | node -e "const s=JSON.parse(require('fs').readFileSync(0,'utf8')); process.stdout.write(s.active||'blue')")
+state_get() {
+  python3 - "$STATE_FILE" "$1" <<'PY'
+import json
+import sys
+
+path, field = sys.argv[1], sys.argv[2]
+with open(path, encoding="utf-8") as f:
+    state = json.load(f)
+
+if field == "active":
+    print(state.get("active") or "blue")
+elif field == "previous.tag":
+    prev = state.get("previous") or {}
+    print(prev.get("tag") or "")
+elif field == "blue.tag":
+    print((state.get("blue") or {}).get("tag") or "latest")
+elif field == "green.tag":
+    print((state.get("green") or {}).get("tag") or "latest")
+elif field == "active.tag":
+    slot = state.get("active") or "blue"
+    print((state.get(slot) or {}).get("tag") or "")
+else:
+    raise SystemExit(f"unknown state field: {field}")
+PY
+}
+
+state_write() {
+  python3 - "$STATE_FILE" "$1" "$2" "$3" "$4" <<'PY'
+import json
+import sys
+
+path, active, inactive, image_tag, prev_active_tag = sys.argv[1:6]
+with open(path, encoding="utf-8") as f:
+    state = json.load(f)
+
+state["active"] = inactive
+state[inactive] = {"tag": image_tag}
+state["previous"] = {"slot": active, "tag": prev_active_tag}
+
+with open(path, "w", encoding="utf-8") as f:
+    json.dump(state, f, indent=2)
+    f.write("\n")
+PY
+}
+
+ACTIVE=$(state_get active)
 
 if [ "$ACTIVE" = "blue" ]; then
   INACTIVE="green"
@@ -44,7 +87,7 @@ else
 fi
 
 if [ "$ROLLBACK" = "true" ]; then
-  PREV_TAG=$(echo "$STATE_JSON" | node -e "const s=JSON.parse(require('fs').readFileSync(0,'utf8')); process.stdout.write(s.previous?.tag||'')")
+  PREV_TAG=$(state_get previous.tag)
   if [ -z "$PREV_TAG" ]; then
     echo "ERROR: No previous deployment to roll back to"
     exit 1
@@ -65,10 +108,10 @@ docker pull "${IMAGE_REGISTRY}:${IMAGE_TAG}-migrate"
 
 if [ "$INACTIVE" = "blue" ]; then
   export BLUE_IMAGE_TAG="$IMAGE_TAG"
-  export GREEN_IMAGE_TAG=$(echo "$STATE_JSON" | node -e "const s=JSON.parse(require('fs').readFileSync(0,'utf8')); process.stdout.write(s.green?.tag||'latest')")
+  export GREEN_IMAGE_TAG=$(state_get green.tag)
 else
   export GREEN_IMAGE_TAG="$IMAGE_TAG"
-  export BLUE_IMAGE_TAG=$(echo "$STATE_JSON" | node -e "const s=JSON.parse(require('fs').readFileSync(0,'utf8')); process.stdout.write(s.blue?.tag||'latest')")
+  export BLUE_IMAGE_TAG=$(state_get blue.tag)
 fi
 
 log "[3/6] Recreating container on inactive slot: app-${INACTIVE}"
@@ -100,15 +143,7 @@ echo "server app-${INACTIVE}:3000;" > "$UPSTREAM_FILE"
 docker compose exec -T nginx nginx -s reload
 docker compose stop "app-${ACTIVE}"
 
-PREV_ACTIVE_TAG=$(echo "$STATE_JSON" | node -e "const s=JSON.parse(require('fs').readFileSync(0,'utf8')); process.stdout.write(s[s.active]?.tag||'')")
-
-node -e "
-const fs=require('fs');
-const state=JSON.parse(fs.readFileSync('${STATE_FILE}','utf8'));
-state.active='${INACTIVE}';
-state['${INACTIVE}']={tag:'${IMAGE_TAG}'};
-state.previous={slot:'${ACTIVE}',tag:'${PREV_ACTIVE_TAG}'};
-fs.writeFileSync('${STATE_FILE}', JSON.stringify(state,null,2));
-"
+PREV_ACTIVE_TAG=$(state_get active.tag)
+state_write "$ACTIVE" "$INACTIVE" "$IMAGE_TAG" "$PREV_ACTIVE_TAG"
 
 log "Deploy complete — active: app-${INACTIVE} (${IMAGE_TAG})"
