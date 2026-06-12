@@ -2,6 +2,7 @@
 
 import type { InfiniteData, UseInfiniteQueryResult } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { CarGrid } from "@/components/cars/car-grid";
 import { useInfiniteScroll } from "@/hooks/use-infinite-scroll";
@@ -13,6 +14,7 @@ type InfiniteCarsQuery = UseInfiniteQueryResult<
 >;
 
 export function CarSearchResults({ query }: { query: InfiniteCarsQuery }) {
+  const t = useTranslations("search");
   const {
     data,
     isFetchingNextPage,
@@ -36,7 +38,7 @@ export function CarSearchResults({ query }: { query: InfiniteCarsQuery }) {
   return (
     <div className="space-y-4">
       <p className="text-xs text-muted-foreground">
-        Showing {cars.length} of {total} listings
+        {t("showingResults", { shown: cars.length, total })}
       </p>
       <CarGrid cars={cars} />
       <div ref={sentinelRef} className="flex justify-center py-4">
@@ -44,7 +46,7 @@ export function CarSearchResults({ query }: { query: InfiniteCarsQuery }) {
           <Loader2 className="h-6 w-6 animate-spin text-primary" />
         )}
         {!hasNextPage && (
-          <p className="text-xs text-muted-foreground">End of results</p>
+          <p className="text-xs text-muted-foreground">{t("endOfResults")}</p>
         )}
       </div>
     </div>

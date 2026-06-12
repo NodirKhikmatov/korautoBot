@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Heart, Search } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { AuthGate } from "@/components/auth/auth-gate";
 import { FavoritesList } from "@/components/cars/favorites-list";
@@ -12,16 +13,15 @@ import { Button } from "@/components/ui/button";
 import { useFavorites } from "@/hooks/use-favorites";
 
 function FavoritesContent() {
+  const t = useTranslations("favorites");
   const { favorites, total, isLoading } = useFavorites();
 
   return (
     <div className="space-y-5">
       <PageHeader
-        title="Favorites"
+        title={t("title")}
         subtitle={
-          total > 0
-            ? `${total} saved listing${total === 1 ? "" : "s"}`
-            : "Your saved cars"
+          total > 0 ? t("savedCount", { count: total }) : t("subtitle")
         }
       />
 
@@ -31,13 +31,13 @@ function FavoritesContent() {
         <div className="space-y-4">
           <EmptyState
             icon={Heart}
-            title="No favorites yet"
-            description="Tap the heart on any listing to save it here."
+            title={t("emptyTitle")}
+            description={t("emptyDescription")}
           />
           <Button asChild variant="outline" className="w-full rounded-xl">
             <Link href="/search">
               <Search className="h-4 w-4" />
-              Browse listings
+              {t("browseListings")}
             </Link>
           </Button>
         </div>
@@ -50,7 +50,7 @@ function FavoritesContent() {
 
 export default function FavoritesPage() {
   return (
-    <AuthGate message="Sign in with Telegram to view your favorites">
+    <AuthGate messageKey="signInForFavorites">
       <FavoritesContent />
     </AuthGate>
   );

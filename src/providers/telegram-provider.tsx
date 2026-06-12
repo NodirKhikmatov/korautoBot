@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 
+import { syncTelegramNativeChrome } from "@/lib/theme/telegram-chrome";
 import { useAuthStore } from "@/stores/auth-store";
 
 async function fetchSession(): Promise<boolean> {
@@ -66,9 +67,15 @@ export function TelegramProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
-    if (window.Telegram?.WebApp) {
-      window.Telegram.WebApp.ready();
-      window.Telegram.WebApp.expand();
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+      tg.ready();
+      tg.expand();
+      document.documentElement.style.setProperty(
+        "--tg-viewport-height",
+        `${tg.viewportStableHeight ?? tg.viewportHeight ?? window.innerHeight}px`,
+      );
+      syncTelegramNativeChrome();
     }
 
     bootstrapAuth();

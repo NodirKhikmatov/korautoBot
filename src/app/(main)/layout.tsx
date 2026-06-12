@@ -2,15 +2,12 @@
 
 import { DevAuthPrompt } from "@/components/auth/dev-auth-prompt";
 import { BottomNav } from "@/components/layout/bottom-nav";
-import { useTelegramTheme } from "@/hooks/use-telegram-theme";
 
 export default function MainLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  useTelegramTheme();
-
   return (
     <div className="relative min-h-dvh bg-background">
       <div
@@ -18,7 +15,7 @@ export default function MainLayout({
         aria-hidden
       />
       <main
-        className="mx-auto max-w-lg px-4 pb-24 pt-4"
+        className="mx-auto w-full max-w-lg px-4 pb-24 pt-4 sm:px-6 md:max-w-xl"
         style={{ paddingTop: "max(1rem, env(safe-area-inset-top))" }}
       >
         <DevAuthPrompt />

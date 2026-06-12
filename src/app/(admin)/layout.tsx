@@ -2,15 +2,12 @@
 
 import { AdminGate } from "@/components/admin/admin-gate";
 import { AdminNav } from "@/components/admin/admin-nav";
-import { useTelegramTheme } from "@/hooks/use-telegram-theme";
 
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  useTelegramTheme();
-
   return (
     <AdminGate>
       <div className="relative min-h-dvh bg-background">
@@ -19,7 +16,7 @@ export default function AdminLayout({
           aria-hidden
         />
         <div
-          className="mx-auto max-w-lg px-4 pb-8"
+          className="mx-auto w-full max-w-lg px-4 pb-8 sm:px-6 md:max-w-xl"
           style={{ paddingBottom: "max(2rem, env(safe-area-inset-bottom))" }}
         >
           <AdminNav />

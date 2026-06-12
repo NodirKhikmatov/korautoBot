@@ -18,6 +18,7 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -44,6 +45,7 @@
   --accent: oklch(0.94 0.02 250);
   --accent-foreground: oklch(0.25 0.02 260);
   --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.99 0 0);
   --border: oklch(0.9 0.01 260);
   --input: oklch(0.9 0.01 260);
   --ring: oklch(0.55 0.2 250);
@@ -65,6 +67,7 @@
   --accent: oklch(0.24 0.03 250);
   --accent-foreground: oklch(0.96 0.01 260);
   --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: oklch(0.99 0 0);
   --border: oklch(1 0 0 / 8%);
   --input: oklch(1 0 0 / 12%);
   --ring: oklch(0.62 0.19 250);
@@ -80,11 +83,20 @@
     overflow-x: hidden;
   }
 
+  @media (prefers-reduced-motion: no-preference) {
+    html.theme-transition,
+    html.theme-transition * {
+      transition-property: background-color, border-color, color, fill, stroke;
+      transition-duration: 0.2s;
+      transition-timing-function: ease;
+    }
+  }
+
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
     overflow-x: hidden;
-    min-height: 100dvh;
+    min-height: var(--tg-viewport-height, 100dvh);
   }
 }
 

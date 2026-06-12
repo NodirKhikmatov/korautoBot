@@ -1,6 +1,7 @@
 "use client";
 
 import { MessageCircle } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 import { useContactSeller } from "@/hooks/use-contact-seller";
@@ -17,12 +18,13 @@ export function ContactSellerButton({
   size?: "default" | "lg" | "sm";
   fullWidth?: boolean;
 }) {
+  const t = useTranslations("seller");
   const { canContact, contactSeller } = useContactSeller(username);
 
   if (!canContact) {
     return (
       <p className="text-center text-sm text-muted-foreground">
-        This seller has no public Telegram username.
+        {t("noUsername")}
       </p>
     );
   }
@@ -40,7 +42,7 @@ export function ContactSellerButton({
       onClick={() => contactSeller()}
     >
       <MessageCircle className="h-5 w-5" />
-      Contact Seller
+      {t("contactSeller")}
     </Button>
   );
 }

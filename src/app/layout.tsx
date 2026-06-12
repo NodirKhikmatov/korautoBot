@@ -1,8 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages, getTranslations } from "next-intl/server";
 
 import { TelegramScript } from "@/components/telegram/telegram-script";
-import { APP_NAME } from "@/lib/constants";
+import { getThemeInitScript } from "@/lib/theme/theme-init-script";
 import { Providers } from "@/providers";
 
 import "./globals.css";
@@ -17,10 +19,14 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: APP_NAME,
-  description: "Marketplace for buying and selling used cars in South Korea",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("common");
+
+  return {
+    title: t("appName"),
+    description: t("appDescription"),
+  };
+}
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -44,23 +50,29 @@ function getR2PreconnectOrigin(): string | undefined {
 
 const r2Origin = getR2PreconnectOrigin();
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+
   return (
-    <html lang="en">
+    <html lang={locale} suppressHydrationWarning>
       <head>
         {r2Origin ? (
           <link rel="preconnect" href={r2Origin} crossOrigin="anonymous" />
         ) : null}
         <TelegramScript />
+        <script dangerouslySetInnerHTML={{ __html: getThemeInitScript() }} />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Providers>{children}</Providers>
+        <NextIntlClientProvider messages={messages}>
+          <Providers>{children}</Providers>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

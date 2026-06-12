@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Calendar,
   Cog,
@@ -6,8 +8,9 @@ import {
   MapPin,
   Tag,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
-import { formatFuelType, formatTransmission } from "@/lib/format";
+import { useTranslatedFormat } from "@/hooks/use-translated-format";
 import { formatMileage, formatPrice } from "@/lib/utils";
 import type { CarWithSeller } from "@/types";
 
@@ -34,19 +37,22 @@ function SpecItem({
 }
 
 export function CarSpecs({ car }: { car: CarWithSeller }) {
+  const t = useTranslations("listing");
+  const { formatFuelType, formatTransmission } = useTranslatedFormat();
+
   return (
     <div className="grid grid-cols-2 gap-2">
-      <SpecItem icon={Tag} label="Price" value={formatPrice(car.price)} />
-      <SpecItem icon={Calendar} label="Year" value={String(car.year)} />
-      <SpecItem icon={Gauge} label="Mileage" value={formatMileage(car.mileage)} />
-      <SpecItem icon={Fuel} label="Fuel" value={formatFuelType(car.fuelType)} />
+      <SpecItem icon={Tag} label={t("price")} value={formatPrice(car.price)} />
+      <SpecItem icon={Calendar} label={t("year")} value={String(car.year)} />
+      <SpecItem icon={Gauge} label={t("mileage")} value={formatMileage(car.mileage)} />
+      <SpecItem icon={Fuel} label={t("fuel")} value={formatFuelType(car.fuelType)} />
       <SpecItem
         icon={Cog}
-        label="Transmission"
+        label={t("transmission")}
         value={formatTransmission(car.transmission)}
       />
       {car.location && (
-        <SpecItem icon={MapPin} label="Location" value={car.location} />
+        <SpecItem icon={MapPin} label={t("location")} value={car.location} />
       )}
     </div>
   );

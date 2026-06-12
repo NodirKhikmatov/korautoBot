@@ -2,14 +2,15 @@
 
 import { useMemo, useState } from "react";
 import { Search, SlidersHorizontal, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { useCarFilterOptions } from "@/hooks/use-car-filter-options";
+import { useTranslatedFormat } from "@/hooks/use-translated-format";
 import { CAR_BRANDS, FUEL_TYPES, TRANSMISSION_TYPES } from "@/lib/constants";
-import { formatFuelType, formatTransmission } from "@/lib/format";
 import { KOREA_REGIONS } from "@/lib/search/constants";
 import { countActiveFilters } from "@/lib/search/params";
 import type { CarFilters } from "@/types";
@@ -23,6 +24,10 @@ export function CarFiltersPanel({
   onChange: (filters: CarFilters) => void;
   onReset: () => void;
 }) {
+  const t = useTranslations("search");
+  const tListing = useTranslations("listing");
+  const tCommon = useTranslations("common");
+  const { formatFuelType, formatTransmission } = useTranslatedFormat();
   const [expanded, setExpanded] = useState(false);
   const { data: optionsData } = useCarFilterOptions(filters.brand);
 
@@ -56,7 +61,7 @@ export function CarFiltersPanel({
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Search brand, model, title..."
+            placeholder={t("searchPlaceholder")}
             value={filters.search ?? ""}
             onChange={(e) => update({ search: e.target.value || undefined })}
             className="h-11 rounded-xl bg-card/50 pl-9"
@@ -80,7 +85,7 @@ export function CarFiltersPanel({
       {activeCount > 0 && (
         <div className="flex items-center justify-between">
           <span className="text-xs text-muted-foreground">
-            {activeCount} filter{activeCount > 1 ? "s" : ""} active
+            {t("filtersActive", { count: activeCount })}
           </span>
           <Button
             variant="ghost"
@@ -89,7 +94,7 @@ export function CarFiltersPanel({
             onClick={onReset}
           >
             <X className="h-3 w-3" />
-            Clear all
+            {t("clearAll")}
           </Button>
         </div>
       )}
@@ -98,29 +103,31 @@ export function CarFiltersPanel({
         <div className="space-y-3 rounded-2xl border border-border/60 bg-card/40 p-4">
           <div className="grid grid-cols-2 gap-3">
             <FilterSelect
-              label="Brand"
+              label={tListing("brand")}
               value={filters.brand ?? ""}
               onChange={(value) => update({ brand: value || undefined })}
               options={brandOptions}
-              placeholder="All brands"
+              placeholder={t("allBrands")}
             />
             <FilterSelect
-              label="Model"
+              label={tListing("model")}
               value={filters.model ?? ""}
               onChange={(value) => update({ model: value || undefined })}
               options={modelOptions}
-              placeholder={filters.brand ? "All models" : "Select brand first"}
+              placeholder={
+                filters.brand ? t("allModels") : t("selectBrandFirst")
+              }
               disabled={!filters.brand && modelOptions.length === 0}
             />
             <FilterSelect
-              label="Region"
+              label={tListing("region")}
               value={filters.region ?? ""}
               onChange={(value) => update({ region: value || undefined })}
               options={regionOptions}
-              placeholder="All regions"
+              placeholder={t("allRegions")}
             />
             <FilterSelect
-              label="Fuel"
+              label={tListing("fuel")}
               value={filters.fuelType ?? ""}
               onChange={(value) =>
                 update({
@@ -131,57 +138,57 @@ export function CarFiltersPanel({
                 value: fuel,
                 label: formatFuelType(fuel),
               }))}
-              placeholder="All fuels"
+              placeholder={t("allFuels")}
             />
             <FilterSelect
-              label="Transmission"
+              label={tListing("transmission")}
               value={filters.transmission ?? ""}
               onChange={(value) =>
                 update({
                   transmission: (value || undefined) as CarFilters["transmission"],
                 })
               }
-              options={TRANSMISSION_TYPES.map((t) => ({
-                value: t,
-                label: formatTransmission(t),
+              options={TRANSMISSION_TYPES.map((trans) => ({
+                value: trans,
+                label: formatTransmission(trans),
               }))}
-              placeholder="All"
+              placeholder={tCommon("all")}
             />
             <NumberField
-              label="Min price (₩)"
+              label={t("minPrice")}
               value={filters.minPrice}
               onChange={(v) => update({ minPrice: v })}
               placeholder="0"
             />
             <NumberField
-              label="Max price (₩)"
+              label={t("maxPrice")}
               value={filters.maxPrice}
               onChange={(v) => update({ maxPrice: v })}
-              placeholder="Any"
+              placeholder={tCommon("any")}
             />
             <NumberField
-              label="Min year"
+              label={t("minYear")}
               value={filters.minYear}
               onChange={(v) => update({ minYear: v })}
               placeholder="1990"
             />
             <NumberField
-              label="Max year"
+              label={t("maxYear")}
               value={filters.maxYear}
               onChange={(v) => update({ maxYear: v })}
               placeholder={String(new Date().getFullYear())}
             />
             <NumberField
-              label="Min mileage (km)"
+              label={t("minMileage")}
               value={filters.minMileage}
               onChange={(v) => update({ minMileage: v })}
               placeholder="0"
             />
             <NumberField
-              label="Max mileage (km)"
+              label={t("maxMileage")}
               value={filters.maxMileage}
               onChange={(v) => update({ maxMileage: v })}
-              placeholder="Any"
+              placeholder={tCommon("any")}
             />
           </div>
         </div>

@@ -1,4 +1,7 @@
+"use client";
+
 import { Send } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -7,14 +10,18 @@ import { formatTelegramUsername } from "@/lib/telegram/contact";
 import type { SellerProfile } from "@/types";
 
 export function SellerProfileCard({ seller }: { seller: SellerProfile }) {
-  const displayName = getDisplayName(
-    seller.firstName,
-    seller.lastName,
-    seller.username,
-  );
+  const t = useTranslations("seller");
+  const tCommon = useTranslations("common");
+  const displayName =
+    getDisplayName(
+      seller.firstName,
+      seller.lastName,
+      seller.username,
+    ) || tCommon("user");
   const usernameLabel = seller.username
     ? formatTelegramUsername(seller.username)
     : null;
+
   return (
     <div className="rounded-2xl border border-border/60 bg-card/50 p-4">
       <div className="flex items-center gap-3">
@@ -32,7 +39,7 @@ export function SellerProfileCard({ seller }: { seller: SellerProfile }) {
               className="shrink-0 gap-1 border-primary/20 bg-primary/10 text-[10px] text-primary"
             >
               <Send className="h-3 w-3" />
-              Telegram
+              {t("telegram")}
             </Badge>
           </div>
           {usernameLabel && (

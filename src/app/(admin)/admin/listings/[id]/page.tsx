@@ -2,6 +2,7 @@
 
 import { use } from "react";
 import { Car } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { AdminEditCarForm } from "@/components/admin/admin-edit-car-form";
 import { EmptyState } from "@/components/layout/empty-state";
@@ -14,6 +15,7 @@ export default function AdminEditListingPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const t = useTranslations("listing");
   const { id } = use(params);
   const { data, isLoading, isError } = useAdminCar(id);
 
@@ -30,18 +32,15 @@ export default function AdminEditListingPage({
     return (
       <EmptyState
         icon={Car}
-        title="Listing not found"
-        description="This listing may have been deleted."
+        title={t("notFound")}
+        description={t("notFoundDescription")}
       />
     );
   }
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title="Edit listing"
-        subtitle={data.car.title}
-      />
+      <PageHeader title={t("editTitle")} subtitle={data.car.title} />
       <AdminEditCarForm car={data.car} />
     </div>
   );

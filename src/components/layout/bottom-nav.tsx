@@ -3,33 +3,35 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Heart, Home, PlusCircle, Search, User } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { cn } from "@/lib/utils";
 
 type NavItem = {
   href: string;
-  label: string;
+  labelKey: "home" | "search" | "sell" | "saved" | "profile";
   icon: typeof Home;
   highlight?: boolean;
 };
 
 const NAV_ITEMS: NavItem[] = [
-  { href: "/", label: "Home", icon: Home },
-  { href: "/search", label: "Search", icon: Search },
-  { href: "/create", label: "Sell", icon: PlusCircle, highlight: true },
-  { href: "/favorites", label: "Saved", icon: Heart },
-  { href: "/profile", label: "Profile", icon: User },
+  { href: "/", labelKey: "home", icon: Home },
+  { href: "/search", labelKey: "search", icon: Search },
+  { href: "/create", labelKey: "sell", icon: PlusCircle, highlight: true },
+  { href: "/favorites", labelKey: "saved", icon: Heart },
+  { href: "/profile", labelKey: "profile", icon: User },
 ];
 
 export function BottomNav() {
   const pathname = usePathname();
+  const t = useTranslations("nav");
 
   return (
     <nav
       className="fixed inset-x-0 bottom-0 z-50 border-t border-border/60 bg-card/95 backdrop-blur-xl supports-[backdrop-filter]:bg-card/80"
       style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
     >
-      <div className="mx-auto flex h-16 max-w-lg items-center justify-around px-2">
+      <div className="mx-auto flex h-16 w-full max-w-lg items-center justify-around px-2 sm:max-w-xl md:max-w-xl">
         {NAV_ITEMS.map((item) => {
           const isActive =
             item.href === "/"
@@ -65,7 +67,7 @@ export function BottomNav() {
                 <Icon className={cn("h-5 w-5", isActive && "stroke-[2.5]")} />
               )}
               <span className="text-[10px] font-medium tracking-wide">
-                {item.label}
+                {t(item.labelKey)}
               </span>
             </Link>
           );

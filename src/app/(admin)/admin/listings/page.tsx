@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Car, Search } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { AdminListingRow } from "@/components/admin/admin-listing-row";
 import { EmptyState } from "@/components/layout/empty-state";
@@ -12,6 +13,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAdminCars, useAdminMutations } from "@/hooks/use-admin";
 
 export default function AdminListingsPage() {
+  const t = useTranslations("admin");
+  const tListing = useTranslations("listing");
+  const tCommon = useTranslations("common");
   const [search, setSearch] = useState("");
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
@@ -30,7 +34,7 @@ export default function AdminListingsPage() {
   }
 
   async function handleDelete(carId: string) {
-    if (!confirm("Delete this listing? This cannot be undone.")) return;
+    if (!confirm(tListing("deleteConfirm"))) return;
     await deleteCar.mutateAsync(carId);
   }
 
@@ -41,8 +45,12 @@ export default function AdminListingsPage() {
   return (
     <div className="space-y-4">
       <PageHeader
-        title="Listings"
-        subtitle={total > 0 ? `${total} total listings` : "All marketplace listings"}
+        title={t("listingsTitle")}
+        subtitle={
+          total > 0
+            ? t("totalListings", { count: total })
+            : t("listingsSubtitle")
+        }
       />
 
       <form onSubmit={handleSearch} className="flex gap-2">
@@ -51,12 +59,12 @@ export default function AdminListingsPage() {
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by title, brand, model…"
+            placeholder={t("searchListingsPlaceholder")}
             className="h-11 rounded-xl bg-card/50 pl-9"
           />
         </div>
         <Button type="submit" className="h-11 rounded-xl px-4">
-          Go
+          {tCommon("go")}
         </Button>
       </form>
 
@@ -71,16 +79,18 @@ export default function AdminListingsPage() {
       {isError && (
         <EmptyState
           icon={Car}
-          title="Could not load listings"
-          description="Check your connection and try again."
+          title={tCommon("loadError")}
+          description={tCommon("loadErrorDescription")}
         />
       )}
 
       {!isLoading && !isError && cars.length === 0 && (
         <EmptyState
           icon={Car}
-          title="No listings found"
-          description={query ? "Try a different search term." : "No listings on the platform yet."}
+          title={t("noListingsFound")}
+          description={
+            query ? t("tryDifferentSearch") : t("noListingsOnPlatform")
+          }
         />
       )}
 
@@ -107,7 +117,7 @@ export default function AdminListingsPage() {
             disabled={page <= 1}
             onClick={() => setPage((p) => p - 1)}
           >
-            Previous
+            {tCommon("previous")}
           </Button>
           <Button
             variant="outline"
@@ -115,7 +125,7 @@ export default function AdminListingsPage() {
             disabled={!hasMore}
             onClick={() => setPage((p) => p + 1)}
           >
-            Next
+            {tCommon("next")}
           </Button>
         </div>
       )}

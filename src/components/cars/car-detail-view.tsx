@@ -3,6 +3,7 @@
 import { useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, Share2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { CarImageGallery } from "@/components/cars/car-image-gallery";
 import { FavoriteButton } from "@/components/cars/favorite-button";
@@ -16,6 +17,9 @@ import { useCar } from "@/hooks/use-car";
 import { useTelegramBackButton } from "@/hooks/use-telegram-back-button";
 
 export function CarDetailView({ carId }: { carId: string }) {
+  const t = useTranslations("listing");
+  const tCommon = useTranslations("common");
+  const tSeller = useTranslations("seller");
   const router = useRouter();
   const { data, isLoading, isError } = useCar(carId);
   const { isAuthenticated } = useAuth();
@@ -34,9 +38,9 @@ export function CarDetailView({ carId }: { carId: string }) {
   if (isError || !data?.car) {
     return (
       <div className="flex min-h-[50vh] flex-col items-center justify-center gap-2 text-center">
-        <p className="font-semibold">Listing not found</p>
+        <p className="font-semibold">{t("notFound")}</p>
         <Button variant="outline" onClick={() => router.push("/")}>
-          Back to home
+          {tCommon("backToHome")}
         </Button>
       </div>
     );
@@ -83,7 +87,7 @@ export function CarDetailView({ carId }: { carId: string }) {
 
       {car.description && (
         <div className="space-y-2">
-          <h2 className="text-sm font-semibold">Description</h2>
+          <h2 className="text-sm font-semibold">{t("description")}</h2>
           <p className="text-sm leading-relaxed text-muted-foreground">
             {car.description}
           </p>
@@ -93,7 +97,7 @@ export function CarDetailView({ carId }: { carId: string }) {
       <Separator />
 
       <div className="space-y-3">
-        <h2 className="text-sm font-semibold">Seller</h2>
+        <h2 className="text-sm font-semibold">{tSeller("title")}</h2>
         <SellerProfileCard seller={car.user} />
         <ContactSellerButton username={car.user.username} />
       </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { Loader2, LogIn } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -8,13 +9,21 @@ import { useAuth } from "@/hooks/use-auth";
 import { canShowDevAuthPrompt } from "@/lib/auth/dev-auth-client";
 import { useAuthStore } from "@/stores/auth-store";
 
+type AuthMessageKey =
+  | "signInToContinue"
+  | "signInForFavorites"
+  | "signInForProfile"
+  | "signInForCreate"
+  | "signInForAdmin";
+
 export function AuthGate({
   children,
-  message = "Sign in with Telegram to continue",
+  messageKey = "signInToContinue",
 }: {
   children: React.ReactNode;
-  message?: string;
+  messageKey?: AuthMessageKey;
 }) {
+  const t = useTranslations("auth");
   const { isAuthenticated, isLoading } = useAuth();
   const [devPending, setDevPending] = useState(false);
   const [devError, setDevError] = useState<string | null>(null);
@@ -34,13 +43,15 @@ export function AuthGate({
         const data = (await response.json().catch(() => null)) as
           | { error?: string }
           | null;
-        throw new Error(data?.error ?? "Dev login failed");
+        throw new Error(data?.error ?? t("devLoginFailed"));
       }
 
       const { user } = await response.json();
       useAuthStore.getState().setUser(user);
     } catch (err) {
-      setDevError(err instanceof Error ? err.message : "Dev login failed");
+      setDevError(
+        err instanceof Error ? err.message : t("devLoginFailed"),
+      );
     } finally {
       setDevPending(false);
     }
@@ -61,8 +72,10 @@ export function AuthGate({
           <LogIn className="h-7 w-7 text-primary" />
         </div>
         <div className="space-y-1">
-          <h2 className="text-lg font-semibold">Authentication required</h2>
-          <p className="text-sm text-muted-foreground">{message}</p>
+          <h2 className="text-lg font-semibold">
+            {t("authenticationRequired")}
+          </h2>
+          <p className="text-sm text-muted-foreground">{t(messageKey)}</p>
         </div>
         {showDevLogin ? (
           <div className="flex w-full max-w-xs flex-col gap-2">
@@ -75,10 +88,10 @@ export function AuthGate({
               {devPending ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Signing in…
+                  {t("signingIn")}
                 </>
               ) : (
-                "Dev login (localhost)"
+                t("devLogin")
               )}
             </Button>
             {devError ? (
@@ -91,7 +104,7 @@ export function AuthGate({
             className="rounded-xl"
             onClick={() => window.Telegram?.WebApp?.close()}
           >
-            Open in Telegram
+            {t("openInTelegram")}
           </Button>
         )}
       </div>

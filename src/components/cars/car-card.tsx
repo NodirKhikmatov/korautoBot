@@ -46,22 +46,22 @@ export function CarCard({
               <CarPlaceholderIcon />
             </div>
           )}
-          <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/50 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-foreground/50 to-transparent" />
           <div className="absolute right-2 top-2">
             <FavoriteButton
               carId={car.id}
-              className="h-8 w-8 border-0 bg-black/40 text-white backdrop-blur-sm hover:bg-black/60 hover:text-white"
+              className="h-8 w-8 border-0 bg-foreground/40 text-background backdrop-blur-sm hover:bg-foreground/60"
               variant="ghost"
             />
           </div>
           <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between gap-2">
             <Badge
-              className="border-0 bg-black/50 text-white backdrop-blur-sm"
+              className="border-0 bg-foreground/50 text-background backdrop-blur-sm"
               variant="secondary"
             >
               {car.brand}
             </Badge>
-            <span className="text-sm font-bold text-white drop-shadow">
+            <span className="text-sm font-bold text-background drop-shadow">
               {formatPrice(car.price)}
             </span>
           </div>

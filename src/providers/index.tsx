@@ -2,11 +2,14 @@
 
 import { QueryProvider } from "./query-provider";
 import { TelegramProvider } from "./telegram-provider";
+import { ThemeProvider } from "./theme-provider";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <QueryProvider>
-      <TelegramProvider>{children}</TelegramProvider>
-    </QueryProvider>
+    <ThemeProvider>
+      <QueryProvider>
+        <TelegramProvider>{children}</TelegramProvider>
+      </QueryProvider>
+    </ThemeProvider>
   );
 }

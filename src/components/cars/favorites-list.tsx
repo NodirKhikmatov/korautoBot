@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Heart, Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { CarImage } from "@/components/cars/car-image";
 import { Badge } from "@/components/ui/badge";
@@ -46,6 +47,7 @@ function FavoriteListItem({
   onRemove: () => void;
   isRemoving: boolean;
 }) {
+  const t = useTranslations("common");
   const cover = getCoverImage(car);
 
   return (
@@ -67,7 +69,7 @@ function FavoriteListItem({
           />
         ) : (
           <div className="flex h-full items-center justify-center text-xs text-muted-foreground">
-            No photo
+            {t("noPhoto")}
           </div>
         )}
       </Link>
@@ -103,7 +105,7 @@ function FavoriteListItem({
             ) : (
               <Heart className="h-3 w-3 fill-primary text-primary" />
             )}
-            Remove
+            {t("remove")}
           </Button>
         </div>
       </div>

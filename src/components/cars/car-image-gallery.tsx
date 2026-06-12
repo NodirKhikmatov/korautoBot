@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 
 import { CarImage as CarImageView } from "@/components/cars/car-image";
 import { cn } from "@/lib/utils";
@@ -13,13 +14,14 @@ export function CarImageGallery({
   images: CarImage[];
   carTitle?: string;
 }) {
+  const t = useTranslations("listing");
   const sorted = [...images].sort((a, b) => a.sortOrder - b.sortOrder);
   const [activeIndex, setActiveIndex] = useState(0);
 
   if (sorted.length === 0) {
     return (
       <div className="aspect-[16/10] flex items-center justify-center rounded-2xl bg-muted">
-        <span className="text-sm text-muted-foreground">No photos</span>
+        <span className="text-sm text-muted-foreground">{t("noPhotos")}</span>
       </div>
     );
   }
@@ -33,8 +35,15 @@ export function CarImageGallery({
           src={active.url}
           alt={
             carTitle
-              ? `${carTitle} — photo ${activeIndex + 1} of ${sorted.length}`
-              : `Car photo ${activeIndex + 1} of ${sorted.length}`
+              ? t("photoAlt", {
+                  title: carTitle,
+                  index: activeIndex + 1,
+                  total: sorted.length,
+                })
+              : t("carPhotoAlt", {
+                  index: activeIndex + 1,
+                  total: sorted.length,
+                })
           }
           width={1280}
           height={800}
@@ -43,7 +52,7 @@ export function CarImageGallery({
           priority
         />
         {sorted.length > 1 && (
-          <div className="absolute bottom-3 right-3 rounded-full bg-black/50 px-2.5 py-1 text-xs font-medium text-white backdrop-blur-sm">
+          <div className="absolute bottom-3 right-3 rounded-full bg-foreground/50 px-2.5 py-1 text-xs font-medium text-background backdrop-blur-sm">
             {activeIndex + 1} / {sorted.length}
           </div>
         )}
@@ -67,8 +76,11 @@ export function CarImageGallery({
                 src={image.thumbnailUrl}
                 alt={
                   carTitle
-                    ? `${carTitle} thumbnail ${index + 1}`
-                    : `Car thumbnail ${index + 1}`
+                    ? t("thumbnailAlt", {
+                        title: carTitle,
+                        index: index + 1,
+                      })
+                    : t("carThumbnailAlt", { index: index + 1 })
                 }
                 width={96}
                 height={64}

@@ -6,7 +6,12 @@
 --   postgresql://korea_auto_market:CHANGE_ME@127.0.0.1:5432/korea_auto_market
 
 CREATE USER korea_auto_market WITH PASSWORD 'CHANGE_ME';
-CREATE DATABASE korea_auto_market OWNER korea_auto_market;
+CREATE DATABASE korea_auto_market
+  OWNER korea_auto_market
+  ENCODING 'UTF8'
+  LC_COLLATE 'en_US.UTF-8'
+  LC_CTYPE 'en_US.UTF-8'
+  TEMPLATE template0;
 GRANT ALL PRIVILEGES ON DATABASE korea_auto_market TO korea_auto_market;
 
 \c korea_auto_market

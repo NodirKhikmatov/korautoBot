@@ -3,6 +3,7 @@
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { SearchX } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { CarFiltersPanel } from "@/components/cars/car-filters";
 import { CarSearchResults } from "@/components/cars/car-search-results";
@@ -20,6 +21,7 @@ import type { CarFilters } from "@/types";
 const EMPTY_FILTERS: CarFilters = {};
 
 function SearchPageContent() {
+  const t = useTranslations("search");
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -60,11 +62,11 @@ function SearchPageContent() {
   return (
     <div className="space-y-5">
       <PageHeader
-        title="Search"
+        title={t("title")}
         subtitle={
           total !== undefined
-            ? `${total} listings found`
-            : "Find your next car"
+            ? t("listingsFound", { count: total })
+            : t("subtitle")
         }
       />
 
@@ -79,8 +81,8 @@ function SearchPageContent() {
       {!carsQuery.isLoading && !hasResults && (
         <EmptyState
           icon={SearchX}
-          title="No matches"
-          description="Try adjusting your filters or search terms."
+          title={t("noMatchesTitle")}
+          description={t("noMatchesDescription")}
         />
       )}
 

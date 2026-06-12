@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { ArrowRight, Car, Sparkles } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { CarGrid, CarGridSkeleton } from "@/components/cars/car-grid";
 import { EmptyState } from "@/components/layout/empty-state";
@@ -9,9 +10,10 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { useCars } from "@/hooks/use-cars";
 import { useFeaturedCars } from "@/hooks/use-featured-cars";
-import { APP_NAME } from "@/lib/constants";
 
 export function HomePageClient() {
+  const t = useTranslations("home");
+  const tCommon = useTranslations("common");
   const { data, isLoading, isError } = useCars({ limit: 12 });
   const featured = useFeaturedCars();
 
@@ -25,17 +27,17 @@ export function HomePageClient() {
           </div>
           <div className="space-y-1">
             <p className="text-xs font-medium uppercase tracking-wider text-primary">
-              South Korea
+              {t("region")}
             </p>
-            <h1 className="text-xl font-bold leading-tight">{APP_NAME}</h1>
-            <p className="text-sm text-muted-foreground">
-              Premium used cars from Korea. Browse, compare, connect.
-            </p>
+            <h1 className="text-xl font-bold leading-tight">
+              {tCommon("appName")}
+            </h1>
+            <p className="text-sm text-muted-foreground">{t("tagline")}</p>
           </div>
         </div>
         <Button asChild className="mt-4 w-full rounded-xl" size="lg">
           <Link href="/search" prefetch={false}>
-            Explore listings
+            {t("exploreListings")}
             <ArrowRight className="h-4 w-4" />
           </Link>
         </Button>
@@ -44,8 +46,8 @@ export function HomePageClient() {
       {(featured.isLoading || (featured.data && featured.data.cars.length > 0)) && (
         <section className="space-y-4">
           <PageHeader
-            title="Featured listings"
-            subtitle="Hand-picked premium cars"
+            title={t("featuredTitle")}
+            subtitle={t("featuredSubtitle")}
             headingLevel={2}
           />
           {featured.isLoading ? (
@@ -58,8 +60,8 @@ export function HomePageClient() {
 
       <section className="space-y-4">
         <PageHeader
-          title="Latest listings"
-          subtitle="Fresh arrivals on the market"
+          title={t("latestTitle")}
+          subtitle={t("latestSubtitle")}
           headingLevel={2}
         />
 
@@ -68,16 +70,16 @@ export function HomePageClient() {
         {isError && (
           <EmptyState
             icon={Car}
-            title="Could not load listings"
-            description="Check your connection and try again."
+            title={tCommon("loadError")}
+            description={tCommon("loadErrorDescription")}
           />
         )}
 
         {data && data.cars.length === 0 && (
           <EmptyState
             icon={Car}
-            title="No listings yet"
-            description="Be the first to list a car on the marketplace."
+            title={t("noListingsTitle")}
+            description={t("noListingsDescription")}
           />
         )}
 
