@@ -13,8 +13,6 @@ import {
   removeFavoriteApi,
   type FavoritesResponse,
 } from "@/lib/favorites/fetch";
-import type { CarWithImages } from "@/types";
-
 function favoritesQueryKey(userId: string) {
   return ["favorites", userId] as const;
 }

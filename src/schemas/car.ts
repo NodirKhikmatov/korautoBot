@@ -5,7 +5,7 @@ import {
   MAX_IMAGES_PER_LISTING,
   TRANSMISSION_TYPES,
 } from "@/lib/constants";
-import { KOREA_REGIONS, SEARCH_PAGE_SIZE } from "@/lib/search/constants";
+import { SEARCH_PAGE_SIZE } from "@/lib/search/constants";
 
 export const carImageInputSchema = z.object({
   url: z.string().url(),

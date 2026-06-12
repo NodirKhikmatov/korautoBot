@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { handleRouteError } from "@/lib/api/handle-route-error";
 import { carFilterOptionsSchema } from "@/schemas/car";
 import { getCarFilterOptions } from "@/services/cars";
 
@@ -21,10 +22,10 @@ export async function GET(request: Request) {
       },
     );
   } catch (error) {
-    console.error("Get car filter options error:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch filter options" },
-      { status: 500 },
+    return handleRouteError(
+      error,
+      "Get car filter options error",
+      "Failed to fetch filter options",
     );
   }
 }

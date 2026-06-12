@@ -19,11 +19,7 @@ export async function GET(request: Request) {
       },
     });
   } catch (error) {
-    console.error("Get cars error:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch cars" },
-      { status: 500 },
-    );
+    return handleRouteError(error, "Get cars error", "Failed to fetch cars");
   }
 }
 

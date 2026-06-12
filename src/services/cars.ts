@@ -17,6 +17,7 @@ import type { z } from "zod";
 import { withBypassRls } from "@/db/context";
 import { carImages, cars } from "@/db/schema";
 import { attachCoverImages } from "@/lib/db/attach-cover-images";
+import { toIlikeContainsPattern } from "@/lib/db/escape-ilike";
 import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
 import type { createCarSchema } from "@/schemas/car";
 import type {
@@ -44,7 +45,7 @@ function buildCarFilterConditions(filters: CarFilters) {
   const conditions = [eq(cars.isActive, true), isNull(cars.deletedAt)];
 
   if (filters.search) {
-    const pattern = `%${filters.search}%`;
+    const pattern = toIlikeContainsPattern(filters.search);
     const tsQuery = toTsQuery(filters.search);
 
     if (tsQuery) {
@@ -72,7 +73,7 @@ function buildCarFilterConditions(filters: CarFilters) {
   }
 
   if (filters.model) {
-    conditions.push(ilike(cars.model, `%${filters.model}%`));
+    conditions.push(ilike(cars.model, toIlikeContainsPattern(filters.model)));
   }
 
   if (filters.minPrice !== undefined) {
@@ -129,7 +130,7 @@ export async function getCars(
         .select()
         .from(cars)
         .where(where)
-        .orderBy(desc(cars.createdAt))
+        .orderBy(desc(cars.isFeatured), desc(cars.createdAt))
         .limit(limit)
         .offset(offset),
     ]);
@@ -144,6 +145,27 @@ export async function getCars(
       limit,
       hasMore: page * limit < total,
     };
+  });
+}
+
+export async function getFeaturedCars(
+  limit = 6,
+): Promise<CarWithImages[]> {
+  return withBypassRls(async (tx) => {
+    const carsData = await tx
+      .select()
+      .from(cars)
+      .where(
+        and(
+          eq(cars.isActive, true),
+          isNull(cars.deletedAt),
+          eq(cars.isFeatured, true),
+        ),
+      )
+      .orderBy(desc(cars.createdAt))
+      .limit(limit);
+
+    return attachCoverImages(tx, carsData);
   });
 }
 

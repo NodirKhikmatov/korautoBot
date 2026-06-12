@@ -56,5 +56,7 @@ export const config = {
     "/api/cars/mine",
     "/api/cars/:id*",
     "/create",
+    "/admin/:path*",
+    "/api/admin/:path*",
   ],
 };

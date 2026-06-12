@@ -8,10 +8,12 @@ import { EmptyState } from "@/components/layout/empty-state";
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { useCars } from "@/hooks/use-cars";
+import { useFeaturedCars } from "@/hooks/use-featured-cars";
 import { APP_NAME } from "@/lib/constants";
 
 export default function HomePage() {
   const { data, isLoading, isError } = useCars({ limit: 12 });
+  const featured = useFeaturedCars();
 
   return (
     <div className="space-y-6">
@@ -38,6 +40,16 @@ export default function HomePage() {
           </Link>
         </Button>
       </section>
+
+      {featured.data && featured.data.cars.length > 0 && (
+        <section className="space-y-4">
+          <PageHeader
+            title="Featured listings"
+            subtitle="Hand-picked premium cars"
+          />
+          <CarGrid cars={featured.data.cars} />
+        </section>
+      )}
 
       <section className="space-y-4">
         <PageHeader

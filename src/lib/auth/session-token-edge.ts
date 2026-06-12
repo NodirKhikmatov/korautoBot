@@ -1,7 +1,17 @@
 import { SESSION_MAX_AGE_SECONDS } from "./constants";
 
 function getSessionSecret(): string {
-  return process.env.SESSION_SECRET ?? process.env.TELEGRAM_BOT_TOKEN ?? "";
+  const sessionSecret = process.env.SESSION_SECRET;
+
+  if (sessionSecret) {
+    return sessionSecret;
+  }
+
+  if (process.env.NODE_ENV === "production") {
+    return "";
+  }
+
+  return process.env.TELEGRAM_BOT_TOKEN ?? "";
 }
 
 function toHex(buffer: ArrayBuffer): string {

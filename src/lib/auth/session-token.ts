@@ -3,14 +3,23 @@ import { createHmac, timingSafeEqual } from "crypto";
 import { SESSION_MAX_AGE_SECONDS } from "./constants";
 
 function getSessionSecret(): string {
-  const secret =
-    process.env.SESSION_SECRET ?? process.env.TELEGRAM_BOT_TOKEN ?? "";
+  const sessionSecret = process.env.SESSION_SECRET;
 
-  if (!secret) {
+  if (sessionSecret) {
+    return sessionSecret;
+  }
+
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("SESSION_SECRET must be set in production");
+  }
+
+  const fallback = process.env.TELEGRAM_BOT_TOKEN;
+
+  if (!fallback) {
     throw new Error("SESSION_SECRET or TELEGRAM_BOT_TOKEN must be set");
   }
 
-  return secret;
+  return fallback;
 }
 
 export function createSessionToken(userId: string): string {
@@ -20,7 +29,7 @@ export function createSessionToken(userId: string): string {
     .update(payload)
     .digest("hex");
 
-  return `${payload}.${signature}`;
+  return `${userId}.${timestamp}.${signature}`;
 }
 
 export function verifySessionToken(token: string): string | null {

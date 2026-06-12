@@ -46,7 +46,7 @@ export function CarImageGallery({ images }: { images: CarImage[] }) {
               type="button"
               onClick={() => setActiveIndex(index)}
               className={cn(
-                "relative h-16 w-24 shrink-0 overflow-hidden rounded-xl border-2 transition-all",
+                "relative h-16 w-24 shrink-0 overflow-hidden rounded-xl border-2 transition-all touch-manipulation",
                 index === activeIndex
                   ? "border-primary ring-2 ring-primary/30"
                   : "border-transparent opacity-70 hover:opacity-100",
