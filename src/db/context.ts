@@ -1,13 +1,13 @@
 import { sql } from "drizzle-orm";
 import type { ExtractTablesWithRelations } from "drizzle-orm";
 import type { PgTransaction } from "drizzle-orm/pg-core";
-import type { NeonHttpQueryResultHKT } from "drizzle-orm/neon-http";
+import type { NeonQueryResultHKT } from "drizzle-orm/neon-serverless";
 
 import { db } from "./index";
 import type * as schema from "./schema";
 
 export type DbTransaction = PgTransaction<
-  NeonHttpQueryResultHKT,
+  NeonQueryResultHKT,
   typeof schema,
   ExtractTablesWithRelations<typeof schema>
 >;

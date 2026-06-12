@@ -52,6 +52,7 @@ export const config = {
     "/api/upload",
     "/api/favorites",
     "/api/cars",
+    "/api/cars/mine",
     "/api/cars/:id*",
     "/create",
   ],
