@@ -13,7 +13,8 @@ import type { CarWithImages } from "@/types";
 function getCoverImage(car: CarWithImages): string | null {
   const sorted = [...car.carImages].sort((a, b) => a.sortOrder - b.sortOrder);
   const first = sorted[0];
-  return first?.url ?? first?.thumbnailUrl ?? null;
+  // Grid cards render small (≤400px); prefer the lightweight thumbnail.
+  return first?.thumbnailUrl ?? first?.url ?? null;
 }
 
 export function CarCard({
