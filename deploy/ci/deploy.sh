@@ -29,6 +29,22 @@ set -a && source .env.production && set +a
 
 mkdir -p deploy/ci deploy/nginx/upstream
 
+if [ ! -f "$UPSTREAM_FILE" ]; then
+  echo "server 127.0.0.1:65535 down;" > "$UPSTREAM_FILE"
+fi
+
+# git reset --hard must not wipe runtime nginx files (they are gitignored on VPS).
+DOMAIN="${APP_DOMAIN:-}"
+if [ -z "$DOMAIN" ] && [ -n "${NEXT_PUBLIC_APP_URL:-}" ]; then
+  DOMAIN="${NEXT_PUBLIC_APP_URL#https://}"
+  DOMAIN="${DOMAIN#http://}"
+  DOMAIN="${DOMAIN%%/*}"
+fi
+if [ -n "$DOMAIN" ] && [ -f deploy/nginx/docker/default.conf ]; then
+  sed "s/YOUR_DOMAIN/${DOMAIN}/g" deploy/nginx/docker/default.conf \
+    > deploy/nginx/docker/default.conf.active
+fi
+
 if [ ! -f "$STATE_FILE" ]; then
   echo '{"active":"blue","blue":{"tag":""},"green":{"tag":""},"previous":null}' > "$STATE_FILE"
 fi
@@ -140,6 +156,7 @@ docker run --rm \
 
 log "[6/6] Switching traffic (zero-downtime) and stopping app-${ACTIVE}"
 echo "server app-${INACTIVE}:3000;" > "$UPSTREAM_FILE"
+log "Nginx upstream: app-${INACTIVE}:3000"
 docker compose exec -T nginx nginx -s reload
 docker compose stop "app-${ACTIVE}"
 

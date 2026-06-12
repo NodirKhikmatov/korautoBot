@@ -35,6 +35,8 @@ yarn-error.log*
 
 # deploy state (VPS only)
 deploy/ci/.deploy-state.json
+deploy/nginx/upstream/active.conf
+deploy/nginx/docker/default.conf.active
 
 # vercel
 .vercel
