@@ -13,7 +13,11 @@ export async function GET(request: Request) {
 
     const result = await getCars(filters, filters.page, filters.limit);
 
-    return NextResponse.json(result);
+    return NextResponse.json(result, {
+      headers: {
+        "Cache-Control": "public, s-maxage=60, stale-while-revalidate=120",
+      },
+    });
   } catch (error) {
     console.error("Get cars error:", error);
     return NextResponse.json(
