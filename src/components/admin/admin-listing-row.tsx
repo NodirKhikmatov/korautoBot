@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { Pencil, Sparkles, Trash2 } from "lucide-react";
 
+import { CarImage } from "@/components/cars/car-image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getDisplayName } from "@/lib/format";
@@ -35,11 +35,12 @@ export function AdminListingRow({
       <div className="flex gap-3">
         <div className="relative h-20 w-24 shrink-0 overflow-hidden rounded-xl bg-muted">
           {cover ? (
-            <Image
+            <CarImage
               src={cover.thumbnailUrl ?? cover.url}
-              alt={car.title}
-              fill
-              className="object-cover"
+              alt={`${car.title} listing photo`}
+              width={96}
+              height={80}
+              className="h-full w-full object-cover"
               sizes="96px"
             />
           ) : (

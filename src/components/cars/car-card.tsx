@@ -1,9 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { Calendar, Gauge, MapPin } from "lucide-react";
 
+import { CarImage } from "@/components/cars/car-image";
 import { FavoriteButton } from "@/components/cars/favorite-button";
 import { Badge } from "@/components/ui/badge";
 import { formatMileage, formatPrice } from "@/lib/utils";
@@ -15,8 +15,15 @@ function getCoverImage(car: CarWithImages): string | null {
   return first?.thumbnailUrl ?? first?.url ?? null;
 }
 
-export function CarCard({ car }: { car: CarWithImages }) {
+export function CarCard({
+  car,
+  priority = false,
+}: {
+  car: CarWithImages;
+  priority?: boolean;
+}) {
   const cover = getCoverImage(car);
+  const coverAlt = `${car.title} — ${car.brand} ${car.model} ${car.year}`;
 
   return (
     <Link href={`/car/${car.id}`} className="group block">
@@ -25,11 +32,13 @@ export function CarCard({ car }: { car: CarWithImages }) {
       >
         <div className="relative aspect-[16/10] overflow-hidden bg-muted">
           {cover ? (
-            <Image
+            <CarImage
               src={cover}
-              alt={car.title}
-              fill
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
+              alt={coverAlt}
+              width={640}
+              height={400}
+              priority={priority}
+              className="h-full w-full object-cover"
               sizes="(max-width: 768px) 50vw, 33vw"
             />
           ) : (

@@ -19,8 +19,8 @@ export function CarGridSkeleton({ count = 6 }: { count?: number }) {
 export function CarGrid({ cars }: { cars: CarWithImages[] }) {
   return (
     <div className="grid grid-cols-2 gap-3">
-      {cars.map((car) => (
-        <CarCard key={car.id} car={car} />
+      {cars.map((car, index) => (
+        <CarCard key={car.id} car={car} priority={index < 2} />
       ))}
     </div>
   );

@@ -1,12 +1,18 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
 
+import { CarImage as CarImageView } from "@/components/cars/car-image";
 import { cn } from "@/lib/utils";
 import type { CarImage } from "@/types";
 
-export function CarImageGallery({ images }: { images: CarImage[] }) {
+export function CarImageGallery({
+  images,
+  carTitle,
+}: {
+  images: CarImage[];
+  carTitle?: string;
+}) {
   const sorted = [...images].sort((a, b) => a.sortOrder - b.sortOrder);
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -23,11 +29,16 @@ export function CarImageGallery({ images }: { images: CarImage[] }) {
   return (
     <div className="space-y-3">
       <div className="relative aspect-[16/10] overflow-hidden rounded-2xl bg-muted">
-        <Image
+        <CarImageView
           src={active.url}
-          alt={`Photo ${activeIndex + 1}`}
-          fill
-          className="object-cover"
+          alt={
+            carTitle
+              ? `${carTitle} — photo ${activeIndex + 1} of ${sorted.length}`
+              : `Car photo ${activeIndex + 1} of ${sorted.length}`
+          }
+          width={1280}
+          height={800}
+          className="h-full w-full object-cover"
           sizes="100vw"
           priority
         />
@@ -52,11 +63,16 @@ export function CarImageGallery({ images }: { images: CarImage[] }) {
                   : "border-transparent opacity-70 hover:opacity-100",
               )}
             >
-              <Image
+              <CarImageView
                 src={image.thumbnailUrl}
-                alt={`Thumbnail ${index + 1}`}
-                fill
-                className="object-cover"
+                alt={
+                  carTitle
+                    ? `${carTitle} thumbnail ${index + 1}`
+                    : `Car thumbnail ${index + 1}`
+                }
+                width={96}
+                height={64}
+                className="h-full w-full object-cover"
                 sizes="96px"
               />
             </button>

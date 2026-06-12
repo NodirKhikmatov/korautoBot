@@ -25,9 +25,24 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
+  maximumScale: 5,
 };
+
+function getR2PreconnectOrigin(): string | undefined {
+  const publicUrl = process.env.R2_PUBLIC_URL;
+
+  if (!publicUrl) {
+    return undefined;
+  }
+
+  try {
+    return new URL(publicUrl).origin;
+  } catch {
+    return undefined;
+  }
+}
+
+const r2Origin = getR2PreconnectOrigin();
 
 export default function RootLayout({
   children,
@@ -37,6 +52,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {r2Origin ? (
+          <link rel="preconnect" href={r2Origin} crossOrigin="anonymous" />
+        ) : null}
         <TelegramScript />
       </head>
       <body

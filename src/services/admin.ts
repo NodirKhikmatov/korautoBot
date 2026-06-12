@@ -12,6 +12,7 @@ import {
 
 import { withBypassRls } from "@/db/context";
 import { cars, favorites, users } from "@/db/schema";
+import { revalidateCarsCache } from "@/lib/cache/cars";
 import { attachCoverImages } from "@/lib/db/attach-cover-images";
 import { toIlikeContainsPattern } from "@/lib/db/escape-ilike";
 import type { AdminStats, CarWithImages, CarWithSeller, User } from "@/types";
@@ -195,6 +196,8 @@ export async function adminUpdateCar(
       throw new Error("Failed to fetch updated car");
     }
 
+    revalidateCarsCache();
+
     return car;
   });
 }
@@ -211,6 +214,8 @@ export async function adminDeleteCar(carId: string): Promise<void> {
       })
       .where(and(eq(cars.id, carId), isNull(cars.deletedAt)));
   });
+
+  revalidateCarsCache();
 }
 
 export async function adminSetCarFeatured(
@@ -223,6 +228,8 @@ export async function adminSetCarFeatured(
       .set({ isFeatured, updatedAt: new Date() })
       .where(and(eq(cars.id, carId), isNull(cars.deletedAt)));
   });
+
+  revalidateCarsCache();
 }
 
 export async function listAdminUsers(

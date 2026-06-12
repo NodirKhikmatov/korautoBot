@@ -12,10 +12,12 @@ import {
   or,
   sql,
 } from "drizzle-orm";
+import { unstable_cache } from "next/cache";
 import type { z } from "zod";
 
 import { withBypassRls } from "@/db/context";
 import { carImages, cars } from "@/db/schema";
+import { revalidateCarsCache } from "@/lib/cache/cars";
 import { attachCoverImages } from "@/lib/db/attach-cover-images";
 import { toIlikeContainsPattern } from "@/lib/db/escape-ilike";
 import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
@@ -115,7 +117,9 @@ function buildCarFilterConditions(filters: CarFilters) {
   return and(...conditions);
 }
 
-export async function getCars(
+const CARS_LIST_CACHE_SECONDS = 60;
+
+async function getCarsFromDb(
   filters: CarFilters = {},
   page = 1,
   limit = DEFAULT_PAGE_SIZE,
@@ -148,9 +152,21 @@ export async function getCars(
   });
 }
 
-export async function getFeaturedCars(
-  limit = 6,
-): Promise<CarWithImages[]> {
+export async function getCars(
+  filters: CarFilters = {},
+  page = 1,
+  limit = DEFAULT_PAGE_SIZE,
+): Promise<CarsListResult> {
+  const cacheKey = JSON.stringify({ filters, page, limit });
+
+  return unstable_cache(
+    () => getCarsFromDb(filters, page, limit),
+    ["cars-list", cacheKey],
+    { revalidate: CARS_LIST_CACHE_SECONDS, tags: ["cars"] },
+  )();
+}
+
+async function getFeaturedCarsFromDb(limit = 6): Promise<CarWithImages[]> {
   return withBypassRls(async (tx) => {
     const carsData = await tx
       .select()
@@ -167,6 +183,16 @@ export async function getFeaturedCars(
 
     return attachCoverImages(tx, carsData);
   });
+}
+
+export async function getFeaturedCars(
+  limit = 6,
+): Promise<CarWithImages[]> {
+  return unstable_cache(
+    () => getFeaturedCarsFromDb(limit),
+    ["cars-featured", String(limit)],
+    { revalidate: CARS_LIST_CACHE_SECONDS, tags: ["cars"] },
+  )();
 }
 
 export async function getCarFilterOptions(
@@ -292,6 +318,8 @@ export async function createCar(
       throw new Error("Failed to fetch created car");
     }
 
+    revalidateCarsCache();
+
     return result as CarWithSeller;
   });
 }
@@ -310,6 +338,8 @@ export async function softDeleteCar(
       })
       .where(and(eq(cars.id, carId), eq(cars.userId, userId)));
   });
+
+  revalidateCarsCache();
 }
 
 export async function getUserCars(userId: string): Promise<CarWithImages[]> {

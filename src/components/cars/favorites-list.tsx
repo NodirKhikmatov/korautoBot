@@ -1,9 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { Heart, Loader2 } from "lucide-react";
 
+import { CarImage } from "@/components/cars/car-image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useFavorites } from "@/hooks/use-favorites";
@@ -57,11 +57,12 @@ function FavoriteListItem({
         className="relative h-20 w-28 shrink-0 overflow-hidden rounded-xl bg-muted"
       >
         {cover ? (
-          <Image
+          <CarImage
             src={cover}
-            alt={car.title}
-            fill
-            className="object-cover"
+            alt={`${car.title} — ${car.brand} ${car.model}`}
+            width={112}
+            height={80}
+            className="h-full w-full object-cover"
             sizes="112px"
           />
         ) : (

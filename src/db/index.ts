@@ -15,7 +15,7 @@ function createPool(): Pool {
 
   const useSsl =
     process.env.DATABASE_SSL === "true" ||
-    connectionString.includes("sslmode=require");
+    /sslmode=(require|verify-full|verify-ca|prefer)/i.test(connectionString);
 
   return new Pool({
     connectionString,
@@ -32,27 +32,19 @@ const globalForDb = globalThis as unknown as {
 };
 
 function getPool(): Pool {
-  if (globalForDb.pgPool) {
-    return globalForDb.pgPool;
+  if (!globalForDb.pgPool) {
+    globalForDb.pgPool = createPool();
   }
 
-  const pool = createPool();
-  if (process.env.NODE_ENV !== "production") {
-    globalForDb.pgPool = pool;
-  }
-  return pool;
+  return globalForDb.pgPool;
 }
 
 function getDb(): Database {
-  if (globalForDb.db) {
-    return globalForDb.db;
+  if (!globalForDb.db) {
+    globalForDb.db = drizzle(getPool(), { schema });
   }
 
-  const database = drizzle(getPool(), { schema });
-  if (process.env.NODE_ENV !== "production") {
-    globalForDb.db = database;
-  }
-  return database;
+  return globalForDb.db;
 }
 
 /** Lazy DB handle — avoids connecting during Next.js production build. */

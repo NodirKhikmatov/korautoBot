@@ -1,9 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import { ImagePlus, Loader2, X } from "lucide-react";
 import { useState } from "react";
 
+import { CarImage } from "@/components/cars/car-image";
 import { MAX_IMAGES_PER_LISTING } from "@/lib/constants";
 import { useImageUpload } from "@/hooks/use-image-upload";
 import type { UploadedCarImage } from "@/types";
@@ -51,16 +51,17 @@ export function ImageUploader({
   return (
     <div className="space-y-3">
       <div className="grid grid-cols-3 gap-2">
-        {images.map((image) => (
+        {images.map((image, index) => (
           <div
             key={image.imageId}
             className="group relative aspect-square overflow-hidden rounded-xl border border-border/60 bg-muted"
           >
-            <Image
+            <CarImage
               src={image.thumbnailUrl}
-              alt="Uploaded"
-              fill
-              className="object-cover"
+              alt={`Listing photo ${index + 1}`}
+              width={120}
+              height={120}
+              className="h-full w-full object-cover"
               sizes="120px"
             />
             <button

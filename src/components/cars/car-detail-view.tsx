@@ -53,7 +53,7 @@ export function CarDetailView({ carId }: { carId: string }) {
 
   return (
     <div className="space-y-5 pb-4">
-      <CarImageGallery images={car.carImages} />
+      <CarImageGallery images={car.carImages} carTitle={car.title} />
 
       <div className="space-y-3">
         <div className="flex items-start justify-between gap-3">
