@@ -1,0 +1,66 @@
+---
+description: Korea Auto Market tech stack — required tools and forbidden alternatives
+alwaysApply: true
+---
+
+# Korea Auto Market - Tech Stack Rules
+
+Always use:
+
+## Frontend
+
+- Next.js 15 App Router
+- TypeScript
+- TailwindCSS
+- Shadcn UI
+
+## State Management
+
+- Zustand
+- TanStack Query
+
+## Database
+
+- Neon PostgreSQL
+- Drizzle ORM
+
+## Storage
+
+- Cloudflare R2
+
+## Authentication
+
+- Telegram Mini App SDK
+
+## Validation
+
+- Zod
+
+## Deployment
+
+- Vercel
+
+## Code Quality
+
+- Strict TypeScript
+- Reusable components
+- Mobile First
+- Responsive Design
+
+## Forbidden
+
+- Firebase
+- MongoDB
+- Prisma
+- Redux
+- Material UI
+- Ant Design
+- Express
+- NestJS
+- Supabase
+
+Always follow existing architecture.
+
+Never replace technologies without permission.
+
+Always generate production-ready code.

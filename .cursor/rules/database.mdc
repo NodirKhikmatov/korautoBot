@@ -1,0 +1,53 @@
+---
+description: Neon PostgreSQL schema, Drizzle ORM, and query conventions
+globs: drizzle/**,src/db/**,src/**/services/**
+alwaysApply: false
+---
+
+# Database Rules
+
+## Database Provider
+
+Neon PostgreSQL
+
+## ORM
+
+Drizzle ORM
+
+## Primary Keys
+
+- UUID
+
+## Requirements
+
+- Foreign Key Constraints
+- Database Indexes
+- Soft Deletes when appropriate
+- Schema defined in `src/db/schema.ts`
+- Migrations managed via Drizzle Kit (`drizzle/migrations/`)
+
+## Never
+
+- Store images inside database
+- Store large files inside database
+- Duplicate user data
+- Use Supabase client or raw SQL without Drizzle (except migrations)
+
+## Images
+
+- Cloudflare R2 only
+
+## Tables
+
+- users
+- cars
+- car_images
+- favorites
+
+## Optimize for
+
+- 100,000+ users
+- Fast search
+- Low cost
+
+All queries must be optimized and indexed. Use Drizzle relational queries where appropriate.

@@ -1,0 +1,44 @@
+---
+description: Telegram Mini App auth, identity, and seller contact rules
+globs: src/**/telegram/**,src/**/auth/**,app/**
+alwaysApply: false
+---
+
+# Telegram Mini App Rules
+
+## Authentication Source
+
+Telegram Mini App SDK
+
+## Requirements
+
+- Validate initData
+- Validate Telegram signature
+- Auto create user
+- Auto update profile data
+
+## Store
+
+- telegram_id
+- username
+- first_name
+- last_name
+- photo_url
+
+## Never use
+
+- Email Login
+- Password Login
+- Google Login
+
+## Seller Contact
+
+### Display
+
+- Telegram Username
+
+### Contact Button
+
+`https://t.me/{username}`
+
+Always trust Telegram identity as the primary user identity.
