@@ -49,7 +49,10 @@ Requires a local PostgreSQL instance. See `deploy/postgres/init-app-db.sql` for 
 
 - [Project Overview](docs/PROJECT.md)
 - [Architecture](docs/ARCHITECTURE.md)
-- [Deployment (Vultr VPS)](docs/DEPLOYMENT.md)
+- [Production Setup (start here)](docs/PRODUCTION_SETUP.md)
+- [Environment Variables](docs/ENVIRONMENT.md)
+- [SSL / Let's Encrypt](docs/SSL_SETUP.md)
+- [Deployment](docs/DEPLOYMENT.md)
 - [Database](docs/DATABASE.md)
 - [Roadmap](docs/ROADMAP.md)
 

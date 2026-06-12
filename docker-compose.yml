@@ -1,51 +1,48 @@
-# Production stack — env vars live on VPS in .env.production (never committed).
-# Deployed only via GitHub Actions (deploy/ci/deploy.sh).
+# Production stack — Vultr VPS
+# Env: .env.production on server (never committed)
+# Deploy: GitHub Actions only (see .github/workflows/deploy.yml)
 
 name: korea-auto-market
 
+x-app-common: &app-common
+  env_file:
+    - path: .env.production
+      required: true
+  expose:
+    - "3000"
+  networks:
+    - kam
+  logging:
+    driver: json-file
+    options:
+      max-size: "10m"
+      max-file: "3"
+  healthcheck:
+    test:
+      [
+        "CMD-SHELL",
+        "wget -q --spider http://127.0.0.1:3000/api/health || exit 1",
+      ]
+    interval: 15s
+    timeout: 5s
+    retries: 5
+    start_period: 45s
+  deploy:
+    resources:
+      limits:
+        memory: 512M
+
 services:
   app-blue:
+    <<: *app-common
     image: ${IMAGE_REGISTRY}:${BLUE_IMAGE_TAG:-latest}
     container_name: kam-app-blue
-    env_file:
-      - path: .env.production
-        required: true
-    expose:
-      - "3000"
-    healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "wget -q --spider http://127.0.0.1:3000/api/health || exit 1",
-        ]
-      interval: 15s
-      timeout: 5s
-      retries: 5
-      start_period: 45s
-    networks:
-      - kam
     restart: unless-stopped
 
   app-green:
+    <<: *app-common
     image: ${IMAGE_REGISTRY}:${GREEN_IMAGE_TAG:-latest}
     container_name: kam-app-green
-    env_file:
-      - path: .env.production
-        required: true
-    expose:
-      - "3000"
-    healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "wget -q --spider http://127.0.0.1:3000/api/health || exit 1",
-        ]
-      interval: 15s
-      timeout: 5s
-      retries: 5
-      start_period: 45s
-    networks:
-      - kam
     restart: unless-stopped
 
   nginx:
@@ -66,6 +63,11 @@ services:
         condition: service_started
     networks:
       - kam
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     restart: unless-stopped
 
   certbot:

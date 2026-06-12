@@ -1,13 +1,42 @@
+# Dependencies & build output
 node_modules
 .next
+out
+build
+coverage
+
+# Git & CI
 .git
+.gitignore
 .github
-.env*
+
+# Environment (secrets stay on VPS only)
+.env
+.env.*
 !.env.example
 !.env.production.example
+
+# Deploy state (VPS-local)
 deploy/ci/.deploy-state.json
+
+# Docs & editor
 *.md
+docs
 .cursor
 .agents
-coverage
+.vscode
+
+# OS & logs
 .DS_Store
+Thumbs.db
+*.log
+npm-debug.log*
+
+# Docker meta (not needed inside image)
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Tests & misc
+*.tsbuildinfo
+skills-lock.json

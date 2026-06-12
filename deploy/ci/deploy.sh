@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
-# Zero-downtime blue-green deploy — invoked only by GitHub Actions.
+# Zero-downtime blue-green deploy — invoked ONLY by GitHub Actions.
+#
+# Flow:
+#   1. Git pull (done in workflow before this script)
+#   2. Pull Docker images from GHCR
+#   3. Recreate container on inactive slot
+#   4. Health check → migrations → switch Nginx → stop old slot
 set -euo pipefail
 
 DEPLOY_DIR="${DEPLOY_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}"
@@ -11,6 +17,8 @@ IMAGE_TAG="${IMAGE_TAG:?IMAGE_TAG is required}"
 IMAGE_REGISTRY="${IMAGE_REGISTRY:?IMAGE_REGISTRY is required}"
 ROLLBACK="${ROLLBACK:-false}"
 
+log() { echo "==> $*"; }
+
 if [ ! -f .env.production ]; then
   echo "ERROR: .env.production not found on VPS"
   exit 1
@@ -21,19 +29,12 @@ set -a && source .env.production && set +a
 
 mkdir -p deploy/ci deploy/nginx/upstream
 
-read_state() {
-  if [ -f "$STATE_FILE" ]; then
-    cat "$STATE_FILE"
-  else
-    echo '{"active":"blue","blue":{"tag":""},"green":{"tag":""},"previous":null}'
-  fi
-}
+if [ -f "$STATE_FILE" ]; then
+  STATE_JSON=$(cat "$STATE_FILE")
+else
+  STATE_JSON='{"active":"blue","blue":{"tag":""},"green":{"tag":""},"previous":null}'
+fi
 
-write_state() {
-  echo "$1" > "$STATE_FILE"
-}
-
-STATE_JSON=$(read_state)
 ACTIVE=$(echo "$STATE_JSON" | node -e "const s=JSON.parse(require('fs').readFileSync(0,'utf8')); process.stdout.write(s.active||'blue')")
 
 if [ "$ACTIVE" = "blue" ]; then
@@ -49,14 +50,16 @@ if [ "$ROLLBACK" = "true" ]; then
     exit 1
   fi
   IMAGE_TAG="$PREV_TAG"
-  echo "==> Rollback to tag: $IMAGE_TAG"
+  log "Rollback: deploying tag $IMAGE_TAG"
 fi
+
+log "[1/6] Repository updated (git pull completed by GitHub Actions)"
 
 if [ -n "${GHCR_TOKEN:-}" ]; then
   echo "$GHCR_TOKEN" | docker login ghcr.io -u "${GHCR_USER:-github}" --password-stdin
 fi
 
-echo "==> Pulling images for tag: $IMAGE_TAG"
+log "[2/6] Pulling Docker images (tag: $IMAGE_TAG)"
 docker pull "${IMAGE_REGISTRY}:${IMAGE_TAG}"
 docker pull "${IMAGE_REGISTRY}:${IMAGE_TAG}-migrate"
 
@@ -68,35 +71,33 @@ else
   export BLUE_IMAGE_TAG=$(echo "$STATE_JSON" | node -e "const s=JSON.parse(require('fs').readFileSync(0,'utf8')); process.stdout.write(s.blue?.tag||'latest')")
 fi
 
-echo "==> Starting inactive slot: $INACTIVE"
-docker compose up -d "app-${INACTIVE}" --pull always --no-deps
+log "[3/6] Recreating container on inactive slot: app-${INACTIVE}"
+docker compose up -d "app-${INACTIVE}" --pull always --force-recreate --no-deps
 
-echo "==> Waiting for app-${INACTIVE} to become healthy..."
+log "[4/6] Waiting for health check (app-${INACTIVE})"
 for i in $(seq 1 60); do
   STATUS=$(docker inspect --format='{{.State.Health.Status}}' "kam-app-${INACTIVE}" 2>/dev/null || echo "starting")
   if [ "$STATUS" = "healthy" ]; then
-    echo "Health check passed."
+    log "Health check passed"
     break
   fi
   if [ "$i" -eq 60 ]; then
     echo "ERROR: app-${INACTIVE} failed health check"
-    docker logs "kam-app-${INACTIVE}" --tail 50
+    docker logs "kam-app-${INACTIVE}" --tail 80
     exit 1
   fi
   sleep 5
 done
 
-echo "==> Running database migrations"
+log "[5/6] Running database migrations"
 docker run --rm \
   --env-file .env.production \
   --network korea-auto-market_kam \
   "${IMAGE_REGISTRY}:${IMAGE_TAG}-migrate"
 
-echo "==> Switching Nginx upstream to app-${INACTIVE}"
+log "[6/6] Switching traffic (zero-downtime) and stopping app-${ACTIVE}"
 echo "server app-${INACTIVE}:3000;" > "$UPSTREAM_FILE"
 docker compose exec -T nginx nginx -s reload
-
-echo "==> Stopping previous active slot: $ACTIVE"
 docker compose stop "app-${ACTIVE}"
 
 PREV_ACTIVE_TAG=$(echo "$STATE_JSON" | node -e "const s=JSON.parse(require('fs').readFileSync(0,'utf8')); process.stdout.write(s[s.active]?.tag||'')")
@@ -110,4 +111,4 @@ state.previous={slot:'${ACTIVE}',tag:'${PREV_ACTIVE_TAG}'};
 fs.writeFileSync('${STATE_FILE}', JSON.stringify(state,null,2));
 "
 
-echo "==> Deploy complete. Active slot: $INACTIVE ($IMAGE_TAG)"
+log "Deploy complete — active: app-${INACTIVE} (${IMAGE_TAG})"
