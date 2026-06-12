@@ -5,6 +5,7 @@ import {
   AuthConfigError,
   AuthError,
 } from "@/lib/auth/errors";
+import { FavoriteError } from "@/lib/favorites/errors";
 import { ImageUploadError } from "@/lib/images/errors";
 
 export function handleRouteError(
@@ -21,6 +22,10 @@ export function handleRouteError(
   }
 
   if (error instanceof ImageUploadError) {
+    return NextResponse.json({ error: error.message }, { status: error.status });
+  }
+
+  if (error instanceof FavoriteError) {
     return NextResponse.json({ error: error.message }, { status: error.status });
   }
 

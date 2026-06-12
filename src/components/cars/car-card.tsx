@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Calendar, Gauge, MapPin } from "lucide-react";
 
+import { FavoriteButton } from "@/components/cars/favorite-button";
 import { Badge } from "@/components/ui/badge";
 import { formatMileage, formatPrice } from "@/lib/utils";
 import type { CarWithImages } from "@/types";
@@ -37,6 +38,13 @@ export function CarCard({ car }: { car: CarWithImages }) {
             </div>
           )}
           <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/50 to-transparent" />
+          <div className="absolute right-2 top-2">
+            <FavoriteButton
+              carId={car.id}
+              className="h-8 w-8 border-0 bg-black/40 text-white backdrop-blur-sm hover:bg-black/60 hover:text-white"
+              variant="ghost"
+            />
+          </div>
           <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between gap-2">
             <Badge
               className="border-0 bg-black/50 text-white backdrop-blur-sm"

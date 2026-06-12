@@ -51,6 +51,7 @@ export const config = {
   matcher: [
     "/api/upload",
     "/api/favorites",
+    "/api/favorites/check",
     "/api/cars",
     "/api/cars/mine",
     "/api/cars/:id*",

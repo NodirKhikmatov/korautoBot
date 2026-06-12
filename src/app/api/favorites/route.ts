@@ -1,26 +1,26 @@
 import { NextResponse } from "next/server";
-import { z } from "zod";
 
-import { handleAuthRouteError } from "@/lib/auth/handle-auth-route-error";
+import { handleRouteError } from "@/lib/api/handle-route-error";
 import { requireAuth } from "@/lib/auth/require-auth";
+import { favoriteCarSchema } from "@/schemas/favorite";
 import {
   addFavorite,
   getUserFavorites,
   removeFavorite,
 } from "@/services/favorites";
 
-const favoriteSchema = z.object({
-  carId: z.string().uuid(),
-});
-
 export async function GET() {
   try {
     const user = await requireAuth();
-    const favorites = await getUserFavorites(user.id);
+    const result = await getUserFavorites(user.id);
 
-    return NextResponse.json({ favorites });
+    return NextResponse.json(result, {
+      headers: {
+        "Cache-Control": "private, no-store",
+      },
+    });
   } catch (error) {
-    return handleAuthRouteError(error, "Get favorites error");
+    return handleRouteError(error, "Get favorites error");
   }
 }
 
@@ -28,13 +28,13 @@ export async function POST(request: Request) {
   try {
     const user = await requireAuth();
     const body = await request.json();
-    const { carId } = favoriteSchema.parse(body);
+    const { carId } = favoriteCarSchema.parse(body);
 
     await addFavorite(user.id, carId);
 
-    return NextResponse.json({ success: true }, { status: 201 });
+    return NextResponse.json({ success: true, carId }, { status: 201 });
   } catch (error) {
-    return handleAuthRouteError(error, "Add favorite error");
+    return handleRouteError(error, "Add favorite error");
   }
 }
 
@@ -42,12 +42,12 @@ export async function DELETE(request: Request) {
   try {
     const user = await requireAuth();
     const body = await request.json();
-    const { carId } = favoriteSchema.parse(body);
+    const { carId } = favoriteCarSchema.parse(body);
 
     await removeFavorite(user.id, carId);
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, carId });
   } catch (error) {
-    return handleAuthRouteError(error, "Remove favorite error");
+    return handleRouteError(error, "Remove favorite error");
   }
 }

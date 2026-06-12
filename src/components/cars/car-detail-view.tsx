@@ -2,21 +2,16 @@
 
 import { useCallback } from "react";
 import { useRouter } from "next/navigation";
-import {
-  Heart,
-  Loader2,
-  MessageCircle,
-  Share2,
-} from "lucide-react";
+import { Loader2, MessageCircle, Share2 } from "lucide-react";
 
 import { CarImageGallery } from "@/components/cars/car-image-gallery";
+import { FavoriteButton } from "@/components/cars/favorite-button";
 import { CarSpecs } from "@/components/cars/car-specs";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/hooks/use-auth";
 import { useCar } from "@/hooks/use-car";
-import { useFavorites } from "@/hooks/use-favorites";
 import { useTelegramBackButton } from "@/hooks/use-telegram-back-button";
 import { getDisplayName, getTelegramContactUrl } from "@/lib/format";
 
@@ -24,9 +19,6 @@ export function CarDetailView({ carId }: { carId: string }) {
   const router = useRouter();
   const { data, isLoading, isError } = useCar(carId);
   const { isAuthenticated } = useAuth();
-  const { isFavorite, toggleFavorite, isToggling } = useFavorites(
-    isAuthenticated,
-  );
 
   const handleBack = useCallback(() => router.back(), [router]);
   useTelegramBackButton(handleBack);
@@ -51,7 +43,6 @@ export function CarDetailView({ carId }: { carId: string }) {
   }
 
   const car = data.car;
-  const favorited = isFavorite(car.id);
   const sellerName = getDisplayName(
     car.user.firstName,
     car.user.lastName,
@@ -60,12 +51,6 @@ export function CarDetailView({ carId }: { carId: string }) {
   const contactUrl = car.user.username
     ? getTelegramContactUrl(car.user.username)
     : null;
-
-  async function handleFavorite() {
-    if (!isAuthenticated) return;
-    await toggleFavorite(car.id);
-    window.Telegram?.WebApp?.HapticFeedback?.impactOccurred("light");
-  }
 
   function handleContact() {
     if (contactUrl) {
@@ -94,17 +79,7 @@ export function CarDetailView({ carId }: { carId: string }) {
           </div>
           <div className="flex shrink-0 gap-1">
             {isAuthenticated && (
-              <Button
-                variant="outline"
-                size="icon"
-                className="rounded-xl"
-                onClick={handleFavorite}
-                disabled={isToggling}
-              >
-                <Heart
-                  className={`h-5 w-5 ${favorited ? "fill-primary text-primary" : ""}`}
-                />
-              </Button>
+              <FavoriteButton carId={car.id} className="h-10 w-10" />
             )}
             <Button
               variant="outline"
