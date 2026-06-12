@@ -10,6 +10,7 @@ export const PROTECTED_API_ROUTES: {
   { pattern: /^\/api\/upload$/, methods: ["POST", "DELETE"] },
   { pattern: /^\/api\/favorites$/, methods: ["GET", "POST", "DELETE"] },
   { pattern: /^\/api\/cars$/, methods: ["POST"] },
+  { pattern: /^\/api\/cars\/mine$/, methods: ["GET"] },
   { pattern: /^\/api\/cars\/[^/]+$/, methods: ["DELETE"] },
 ];
 
