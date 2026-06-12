@@ -1,46 +1,54 @@
 import { and, desc, eq } from "drizzle-orm";
 
-import { db } from "@/db";
+import { withBypassRls } from "@/db/context";
 import { favorites } from "@/db/schema";
 import type { CarWithImages } from "@/types";
 
 export async function addFavorite(userId: string, carId: string): Promise<void> {
-  await db.insert(favorites).values({ userId, carId });
+  await withBypassRls(async (tx) => {
+    await tx.insert(favorites).values({ userId, carId });
+  });
 }
 
 export async function removeFavorite(
   userId: string,
   carId: string,
 ): Promise<void> {
-  await db
-    .delete(favorites)
-    .where(and(eq(favorites.userId, userId), eq(favorites.carId, carId)));
+  await withBypassRls(async (tx) => {
+    await tx
+      .delete(favorites)
+      .where(and(eq(favorites.userId, userId), eq(favorites.carId, carId)));
+  });
 }
 
 export async function getUserFavorites(
   userId: string,
 ): Promise<CarWithImages[]> {
-  const rows = await db.query.favorites.findMany({
-    where: eq(favorites.userId, userId),
-    with: {
-      car: {
-        with: { carImages: true },
+  return withBypassRls(async (tx) => {
+    const rows = await tx.query.favorites.findMany({
+      where: eq(favorites.userId, userId),
+      with: {
+        car: {
+          with: { carImages: true },
+        },
       },
-    },
-    orderBy: [desc(favorites.createdAt)],
-  });
+      orderBy: [desc(favorites.createdAt)],
+    });
 
-  return rows.map((row) => row.car as CarWithImages);
+    return rows.map((row) => row.car as CarWithImages);
+  });
 }
 
 export async function isFavorite(
   userId: string,
   carId: string,
 ): Promise<boolean> {
-  const favorite = await db.query.favorites.findFirst({
-    where: and(eq(favorites.userId, userId), eq(favorites.carId, carId)),
-    columns: { id: true },
-  });
+  return withBypassRls(async (tx) => {
+    const favorite = await tx.query.favorites.findFirst({
+      where: and(eq(favorites.userId, userId), eq(favorites.carId, carId)),
+      columns: { id: true },
+    });
 
-  return favorite !== undefined;
+    return favorite !== undefined;
+  });
 }

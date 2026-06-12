@@ -1,7 +1,9 @@
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   bigint,
   boolean,
+  check,
+  customType,
   index,
   integer,
   pgEnum,
@@ -11,6 +13,12 @@ import {
   unique,
   uuid,
 } from "drizzle-orm/pg-core";
+
+const tsvector = customType<{ data: string }>({
+  dataType() {
+    return "tsvector";
+  },
+});
 
 export const fuelTypeEnum = pgEnum("fuel_type", [
   "gasoline",
@@ -42,6 +50,8 @@ export const users = pgTable(
   (table) => [
     index("idx_users_telegram_id").on(table.telegramId),
     index("idx_users_deleted_at").on(table.deletedAt),
+    index("idx_users_active").on(table.id).where(sql`deleted_at IS NULL`),
+    check("users_telegram_id_positive", sql`${table.telegramId} > 0`),
   ],
 );
 
@@ -70,6 +80,7 @@ export const cars = pgTable(
       .notNull()
       .defaultNow(),
     deletedAt: timestamp("deleted_at", { withTimezone: true }),
+    searchVector: tsvector("search_vector"),
   },
   (table) => [
     index("idx_cars_user_id").on(table.userId),
@@ -79,8 +90,33 @@ export const cars = pgTable(
     index("idx_cars_price").on(table.price),
     index("idx_cars_year").on(table.year),
     index("idx_cars_fuel_type").on(table.fuelType),
+    index("idx_cars_transmission").on(table.transmission),
     index("idx_cars_location").on(table.location),
     index("idx_cars_created_at").on(table.createdAt),
+    index("idx_cars_active_list")
+      .on(table.createdAt)
+      .where(sql`is_active = TRUE AND deleted_at IS NULL`),
+    index("idx_cars_filter_combo")
+      .on(
+        table.brand,
+        table.fuelType,
+        table.transmission,
+        table.year,
+        table.price,
+      )
+      .where(sql`is_active = TRUE AND deleted_at IS NULL`),
+    index("idx_cars_price_year")
+      .on(table.price, table.year)
+      .where(sql`is_active = TRUE AND deleted_at IS NULL`),
+    index("idx_cars_search_vector").using("gin", table.searchVector),
+    index("idx_cars_title_trgm").using("gin", table.title),
+    index("idx_cars_brand_trgm").using("gin", table.brand),
+    check("cars_year_range", sql`${table.year} >= 1990 AND ${table.year} <= 2100`),
+    check("cars_price_positive", sql`${table.price} > 0`),
+    check("cars_mileage_non_negative", sql`${table.mileage} >= 0`),
+    check("cars_title_not_empty", sql`length(trim(${table.title})) > 0`),
+    check("cars_brand_not_empty", sql`length(trim(${table.brand})) > 0`),
+    check("cars_model_not_empty", sql`length(trim(${table.model})) > 0`),
   ],
 );
 
@@ -100,6 +136,11 @@ export const carImages = pgTable(
   (table) => [
     index("idx_car_images_car_id").on(table.carId),
     index("idx_car_images_sort_order").on(table.carId, table.sortOrder),
+    check("car_images_url_not_empty", sql`length(trim(${table.url})) > 0`),
+    check(
+      "car_images_sort_order_non_negative",
+      sql`${table.sortOrder} >= 0`,
+    ),
   ],
 );
 
@@ -121,6 +162,7 @@ export const favorites = pgTable(
     unique("favorites_user_id_car_id_unique").on(table.userId, table.carId),
     index("idx_favorites_user_id").on(table.userId),
     index("idx_favorites_car_id").on(table.carId),
+    index("idx_favorites_user_created").on(table.userId, table.createdAt),
   ],
 );
 

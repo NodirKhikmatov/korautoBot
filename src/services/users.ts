@@ -1,4 +1,6 @@
-import { db } from "@/db";
+import { eq } from "drizzle-orm";
+
+import { withBypassRls } from "@/db/context";
 import { users } from "@/db/schema";
 import type { User } from "@/types";
 
@@ -13,50 +15,56 @@ export interface UpsertTelegramUserInput {
 export async function upsertTelegramUser(
   input: UpsertTelegramUserInput,
 ): Promise<User> {
-  const [user] = await db
-    .insert(users)
-    .values({
-      telegramId: input.telegramId,
-      username: input.username ?? null,
-      firstName: input.firstName ?? null,
-      lastName: input.lastName ?? null,
-      photoUrl: input.photoUrl ?? null,
-    })
-    .onConflictDoUpdate({
-      target: users.telegramId,
-      set: {
+  return withBypassRls(async (tx) => {
+    const [user] = await tx
+      .insert(users)
+      .values({
+        telegramId: input.telegramId,
         username: input.username ?? null,
         firstName: input.firstName ?? null,
         lastName: input.lastName ?? null,
         photoUrl: input.photoUrl ?? null,
-        updatedAt: new Date(),
-      },
-    })
-    .returning();
+      })
+      .onConflictDoUpdate({
+        target: users.telegramId,
+        set: {
+          username: input.username ?? null,
+          firstName: input.firstName ?? null,
+          lastName: input.lastName ?? null,
+          photoUrl: input.photoUrl ?? null,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
 
-  if (!user) {
-    throw new Error("Failed to upsert user");
-  }
+    if (!user) {
+      throw new Error("Failed to upsert user");
+    }
 
-  return user;
+    return user;
+  });
 }
 
 export async function getUserByTelegramId(
   telegramId: number,
 ): Promise<User | null> {
-  const user = await db.query.users.findFirst({
-    where: (table, { and, eq, isNull }) =>
-      and(eq(table.telegramId, telegramId), isNull(table.deletedAt)),
-  });
+  return withBypassRls(async (tx) => {
+    const user = await tx.query.users.findFirst({
+      where: (table, { and, eq, isNull }) =>
+        and(eq(table.telegramId, telegramId), isNull(table.deletedAt)),
+    });
 
-  return user ?? null;
+    return user ?? null;
+  });
 }
 
 export async function getUserById(userId: string): Promise<User | null> {
-  const user = await db.query.users.findFirst({
-    where: (table, { and, eq, isNull }) =>
-      and(eq(table.id, userId), isNull(table.deletedAt)),
-  });
+  return withBypassRls(async (tx) => {
+    const user = await tx.query.users.findFirst({
+      where: (table, { and, eq, isNull }) =>
+        and(eq(table.id, userId), isNull(table.deletedAt)),
+    });
 
-  return user ?? null;
+    return user ?? null;
+  });
 }

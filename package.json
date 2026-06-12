@@ -14,7 +14,10 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "db:apply-0001": "node scripts/apply-migration-0001.mjs",
+    "db:sync-journal": "node scripts/sync-migration-journal.mjs",
+    "db:fix": "node scripts/db-fix.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.758.0",
