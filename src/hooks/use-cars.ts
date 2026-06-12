@@ -2,34 +2,18 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import { apiFetch } from "@/lib/api/fetch";
-import type { CarFilters, CarWithImages } from "@/types";
+import { fetchCars } from "@/lib/search/fetch-cars";
+import {
+  CARS_GC_TIME_MS,
+  CARS_STALE_TIME_MS,
+} from "@/lib/search/constants";
+import type { CarSearchParams } from "@/lib/search/params";
 
-type CarsResponse = {
-  cars: CarWithImages[];
-  total: number;
-};
-
-function buildSearchParams(filters: CarFilters & { page?: number; limit?: number }) {
-  const params = new URLSearchParams();
-
-  for (const [key, value] of Object.entries(filters)) {
-    if (value !== undefined && value !== "") {
-      params.set(key, String(value));
-    }
-  }
-
-  return params.toString();
-}
-
-export function useCars(
-  filters: CarFilters & { page?: number; limit?: number } = {},
-) {
-  const queryString = buildSearchParams(filters);
-
+export function useCars(filters: CarSearchParams = {}) {
   return useQuery({
     queryKey: ["cars", filters],
-    queryFn: () =>
-      apiFetch<CarsResponse>(`/api/cars?${queryString}`),
+    queryFn: () => fetchCars(filters),
+    staleTime: CARS_STALE_TIME_MS,
+    gcTime: CARS_GC_TIME_MS,
   });
 }

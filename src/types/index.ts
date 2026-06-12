@@ -31,11 +31,28 @@ export type UploadedCarImage = {
 export type CarFilters = {
   search?: string;
   brand?: string;
+  model?: string;
   minPrice?: number;
   maxPrice?: number;
   minYear?: number;
   maxYear?: number;
+  minMileage?: number;
+  maxMileage?: number;
   fuelType?: FuelType;
   transmission?: TransmissionType;
-  location?: string;
+  region?: string;
+};
+
+export type CarsListResult = {
+  cars: CarWithImages[];
+  total: number;
+  page: number;
+  limit: number;
+  hasMore: boolean;
+};
+
+export type CarFilterOptions = {
+  brands: string[];
+  models: string[];
+  regions: string[];
 };

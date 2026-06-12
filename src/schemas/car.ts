@@ -5,6 +5,7 @@ import {
   MAX_IMAGES_PER_LISTING,
   TRANSMISSION_TYPES,
 } from "@/lib/constants";
+import { KOREA_REGIONS, SEARCH_PAGE_SIZE } from "@/lib/search/constants";
 
 export const carImageInputSchema = z.object({
   url: z.string().url(),
@@ -28,15 +29,26 @@ export const createCarSchema = z.object({
 export const updateCarSchema = createCarSchema.partial();
 
 export const carFiltersSchema = z.object({
-  search: z.string().optional(),
-  brand: z.string().optional(),
+  search: z.string().max(100).optional(),
+  brand: z.string().max(50).optional(),
+  model: z.string().max(50).optional(),
   minPrice: z.coerce.number().int().positive().optional(),
   maxPrice: z.coerce.number().int().positive().optional(),
-  minYear: z.coerce.number().int().optional(),
-  maxYear: z.coerce.number().int().optional(),
+  minYear: z.coerce.number().int().min(1990).optional(),
+  maxYear: z.coerce
+    .number()
+    .int()
+    .max(new Date().getFullYear() + 1)
+    .optional(),
+  minMileage: z.coerce.number().int().min(0).optional(),
+  maxMileage: z.coerce.number().int().min(0).optional(),
   fuelType: z.enum(FUEL_TYPES).optional(),
   transmission: z.enum(TRANSMISSION_TYPES).optional(),
-  location: z.string().optional(),
+  region: z.string().max(100).optional(),
   page: z.coerce.number().int().positive().default(1),
-  limit: z.coerce.number().int().positive().max(50).default(20),
+  limit: z.coerce.number().int().positive().max(50).default(SEARCH_PAGE_SIZE),
+});
+
+export const carFilterOptionsSchema = z.object({
+  brand: z.string().max(50).optional(),
 });
