@@ -35,12 +35,14 @@ x-app-common: &app-common
 services:
   app-blue:
     <<: *app-common
+    profiles: ["app"]
     image: ${IMAGE_REGISTRY}:${BLUE_IMAGE_TAG:-latest}
     container_name: kam-app-blue
     restart: unless-stopped
 
   app-green:
     <<: *app-common
+    profiles: ["app"]
     image: ${IMAGE_REGISTRY}:${GREEN_IMAGE_TAG:-latest}
     container_name: kam-app-green
     restart: unless-stopped

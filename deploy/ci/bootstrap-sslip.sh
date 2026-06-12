@@ -78,7 +78,7 @@ docker compose restart nginx
 log "Pulling application images (if available on GHCR)..."
 if docker pull "${IMAGE_REGISTRY}:latest" 2>/dev/null; then
   log "Starting app containers..."
-  docker compose up -d app-blue app-green
+  docker compose --profile app up -d app-blue app-green
 else
   log "WARN: No image on GHCR yet. Push to main branch, then GitHub Actions will deploy."
 fi

@@ -72,7 +72,7 @@ else
 fi
 
 log "[3/6] Recreating container on inactive slot: app-${INACTIVE}"
-docker compose up -d "app-${INACTIVE}" --pull always --force-recreate --no-deps
+docker compose --profile app up -d "app-${INACTIVE}" --pull always --force-recreate --no-deps
 
 log "[4/6] Waiting for health check (app-${INACTIVE})"
 for i in $(seq 1 60); do
