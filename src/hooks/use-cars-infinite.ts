@@ -8,7 +8,6 @@ import {
   CARS_STALE_TIME_MS,
   SEARCH_PAGE_SIZE,
 } from "@/lib/search/constants";
-import type { CarSearchParams } from "@/lib/search/params";
 import type { CarFilters } from "@/types";
 
 export function useCarsInfinite(filters: CarFilters = {}) {

@@ -61,3 +61,12 @@ export type CarFilterOptions = {
   models: string[];
   regions: string[];
 };
+
+export type AdminStats = {
+  totalUsers: number;
+  totalCars: number;
+  activeCars: number;
+  featuredCars: number;
+  bannedUsers: number;
+  totalFavorites: number;
+};

@@ -1,7 +1,8 @@
 import { getUserById } from "@/services/users";
 import type { User } from "@/types";
 
-import { getSessionUserId } from "./session";
+import { isUserBanned } from "./admin";
+import { clearSession, getSessionUserId } from "./session";
 
 export async function getCurrentUser(): Promise<User | null> {
   const userId = await getSessionUserId();
@@ -10,5 +11,17 @@ export async function getCurrentUser(): Promise<User | null> {
     return null;
   }
 
-  return getUserById(userId);
+  const user = await getUserById(userId);
+
+  if (!user) {
+    await clearSession();
+    return null;
+  }
+
+  if (isUserBanned(user)) {
+    await clearSession();
+    return null;
+  }
+
+  return user;
 }

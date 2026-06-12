@@ -1,4 +1,4 @@
-import { createHmac } from "crypto";
+import { createHmac, timingSafeEqual } from "crypto";
 
 import type { TelegramInitData, TelegramUser } from "./types";
 
@@ -41,7 +41,13 @@ export function validateTelegramInitData(
     .update(dataCheckString)
     .digest("hex");
 
-  if (calculatedHash !== hash) {
+  const hashBuffer = Buffer.from(hash, "hex");
+  const calculatedBuffer = Buffer.from(calculatedHash, "hex");
+
+  if (
+    hashBuffer.length !== calculatedBuffer.length ||
+    !timingSafeEqual(hashBuffer, calculatedBuffer)
+  ) {
     return null;
   }
 

@@ -39,6 +39,8 @@ export const users = pgTable(
     firstName: text("first_name"),
     lastName: text("last_name"),
     photoUrl: text("photo_url"),
+    isAdmin: boolean("is_admin").notNull().default(false),
+    bannedAt: timestamp("banned_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -51,6 +53,7 @@ export const users = pgTable(
     index("idx_users_telegram_id").on(table.telegramId),
     index("idx_users_deleted_at").on(table.deletedAt),
     index("idx_users_active").on(table.id).where(sql`deleted_at IS NULL`),
+    index("idx_users_banned_at").on(table.bannedAt),
     check("users_telegram_id_positive", sql`${table.telegramId} > 0`),
   ],
 );
@@ -73,6 +76,7 @@ export const cars = pgTable(
     description: text("description"),
     location: text("location"),
     isActive: boolean("is_active").notNull().default(true),
+    isFeatured: boolean("is_featured").notNull().default(false),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -93,6 +97,12 @@ export const cars = pgTable(
     index("idx_cars_transmission").on(table.transmission),
     index("idx_cars_location").on(table.location),
     index("idx_cars_created_at").on(table.createdAt),
+    index("idx_cars_is_featured").on(table.isFeatured),
+    index("idx_cars_featured_list")
+      .on(table.createdAt)
+      .where(
+        sql`is_featured = TRUE AND is_active = TRUE AND deleted_at IS NULL`,
+      ),
     index("idx_cars_active_list")
       .on(table.createdAt)
       .where(sql`is_active = TRUE AND deleted_at IS NULL`),

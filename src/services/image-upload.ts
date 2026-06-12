@@ -113,13 +113,11 @@ export async function uploadCarImages(
     );
   }
 
-  const results: UploadedCarImage[] = [];
-
-  for (const file of files) {
-    results.push(await uploadCarImage(userId, file.buffer, file.contentType));
-  }
-
-  return results;
+  return Promise.all(
+    files.map((file) =>
+      uploadCarImage(userId, file.buffer, file.contentType),
+    ),
+  );
 }
 
 export async function deleteCarImageByKeys(

@@ -4,6 +4,7 @@ import { ZodError } from "zod";
 import {
   AuthConfigError,
   AuthError,
+  ForbiddenError,
 } from "@/lib/auth/errors";
 import { FavoriteError } from "@/lib/favorites/errors";
 import { ImageUploadError } from "@/lib/images/errors";
@@ -19,6 +20,10 @@ export function handleRouteError(
 
   if (error instanceof AuthConfigError) {
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  if (error instanceof ForbiddenError) {
+    return NextResponse.json({ error: error.message }, { status: 403 });
   }
 
   if (error instanceof ImageUploadError) {

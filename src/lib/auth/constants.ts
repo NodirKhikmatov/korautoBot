@@ -13,7 +13,11 @@ export const PROTECTED_API_ROUTES: {
   { pattern: /^\/api\/cars$/, methods: ["POST"] },
   { pattern: /^\/api\/cars\/mine$/, methods: ["GET"] },
   { pattern: /^\/api\/cars\/[^/]+$/, methods: ["DELETE"] },
+  {
+    pattern: /^\/api\/admin/,
+    methods: ["GET", "POST", "PATCH", "DELETE"],
+  },
 ];
 
 /** Page routes that require authentication (middleware). */
-export const PROTECTED_PAGE_ROUTES: RegExp[] = [/^\/create$/];
+export const PROTECTED_PAGE_ROUTES: RegExp[] = [/^\/create$/, /^\/admin/];

@@ -2,6 +2,7 @@ import { validateTelegramInitData } from "@/lib/telegram/validate-init-data";
 import { upsertTelegramUser } from "@/services/users";
 import type { User } from "@/types";
 
+import { isUserBanned } from "./admin";
 import { AuthConfigError, AuthError } from "./errors";
 import { setSessionUserId } from "./session";
 
@@ -27,6 +28,10 @@ export async function authenticateTelegramInitData(
     lastName: validated.user.last_name ?? null,
     photoUrl: validated.user.photo_url ?? null,
   });
+
+  if (isUserBanned(user)) {
+    throw new AuthError("Your account has been suspended");
+  }
 
   await setSessionUserId(user.id);
 

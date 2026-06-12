@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Car, Heart, LogOut, PlusCircle } from "lucide-react";
+import { Car, Heart, LogOut, PlusCircle, Shield } from "lucide-react";
 
 import { AuthGate } from "@/components/auth/auth-gate";
 import { CarGrid, CarGridSkeleton } from "@/components/cars/car-grid";
@@ -10,12 +10,14 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { useAdminAccess } from "@/hooks/use-admin";
 import { useAuth } from "@/hooks/use-auth";
 import { useMyCars } from "@/hooks/use-my-cars";
 import { getDisplayName } from "@/lib/format";
 
 function ProfileContent() {
   const { user, logout } = useAuth();
+  const { data: adminAccess } = useAdminAccess();
   const { data, isLoading } = useMyCars();
 
   if (!user) return null;
@@ -65,6 +67,18 @@ function ProfileContent() {
             Favorites
           </Link>
         </Button>
+        {adminAccess?.isAdmin && (
+          <Button
+            asChild
+            variant="outline"
+            className="col-span-2 h-11 rounded-xl justify-start gap-2"
+          >
+            <Link href="/admin">
+              <Shield className="h-4 w-4" />
+              Admin dashboard
+            </Link>
+          </Button>
+        )}
       </div>
 
       <Separator />
