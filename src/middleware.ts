@@ -4,8 +4,8 @@ import type { NextRequest } from "next/server";
 import {
   PROTECTED_API_ROUTES,
   PROTECTED_PAGE_ROUTES,
+  SESSION_COOKIE,
 } from "@/lib/auth/constants";
-import { getSessionCookieName } from "@/lib/auth/session";
 import { verifySessionTokenEdge } from "@/lib/auth/session-token-edge";
 
 function isProtectedApiRoute(pathname: string, method: string): boolean {
@@ -31,7 +31,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const token = request.cookies.get(getSessionCookieName())?.value;
+  const token = request.cookies.get(SESSION_COOKIE)?.value;
   const userId = token ? await verifySessionTokenEdge(token) : null;
 
   if (!userId) {

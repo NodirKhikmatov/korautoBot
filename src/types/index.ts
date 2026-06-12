@@ -18,6 +18,16 @@ export type CarWithSeller = CarWithImages & {
   user: Pick<User, "id" | "username" | "firstName" | "lastName" | "photoUrl">;
 };
 
+export type UploadedCarImage = {
+  imageId: string;
+  url: string;
+  thumbnailUrl: string;
+  key: string;
+  thumbnailKey: string;
+  width: number;
+  height: number;
+};
+
 export type CarFilters = {
   search?: string;
   brand?: string;

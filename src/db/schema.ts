@@ -128,6 +128,7 @@ export const carImages = pgTable(
       .notNull()
       .references(() => cars.id, { onDelete: "cascade" }),
     url: text("url").notNull(),
+    thumbnailUrl: text("thumbnail_url").notNull(),
     sortOrder: integer("sort_order").notNull().default(0),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
@@ -137,6 +138,10 @@ export const carImages = pgTable(
     index("idx_car_images_car_id").on(table.carId),
     index("idx_car_images_sort_order").on(table.carId, table.sortOrder),
     check("car_images_url_not_empty", sql`length(trim(${table.url})) > 0`),
+    check(
+      "car_images_thumbnail_url_not_empty",
+      sql`length(trim(${table.thumbnailUrl})) > 0`,
+    ),
     check(
       "car_images_sort_order_non_negative",
       sql`${table.sortOrder} >= 0`,

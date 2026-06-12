@@ -1,6 +1,15 @@
 import { z } from "zod";
 
-import { FUEL_TYPES, TRANSMISSION_TYPES } from "@/lib/constants";
+import {
+  FUEL_TYPES,
+  MAX_IMAGES_PER_LISTING,
+  TRANSMISSION_TYPES,
+} from "@/lib/constants";
+
+export const carImageInputSchema = z.object({
+  url: z.string().url(),
+  thumbnailUrl: z.string().url(),
+});
 
 export const createCarSchema = z.object({
   title: z.string().min(3).max(100),
@@ -13,7 +22,7 @@ export const createCarSchema = z.object({
   transmission: z.enum(TRANSMISSION_TYPES),
   description: z.string().max(2000).optional(),
   location: z.string().max(100).optional(),
-  imageUrls: z.array(z.string().url()).min(1).max(10),
+  images: z.array(carImageInputSchema).min(1).max(MAX_IMAGES_PER_LISTING),
 });
 
 export const updateCarSchema = createCarSchema.partial();
