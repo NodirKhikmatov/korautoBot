@@ -71,10 +71,9 @@ sed -i "s|NEXT_PUBLIC_APP_URL=.*|NEXT_PUBLIC_APP_URL=${PUBLIC_URL}|" .env.produc
 sed -i "s|IMAGE_REGISTRY=.*|IMAGE_REGISTRY=${IMAGE_REGISTRY}|" .env.production
 log "Updated .env.production (NEXT_PUBLIC_APP_URL, IMAGE_REGISTRY)"
 
-sed -i "s/YOUR_DOMAIN/${DOMAIN}/g" deploy/nginx/docker/default.conf
-sed -i "s/YOUR_DOMAIN/${DOMAIN}/g" deploy/nginx/docker/default-http.conf
-
-cp deploy/nginx/docker/default-http.conf deploy/nginx/docker/default.conf.active
+# Substitute domain only into runtime files — do not modify tracked nginx templates (keeps git pull clean).
+sed "s/YOUR_DOMAIN/${DOMAIN}/g" deploy/nginx/docker/default-http.conf \
+  > deploy/nginx/docker/default.conf.active
 echo "server app-blue:3000 resolve;" > deploy/nginx/upstream/active.conf
 
 export IMAGE_REGISTRY
@@ -101,7 +100,8 @@ docker compose run --rm -p 80:80 --entrypoint certbot certbot certonly \
   --non-interactive
 
 log "Enabling HTTPS in Nginx..."
-cp deploy/nginx/docker/default.conf deploy/nginx/docker/default.conf.active
+sed "s/YOUR_DOMAIN/${DOMAIN}/g" deploy/nginx/docker/default.conf \
+  > deploy/nginx/docker/default.conf.active
 docker compose up -d nginx certbot --no-deps
 
 log "Pulling application images (if available on GHCR)..."

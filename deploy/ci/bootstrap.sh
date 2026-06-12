@@ -13,10 +13,8 @@ if [ ! -f .env.production ]; then
   exit 1
 fi
 
-sed -i "s/YOUR_DOMAIN/${DOMAIN}/g" deploy/nginx/docker/default.conf
-sed -i "s/YOUR_DOMAIN/${DOMAIN}/g" deploy/nginx/docker/default-http.conf
-
-cp deploy/nginx/docker/default-http.conf deploy/nginx/docker/default.conf.active
+sed "s/YOUR_DOMAIN/${DOMAIN}/g" deploy/nginx/docker/default-http.conf \
+  > deploy/nginx/docker/default.conf.active
 
 echo "==> Starting base stack (HTTP-only nginx + certbot + app slots)..."
 export IMAGE_REGISTRY="${IMAGE_REGISTRY:-ghcr.io/example/korea-auto-market}"
@@ -34,7 +32,8 @@ docker compose run --rm --entrypoint certbot certbot certonly \
   --no-eff-email \
   --non-interactive
 
-cp deploy/nginx/docker/default.conf deploy/nginx/docker/default.conf.active
+sed "s/YOUR_DOMAIN/${DOMAIN}/g" deploy/nginx/docker/default.conf \
+  > deploy/nginx/docker/default.conf.active
 docker compose restart nginx
 
 echo "Bootstrap complete. Configure GitHub Actions secrets and push to main to deploy."
