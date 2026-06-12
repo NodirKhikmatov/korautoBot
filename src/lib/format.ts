@@ -21,10 +21,6 @@ export function formatTransmission(transmission: TransmissionType): string {
   return TRANSMISSION_LABELS[transmission];
 }
 
-export function getTelegramContactUrl(username: string): string {
-  return `https://t.me/${username.replace(/^@/, "")}`;
-}
-
 export function getDisplayName(
   firstName?: string | null,
   lastName?: string | null,
