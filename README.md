@@ -4,7 +4,7 @@ Telegram Mini App marketplace for buying and selling used cars in South Korea.
 
 ## Status
 
-**Foundation complete** — Neon PostgreSQL + Drizzle ORM, API routes, services, and R2 storage are in place. UI pages are Phase 1 (see [ROADMAP](docs/ROADMAP.md)).
+Production-ready stack: PostgreSQL on Vultr VPS, Drizzle ORM, Cloudflare R2, Nginx, PM2.
 
 ## Tech Stack
 
@@ -12,60 +12,62 @@ Telegram Mini App marketplace for buying and selling used cars in South Korea.
 |-------|------------|
 | Frontend | Next.js 15, TypeScript, TailwindCSS, Shadcn UI |
 | State | Zustand, TanStack Query |
-| Database | Neon PostgreSQL |
+| Database | PostgreSQL (Vultr VPS) |
 | ORM | Drizzle |
 | Storage | Cloudflare R2 |
 | Auth | Telegram Mini App SDK |
 | Validation | Zod |
-| Deployment | Vercel |
+| Deployment | Vultr VPS, Docker, GitHub Actions, Nginx |
 
-## Getting Started
+## Getting Started (local)
 
 ```bash
 npm install
 cp .env.example .env.local   # fill in credentials
-npm run db:push              # apply schema to Neon
+npm run db:migrate           # apply migrations to PostgreSQL
 npm run dev
 ```
+
+Requires a local PostgreSQL instance. See `deploy/postgres/init-app-db.sql` for database setup.
 
 ## Scripts
 
 | Command | Description |
 |---------|-------------|
 | `npm run dev` | Dev server (Turbopack) |
-| `npm run build` | Production build |
+| `npm run build` | Production build (standalone) |
 | `npm run start` | Production server |
 | `npm run lint` | ESLint |
-| `npm run format` | Prettier format |
 | `npm run typecheck` | TypeScript check |
 | `npm run db:generate` | Generate Drizzle migration |
-| `npm run db:migrate` | Run migrations on Neon |
-| `npm run db:push` | Push schema to Neon (dev) |
-| `npm run db:studio` | Drizzle Studio |
+| `npm run db:migrate` | Run migrations |
+| `npm run db:push` | Push schema (dev) |
+| `npm run docker:build` | Build Docker image locally |
+| `npm run db:migrate:prod` | Run migrations (production script) |
 
 ## Documentation
 
 - [Project Overview](docs/PROJECT.md)
 - [Architecture](docs/ARCHITECTURE.md)
+- [Deployment (Vultr VPS)](docs/DEPLOYMENT.md)
+- [Database](docs/DATABASE.md)
 - [Roadmap](docs/ROADMAP.md)
 
 ## Project Structure
 
 ```
 src/
-├── app/api/          # REST API (auth, cars, favorites, upload)
-├── db/               # Drizzle schema + Neon client
-├── components/ui/    # Shadcn UI primitives
-├── config/           # Environment validation
+├── app/api/          # REST API
+├── db/               # Drizzle schema + pg client
+├── services/         # Database service layer
 ├── lib/              # R2, Telegram, auth
-├── services/         # Database service layer (Drizzle)
-├── schemas/          # Zod validation
-├── stores/           # Zustand stores
-├── providers/        # React providers
-├── hooks/            # Custom hooks
-└── types/            # TypeScript types
+deploy/
+├── ci/               # CI/CD deploy scripts (GitHub Actions only)
+├── nginx/            # Nginx + SSL configs
+docker-compose.yml    # Production stack
+.github/workflows/    # CI + deploy pipelines
 drizzle/migrations/   # SQL migrations
-database/             # Canonical SQL schema + RLS reference
+database/             # Canonical SQL reference
 ```
 
 ## License

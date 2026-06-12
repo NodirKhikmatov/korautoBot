@@ -29,10 +29,13 @@ Build a marketplace for buying and selling used cars in South Korea.
 | Layer | Technology |
 |-------|------------|
 | Frontend | Next.js |
-| Database | Neon PostgreSQL |
+| Database | PostgreSQL (Vultr VPS) |
 | ORM | Drizzle |
 | Storage | Cloudflare R2 |
-| Deployment | Vercel |
+| Reverse proxy | Nginx |
+| Containers | Docker + Docker Compose |
+| CI/CD | GitHub Actions |
+| Deployment | Vultr VPS |
 
 ## Priority
 

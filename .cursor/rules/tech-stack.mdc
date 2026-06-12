@@ -21,8 +21,9 @@ Always use:
 
 ## Database
 
-- Neon PostgreSQL
+- PostgreSQL on Vultr VPS
 - Drizzle ORM
+- `pg` driver (node-postgres)
 
 ## Storage
 
@@ -38,7 +39,11 @@ Always use:
 
 ## Deployment
 
-- Vercel
+- Vultr VPS
+- Docker + Docker Compose
+- GitHub Actions (CI/CD only — never manual deploy)
+- Nginx (reverse proxy container)
+- Let's Encrypt (Certbot)
 
 ## Code Quality
 
@@ -58,6 +63,9 @@ Always use:
 - Express
 - NestJS
 - Supabase
+- Neon
+- PM2 (use Docker Compose)
+- Manual production deploys
 
 Always follow existing architecture.
 
