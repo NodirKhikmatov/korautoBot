@@ -14,8 +14,13 @@ export type CarWithImages = Car & {
   carImages: CarImage[];
 };
 
+export type SellerProfile = Pick<
+  User,
+  "id" | "username" | "firstName" | "lastName" | "photoUrl"
+>;
+
 export type CarWithSeller = CarWithImages & {
-  user: Pick<User, "id" | "username" | "firstName" | "lastName" | "photoUrl">;
+  user: SellerProfile;
 };
 
 export type UploadedCarImage = {

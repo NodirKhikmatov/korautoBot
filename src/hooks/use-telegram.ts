@@ -19,6 +19,3 @@ export function useTelegram() {
   };
 }
 
-export function getTelegramContactUrl(username: string): string {
-  return `https://t.me/${username}`;
-}
