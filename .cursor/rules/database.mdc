@@ -45,6 +45,8 @@ PostgreSQL on Vultr VPS (self-hosted or Vultr Managed PostgreSQL)
 - cars
 - car_images
 - favorites
+- conversations
+- messages
 
 ## Optimize for
 

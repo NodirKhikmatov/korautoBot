@@ -22,14 +22,14 @@ Telegram Mini App marketplace for used cars in South Korea. Mobile-first, self-h
 │         │                │                              │
 │  ┌──────▼────────────────▼──────────────────────────┐   │
 │  │              Services Layer                      │   │
-│  │   users · cars · favorites · admin               │   │
+│  │   users · cars · favorites · messaging · admin   │   │
 │  └──────┬─────────────────────┬────────────────────┘   │
 └─────────┼─────────────────────┼────────────────────────┘
           │                     │
-   ┌──────▼──────┐       ┌──────▼──────┐
-   │ PostgreSQL  │       │ Cloudflare  │
-   │ Vultr VPS   │       │     R2      │
-   │ + Drizzle   │       │  (images)   │
+   ┌──────▼──────┐       ┌──────▼──────┐       ┌──────────────┐
+   │ PostgreSQL  │       │ Cloudflare  │       │ Telegram Bot │
+   │ Vultr VPS   │       │     R2      │       │   (relay)    │
+   │ + Drizzle   │       │  (images)   │       └──────────────┘
    └─────────────┘       └─────────────┘
 ```
 
@@ -69,8 +69,39 @@ Telegram Mini App marketplace for used cars in South Korea. Mobile-first, self-h
 | `cars` | Vehicle listings (soft delete, indexed for search) |
 | `car_images` | Image URLs pointing to R2 (not stored in DB) |
 | `favorites` | User ↔ car many-to-many |
+| `conversations` | Buyer ↔ seller thread per listing |
+| `messages` | Bot-relayed messages with Telegram message IDs |
 
 Schema: `src/db/schema.ts` · Migrations: `drizzle/migrations/`
+
+## Messaging System
+
+Bot-mediated contact between buyers and sellers. No in-app realtime chat and no seller username required.
+
+```
+Buyer (Mini App)
+  → POST /api/cars/:id/contact { message }
+  → conversation + message stored in PostgreSQL
+  → bot sends inquiry to seller Telegram ID
+
+Seller (Telegram)
+  → replies to bot message
+  → POST /api/telegram/webhook
+  → bot forwards reply to buyer Telegram ID
+```
+
+**Rules:**
+- Telegram ID is the identity key (username optional)
+- Seller Telegram ID is never exposed in the public API
+- All messages route through the bot
+- Reply threading uses stored `telegram_message_id` on outbound bot messages
+
+**Key paths:**
+- `src/services/messaging.ts` — inquiry + relay logic
+- `src/services/conversations.ts` — conversation persistence
+- `src/lib/telegram/bot-api.ts` — Telegram Bot API client
+- `src/app/api/telegram/webhook/route.ts` — inbound bot updates
+- `src/app/api/cars/[id]/contact/route.ts` — buyer inquiry endpoint
 
 ## Image Upload Flow
 
@@ -110,7 +141,9 @@ See `.env.example` and `.env.production.example`.
 |----------|-------|---------|
 | `NEXT_PUBLIC_APP_URL` | Client | Public app URL |
 | `DATABASE_URL` | Server | PostgreSQL on Vultr |
-| `TELEGRAM_BOT_TOKEN` | Server | Telegram auth |
+| `TELEGRAM_BOT_TOKEN` | Server | Telegram auth + bot messaging |
+| `NEXT_PUBLIC_TELEGRAM_BOT_USERNAME` | Client | Bot deep links after contact |
+| `TELEGRAM_WEBHOOK_SECRET` | Server | Webhook verification (optional) |
 | `SESSION_SECRET` | Server | Session signing (required in prod) |
 | `R2_*` | Server | Cloudflare R2 |
 

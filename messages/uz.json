@@ -104,6 +104,15 @@
     "mileagePlaceholder": "45000",
     "locationPlaceholder": "Seoul",
     "descriptionPlaceholder": "Holati, xususiyatlari, tarixi...",
+    "contactPhone": "Telefon raqam",
+    "contactPhonePlaceholder": "+998901234567",
+    "contactPhoneHint": "Ixtiyoriy. Telegram username bo'lmasa, xaridorlar shu raqam orqali bog'lanadi.",
+    "sold": "Sotilgan",
+    "soldDescription": "Bu mashina sotilgan. Boshqa o'xshash e'lonlarni ko'ring.",
+    "soldDescriptionOwner": "E'lon sotilgan deb belgilangan. Xaridorlar bog'lana olmaydi.",
+    "markSold": "Sotilgan deb belgilash",
+    "relist": "Qayta e'lon qilish",
+    "statusUpdateFailed": "Holatni yangilab bo'lmadi",
     "addPhotoRequired": "Kamida bitta rasm qo'shing",
     "invalidFormData": "Noto'g'ri forma ma'lumotlari",
     "createFailed": "E'lon yaratish muvaffaqiyatsiz",
@@ -175,13 +184,23 @@
       "ko": "한국어",
       "uz": "Oʻzbek",
       "ru": "Русский"
-    }
+    },
+    "phone": "Telefon raqam",
+    "phoneDescription": "Ixtiyoriy. Telegram username bo'lmasa, xaridorlar qo'ng'iroq qilishi mumkin.",
+    "phonePlaceholder": "+998901234567",
+    "phoneCurrent": "Saqlangan: {phone}",
+    "phoneSaved": "Telefon raqam saqlandi",
+    "phoneSaveFailed": "Telefon raqamni saqlab bo'lmadi",
+    "savePhone": "Raqamni saqlash"
   },
   "seller": {
     "title": "Sotuvchi",
     "telegram": "Telegram",
     "contactSeller": "Sotuvchiga bog'lanish",
-    "noUsername": "Bu sotuvchining ochiq Telegram username yo'q."
+    "sendInquiry": "So'rov yuborish",
+    "inquiryHint": "Xabaringiz bot orqali yuboriladi. Sotuvchi Telegramda javob beradi.",
+    "inquiryPlaceholder": "Salom, bu mashina qiziqtiradi. Hali sotuvdami?",
+    "inquirySent": "So'rov yuborildi. Javoblarni olish uchun bot chatini oching."
   },
   "admin": {
     "title": "Admin",

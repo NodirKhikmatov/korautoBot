@@ -11,7 +11,9 @@ export const PROTECTED_API_ROUTES: {
   { pattern: /^\/api\/favorites$/, methods: ["GET", "POST", "DELETE"] },
   { pattern: /^\/api\/favorites\/check$/, methods: ["GET"] },
   { pattern: /^\/api\/cars$/, methods: ["POST"] },
+  { pattern: /^\/api\/profile$/, methods: ["PATCH"] },
   { pattern: /^\/api\/cars\/mine$/, methods: ["GET"] },
+  { pattern: /^\/api\/cars\/[^/]+\/status$/, methods: ["PATCH"] },
   { pattern: /^\/api\/cars\/[^/]+$/, methods: ["DELETE"] },
   {
     pattern: /^\/api\/admin/,

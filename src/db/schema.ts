@@ -11,6 +11,7 @@ import {
   text,
   timestamp,
   unique,
+  uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
 
@@ -30,6 +31,11 @@ export const fuelTypeEnum = pgEnum("fuel_type", [
 
 export const transmissionEnum = pgEnum("transmission", ["automatic", "manual"]);
 
+export const messageDirectionEnum = pgEnum("message_direction", [
+  "buyer_to_seller",
+  "seller_to_buyer",
+]);
+
 export const users = pgTable(
   "users",
   {
@@ -39,6 +45,7 @@ export const users = pgTable(
     firstName: text("first_name"),
     lastName: text("last_name"),
     photoUrl: text("photo_url"),
+    phone: text("phone"),
     isAdmin: boolean("is_admin").notNull().default(false),
     bannedAt: timestamp("banned_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true })
@@ -55,6 +62,10 @@ export const users = pgTable(
     index("idx_users_active").on(table.id).where(sql`deleted_at IS NULL`),
     index("idx_users_banned_at").on(table.bannedAt),
     check("users_telegram_id_positive", sql`${table.telegramId} > 0`),
+    check(
+      "users_phone_not_empty",
+      sql`${table.phone} IS NULL OR length(trim(${table.phone})) > 0`,
+    ),
   ],
 );
 
@@ -77,6 +88,7 @@ export const cars = pgTable(
     location: text("location"),
     isActive: boolean("is_active").notNull().default(true),
     isFeatured: boolean("is_featured").notNull().default(false),
+    soldAt: timestamp("sold_at", { withTimezone: true }),
     viewCount: integer("view_count").notNull().default(0),
     contactCount: integer("contact_count").notNull().default(0),
     createdAt: timestamp("created_at", { withTimezone: true })
@@ -100,6 +112,7 @@ export const cars = pgTable(
     index("idx_cars_location").on(table.location),
     index("idx_cars_created_at").on(table.createdAt),
     index("idx_cars_is_featured").on(table.isFeatured),
+    index("idx_cars_sold_at").on(table.soldAt),
     index("idx_cars_featured_list")
       .on(table.createdAt)
       .where(
@@ -209,6 +222,64 @@ export const carImages = pgTable(
   ],
 );
 
+export const conversations = pgTable(
+  "conversations",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    carId: uuid("car_id")
+      .notNull()
+      .references(() => cars.id, { onDelete: "cascade" }),
+    buyerId: uuid("buyer_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    sellerId: uuid("seller_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    unique("conversations_car_id_buyer_id_unique").on(table.carId, table.buyerId),
+    index("idx_conversations_car_id").on(table.carId),
+    index("idx_conversations_buyer_id").on(table.buyerId),
+    index("idx_conversations_seller_id").on(table.sellerId),
+  ],
+);
+
+export const messages = pgTable(
+  "messages",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    conversationId: uuid("conversation_id")
+      .notNull()
+      .references(() => conversations.id, { onDelete: "cascade" }),
+    senderId: uuid("sender_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    body: text("body").notNull(),
+    direction: messageDirectionEnum("direction").notNull(),
+    telegramMessageId: bigint("telegram_message_id", { mode: "number" }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_messages_conversation_id").on(table.conversationId),
+    index("idx_messages_conversation_created").on(
+      table.conversationId,
+      table.createdAt,
+    ),
+    uniqueIndex("idx_messages_telegram_message_id")
+      .on(table.telegramMessageId)
+      .where(sql`telegram_message_id IS NOT NULL`),
+    check("messages_body_not_empty", sql`length(trim(${table.body})) > 0`),
+  ],
+);
+
 export const favorites = pgTable(
   "favorites",
   {
@@ -234,6 +305,9 @@ export const favorites = pgTable(
 export const usersRelations = relations(users, ({ many }) => ({
   cars: many(cars),
   favorites: many(favorites),
+  buyerConversations: many(conversations, { relationName: "buyer" }),
+  sellerConversations: many(conversations, { relationName: "seller" }),
+  sentMessages: many(messages),
 }));
 
 export const carsRelations = relations(cars, ({ one, many }) => ({
@@ -245,6 +319,7 @@ export const carsRelations = relations(cars, ({ one, many }) => ({
   favorites: many(favorites),
   views: many(carViews),
   contacts: many(carContacts),
+  conversations: many(conversations),
 }));
 
 export const carViewsRelations = relations(carViews, ({ one }) => ({
@@ -269,6 +344,35 @@ export const carImagesRelations = relations(carImages, ({ one }) => ({
   car: one(cars, {
     fields: [carImages.carId],
     references: [cars.id],
+  }),
+}));
+
+export const conversationsRelations = relations(conversations, ({ one, many }) => ({
+  car: one(cars, {
+    fields: [conversations.carId],
+    references: [cars.id],
+  }),
+  buyer: one(users, {
+    fields: [conversations.buyerId],
+    references: [users.id],
+    relationName: "buyer",
+  }),
+  seller: one(users, {
+    fields: [conversations.sellerId],
+    references: [users.id],
+    relationName: "seller",
+  }),
+  messages: many(messages),
+}));
+
+export const messagesRelations = relations(messages, ({ one }) => ({
+  conversation: one(conversations, {
+    fields: [messages.conversationId],
+    references: [conversations.id],
+  }),
+  sender: one(users, {
+    fields: [messages.senderId],
+    references: [users.id],
   }),
 }));
 

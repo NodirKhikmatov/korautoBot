@@ -5,9 +5,11 @@ import { Calendar, Gauge, MapPin } from "lucide-react";
 
 import { CarImage } from "@/components/cars/car-image";
 import { ListingStats } from "@/components/cars/listing-stats";
+import { SoldBadge } from "@/components/cars/sold-badge";
 import { FavoriteButton } from "@/components/cars/favorite-button";
 import { Badge } from "@/components/ui/badge";
 import { formatMileage, formatPrice } from "@/lib/utils";
+import { isListingSold } from "@/lib/listing/status";
 import type { CarWithImages } from "@/types";
 
 function getCoverImage(car: CarWithImages): string | null {
@@ -28,11 +30,12 @@ export function CarCard({
 }) {
   const cover = getCoverImage(car);
   const coverAlt = `${car.title} — ${car.brand} ${car.model} ${car.year}`;
+  const sold = isListingSold(car);
 
   return (
     <Link href={`/car/${car.id}`} className="group block">
       <article
-        className="overflow-hidden rounded-2xl border border-border/60 bg-card shadow-sm transition-all duration-300 group-hover:border-primary/30 group-hover:shadow-md group-active:scale-[0.98]"
+        className={`overflow-hidden rounded-2xl border border-border/60 bg-card shadow-sm transition-all duration-300 group-hover:border-primary/30 group-hover:shadow-md group-active:scale-[0.98] ${sold ? "opacity-80" : ""}`}
       >
         <div className="relative aspect-[16/10] overflow-hidden bg-muted">
           {cover ? (
@@ -42,7 +45,7 @@ export function CarCard({
               width={640}
               height={400}
               priority={priority}
-              className="h-full w-full object-contain"
+              className={`h-full w-full object-contain ${sold ? "grayscale-[35%]" : ""}`}
               sizes="(max-width: 768px) 50vw, 33vw"
             />
           ) : (
@@ -50,12 +53,19 @@ export function CarCard({
               <CarPlaceholderIcon />
             </div>
           )}
+          {sold && (
+            <div className="absolute left-2 top-2">
+              <SoldBadge car={car} />
+            </div>
+          )}
           <div className="absolute right-2 top-2">
-            <FavoriteButton
-              carId={car.id}
-              className="h-8 w-8 border-0 bg-foreground/40 text-background backdrop-blur-sm hover:bg-foreground/60"
-              variant="ghost"
-            />
+            {!sold && (
+              <FavoriteButton
+                carId={car.id}
+                className="h-8 w-8 border-0 bg-foreground/40 text-background backdrop-blur-sm hover:bg-foreground/60"
+                variant="ghost"
+              />
+            )}
           </div>
         </div>
 

@@ -1,5 +1,5 @@
 ---
-description: Telegram Mini App auth, identity, and seller contact rules
+description: Telegram Mini App auth, identity, and bot-mediated communication rules
 globs: src/**/telegram/**,src/**/auth/**,app/**
 alwaysApply: false
 ---
@@ -31,14 +31,31 @@ Telegram Mini App SDK
 - Password Login
 - Google Login
 
-## Seller Contact
+## Communication Rules
 
-### Display
+### Primary Contact Method
 
-- Telegram Username
+Telegram Bot Messaging
 
-### Contact Button
+### Identity
 
-`https://t.me/{username}`
+- Never require Telegram username
+- Use Telegram ID as the unique identifier
+- Username optional
+- Phone optional
+- Telegram ID required
+
+### Flow
+
+Buyer
+→ Contact Seller
+→ Bot forwards message
+→ Seller replies
+→ Bot forwards reply to buyer
+
+### Privacy & Routing
+
+- Do not expose seller Telegram ID publicly
+- All communication must go through the bot
 
 Always trust Telegram identity as the primary user identity.

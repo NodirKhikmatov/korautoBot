@@ -1,8 +1,8 @@
-export const locales = ["en", "ko", "uz", "ru"] as const;
+export const locales = ["uz", "en", "ko", "ru"] as const;
 
 export type Locale = (typeof locales)[number];
 
-export const defaultLocale: Locale = "en";
+export const defaultLocale: Locale = "uz";
 
 export const LOCALE_COOKIE = "NEXT_LOCALE";
 

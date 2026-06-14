@@ -30,6 +30,7 @@ import type {
   CarsListResult,
 } from "@/types";
 import { validateUserImagePair } from "@/services/image-upload";
+import { publicListingWhere } from "@/lib/listing/queries";
 
 type CreateCarInput = z.infer<typeof createCarSchema>;
 
@@ -44,7 +45,7 @@ function toTsQuery(search: string): string {
 }
 
 function buildCarFilterConditions(filters: CarFilters) {
-  const conditions = [eq(cars.isActive, true), isNull(cars.deletedAt)];
+  const conditions = [publicListingWhere()];
 
   if (filters.search) {
     const pattern = toIlikeContainsPattern(filters.search);
@@ -134,7 +135,7 @@ async function getCarsFromDb(
         .select()
         .from(cars)
         .where(where)
-        .orderBy(desc(cars.isFeatured), desc(cars.createdAt))
+        .orderBy(desc(cars.isActive), desc(cars.isFeatured), desc(cars.createdAt))
         .limit(limit)
         .offset(offset),
     ]);
@@ -199,7 +200,7 @@ export async function getCarFilterOptions(
   brand?: string,
 ): Promise<CarFilterOptions> {
   return withBypassRls(async (tx) => {
-    const baseWhere = and(eq(cars.isActive, true), isNull(cars.deletedAt));
+    const baseWhere = publicListingWhere();
 
     const brandRows = await tx
       .selectDistinct({ value: cars.brand })
@@ -247,12 +248,70 @@ export async function getCarById(carId: string): Promise<CarWithSeller | null> {
             firstName: true,
             lastName: true,
             photoUrl: true,
+            phone: true,
           },
         },
       },
     });
 
     return (car as CarWithSeller | undefined) ?? null;
+  });
+}
+
+export type CarForContact = {
+  id: string;
+  userId: string;
+  title: string;
+  isActive: boolean;
+  soldAt: Date | null;
+  seller: {
+    id: string;
+    telegramId: number;
+    username: string | null;
+    firstName: string | null;
+    lastName: string | null;
+    phone: string | null;
+  };
+};
+
+export async function getCarForContact(carId: string): Promise<CarForContact | null> {
+  return withBypassRls(async (tx) => {
+    const car = await tx.query.cars.findFirst({
+      where: (table, { and, eq, isNull }) =>
+        and(eq(table.id, carId), isNull(table.deletedAt)),
+      columns: {
+        id: true,
+        userId: true,
+        title: true,
+        isActive: true,
+        soldAt: true,
+      },
+      with: {
+        user: {
+          columns: {
+            id: true,
+            telegramId: true,
+            username: true,
+            firstName: true,
+            lastName: true,
+            phone: true,
+          },
+        },
+      },
+    });
+
+    if (!car) {
+      return null;
+    }
+
+    return {
+      id: car.id,
+      userId: car.userId,
+      title: car.title,
+      isActive: car.isActive,
+      soldAt: car.soldAt,
+      seller: car.user,
+    };
   });
 }
 
@@ -309,6 +368,7 @@ export async function createCar(
             firstName: true,
             lastName: true,
             photoUrl: true,
+            phone: true,
           },
         },
       },

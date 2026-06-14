@@ -8,6 +8,7 @@ import {
   VIEWER_COOKIE_MAX_AGE_SECONDS,
 } from "@/lib/analytics/viewer-cookie";
 import { getSessionUserId } from "@/lib/auth/session";
+import { isPublicListing } from "@/lib/listing/status";
 import { recordCarView } from "@/services/car-analytics";
 import { getCarById } from "@/services/cars";
 
@@ -20,7 +21,7 @@ export async function POST(_request: Request, context: RouteContext) {
     const { id } = await context.params;
     const car = await getCarById(id);
 
-    if (!car || !car.isActive) {
+    if (!car || !isPublicListing(car)) {
       return NextResponse.json({ error: "Car not found" }, { status: 404 });
     }
 

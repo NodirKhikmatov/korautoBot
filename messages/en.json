@@ -104,6 +104,15 @@
     "mileagePlaceholder": "45000",
     "locationPlaceholder": "Seoul",
     "descriptionPlaceholder": "Condition, features, history...",
+    "contactPhone": "Phone number",
+    "contactPhonePlaceholder": "+998901234567",
+    "contactPhoneHint": "Optional. Buyers can call this number if you have no Telegram username.",
+    "sold": "Sold",
+    "soldDescription": "This car has been sold. Browse similar listings.",
+    "soldDescriptionOwner": "Marked as sold. Buyers can no longer contact you.",
+    "markSold": "Mark as sold",
+    "relist": "List again",
+    "statusUpdateFailed": "Could not update listing status",
     "addPhotoRequired": "Add at least one photo",
     "invalidFormData": "Invalid form data",
     "createFailed": "Failed to create listing",
@@ -175,13 +184,23 @@
       "ko": "Korean",
       "uz": "Uzbek",
       "ru": "Russian"
-    }
+    },
+    "phone": "Phone number",
+    "phoneDescription": "Optional. Buyers can call you if you have no Telegram username.",
+    "phonePlaceholder": "+998901234567",
+    "phoneCurrent": "Saved: {phone}",
+    "phoneSaved": "Phone number saved",
+    "phoneSaveFailed": "Could not save phone number",
+    "savePhone": "Save phone"
   },
   "seller": {
     "title": "Seller",
     "telegram": "Telegram",
     "contactSeller": "Contact Seller",
-    "noUsername": "This seller has no public Telegram username."
+    "sendInquiry": "Send inquiry",
+    "inquiryHint": "Your message is sent through our bot. The seller will reply in Telegram.",
+    "inquiryPlaceholder": "Hi, I'm interested in this car. Is it still available?",
+    "inquirySent": "Inquiry sent. Open the bot chat to receive replies."
   },
   "admin": {
     "title": "Admin",

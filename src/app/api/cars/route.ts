@@ -2,8 +2,10 @@ import { NextResponse } from "next/server";
 
 import { handleRouteError } from "@/lib/api/handle-route-error";
 import { requireAuth } from "@/lib/auth/require-auth";
-import { carFiltersSchema, createCarSchema } from "@/schemas/car";
+import { carFiltersSchema, createCarSchema, createListingSchema } from "@/schemas/car";
 import { createCar, getCars } from "@/services/cars";
+import { updateUserPhone } from "@/services/users";
+import type { User } from "@/types";
 
 export async function GET(request: Request) {
   try {
@@ -27,10 +29,18 @@ export async function POST(request: Request) {
   try {
     const user = await requireAuth();
     const body = await request.json();
-    const input = createCarSchema.parse(body);
-    const car = await createCar(user.id, input);
+    const input = createListingSchema.parse(body);
+    const { phone, ...carData } = input;
+    const parsedCar = createCarSchema.parse(carData);
 
-    return NextResponse.json({ car }, { status: 201 });
+    let currentUser: User = user;
+    if (phone !== undefined) {
+      currentUser = await updateUserPhone(user.id, phone);
+    }
+
+    const car = await createCar(currentUser.id, parsedCar);
+
+    return NextResponse.json({ car, user: currentUser }, { status: 201 });
   } catch (error) {
     return handleRouteError(error, "Create car error");
   }

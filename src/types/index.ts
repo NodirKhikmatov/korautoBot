@@ -1,11 +1,13 @@
 import type { InferSelectModel } from "drizzle-orm";
 
-import type { carImages, cars, favorites, users } from "@/db/schema";
+import type { carImages, cars, conversations, favorites, messages, users } from "@/db/schema";
 
 export type User = InferSelectModel<typeof users>;
 export type Car = InferSelectModel<typeof cars>;
 export type CarImage = InferSelectModel<typeof carImages>;
 export type Favorite = InferSelectModel<typeof favorites>;
+export type Conversation = InferSelectModel<typeof conversations>;
+export type Message = InferSelectModel<typeof messages>;
 
 export type FuelType = Car["fuelType"];
 export type TransmissionType = Car["transmission"];
@@ -16,7 +18,7 @@ export type CarWithImages = Car & {
 
 export type SellerProfile = Pick<
   User,
-  "id" | "username" | "firstName" | "lastName" | "photoUrl"
+  "id" | "username" | "firstName" | "lastName" | "photoUrl" | "phone"
 >;
 
 export type CarWithSeller = CarWithImages & {

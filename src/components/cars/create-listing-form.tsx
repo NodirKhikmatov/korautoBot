@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { ImageUploader } from "@/components/cars/image-uploader";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { useAuth } from "@/hooks/use-auth";
 import { useCreateCar } from "@/hooks/use-create-car";
 import { useTranslatedFormat } from "@/hooks/use-translated-format";
 import {
@@ -17,12 +18,14 @@ import {
   FUEL_TYPES,
   TRANSMISSION_TYPES,
 } from "@/lib/constants";
-import { createCarSchema } from "@/schemas/car";
+import { createListingSchema } from "@/schemas/car";
+import { useAuthStore } from "@/stores/auth-store";
 import type { UploadedCarImage } from "@/types";
 
 export function CreateListingForm() {
   const t = useTranslations("listing");
   const { formatFuelType, formatTransmission } = useTranslatedFormat();
+  const { user } = useAuth();
   const router = useRouter();
   const createCar = useCreateCar();
   const [error, setError] = useState<string | null>(null);
@@ -40,6 +43,11 @@ export function CreateListingForm() {
   );
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
+  const [phone, setPhone] = useState("");
+
+  useEffect(() => {
+    setPhone(user?.phone ?? "");
+  }, [user?.phone]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -61,13 +69,14 @@ export function CreateListingForm() {
       transmission: transmission as typeof TRANSMISSION_TYPES[number],
       description: description || undefined,
       location: location || undefined,
+      phone,
       images: images.map((img) => ({
         url: img.url,
         thumbnailUrl: img.thumbnailUrl,
       })),
     };
 
-    const parsed = createCarSchema.safeParse(payload);
+    const parsed = createListingSchema.safeParse(payload);
 
     if (!parsed.success) {
       setError(parsed.error.errors[0]?.message ?? t("invalidFormData"));
@@ -75,8 +84,11 @@ export function CreateListingForm() {
     }
 
     try {
-      const { car } = await createCar.mutateAsync(parsed.data);
-      router.push(`/car/${car.id}`);
+      const result = await createCar.mutateAsync(parsed.data);
+      if (result.user) {
+        useAuthStore.getState().setUser(result.user);
+      }
+      router.push(`/car/${result.car.id}`);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : t("createFailed"),
@@ -219,6 +231,22 @@ export function CreateListingForm() {
             onChange={(e) => setDescription(e.target.value)}
             rows={4}
           />
+        </div>
+
+        <div className="space-y-1.5">
+          <Label htmlFor="phone">{t("contactPhone")}</Label>
+          <Input
+            id="phone"
+            type="tel"
+            inputMode="tel"
+            placeholder={t("contactPhonePlaceholder")}
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            className="h-11 rounded-xl bg-card/50"
+          />
+          <p className="text-xs text-muted-foreground">
+            {t("contactPhoneHint")}
+          </p>
         </div>
       </div>
 
