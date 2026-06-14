@@ -90,6 +90,50 @@ export function formatSellerFollowUpMessage(
   ].join("\n");
 }
 
+function getPublicAppUrl(): string {
+  return process.env.NEXT_PUBLIC_APP_URL?.trim() || "https://t.me";
+}
+
+export function formatWelcomeMessage(locale?: string | null): string {
+  const template = getBotMessages(locale).welcome;
+
+  return template.replaceAll("{appUrl}", getPublicAppUrl());
+}
+
+export function formatAdminSupportMessage(
+  input: {
+    user: Pick<User, "firstName" | "lastName" | "username" | "telegramId">;
+    message: string;
+  },
+  locale?: string | null,
+): string {
+  const identity = formatContactIdentity(input.user, locale);
+  const handle = input.user.username
+    ? formatTelegramUsername(input.user.username)
+    : null;
+  const timestamp = new Intl.DateTimeFormat("uz-UZ", {
+    dateStyle: "short",
+    timeStyle: "short",
+    timeZone: "Asia/Seoul",
+  }).format(new Date());
+
+  return [
+    "📩 Yangi murojaat — Korea Auto Market",
+    "",
+    `👤 Foydalanuvchi: ${identity}`,
+    handle ? `📎 Username: ${handle}` : "📎 Username: yo'q",
+    `🆔 Telegram ID: ${input.user.telegramId}`,
+    `🕐 Vaqt: ${timestamp}`,
+    "",
+    "📝 Xabar:",
+    input.message,
+  ].join("\n");
+}
+
+export function formatBroadcastMessage(message: string): string {
+  return ["📢 Korea Auto Market", "", message.trim()].join("\n");
+}
+
 export function formatConversationStartMessage(
   carTitle: string,
   locale?: string | null,

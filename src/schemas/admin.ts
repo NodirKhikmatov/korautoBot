@@ -30,3 +30,11 @@ export const adminFeatureCarSchema = z.object({
 export const adminBanUserSchema = z.object({
   banned: z.boolean(),
 });
+
+export const adminBroadcastSchema = z.object({
+  message: z
+    .string()
+    .trim()
+    .min(1, "Message is required")
+    .max(4000, "Message is too long"),
+});

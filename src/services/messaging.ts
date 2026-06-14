@@ -1,5 +1,5 @@
-import { withBypassRls } from "@/db/context";
 import { MessagingError } from "@/lib/messaging/errors";
+import { resolveBotLocaleFromTelegram } from "@/lib/messaging/bot-messages";
 import {
   formatBuyerReplyMessage,
   formatConversationStartMessage,
@@ -7,6 +7,7 @@ import {
   formatSellerFollowUpMessage,
   formatSellerInquiryMessage,
   formatContactIdentity,
+  formatWelcomeMessage,
 } from "@/lib/messaging/format";
 import {
   getTelegramBotChatUrl,
@@ -219,6 +220,15 @@ export async function relayConversationReply(input: {
   });
 
   return true;
+}
+
+export async function handleBotWelcome(
+  telegramUserId: number,
+  languageCode?: string | null,
+): Promise<void> {
+  const locale = resolveBotLocaleFromTelegram(languageCode);
+
+  await sendTelegramMessage(telegramUserId, formatWelcomeMessage(locale));
 }
 
 export async function handleConversationStart(

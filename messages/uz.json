@@ -191,7 +191,15 @@
     "phoneCurrent": "Saqlangan: {phone}",
     "phoneSaved": "Telefon raqam saqlandi",
     "phoneSaveFailed": "Telefon raqamni saqlab bo'lmadi",
-    "savePhone": "Raqamni saqlash"
+    "savePhone": "Raqamni saqlash",
+    "supportSection": "Yordam",
+    "supportButton": "Admin bilan bog'lanish",
+    "supportTitle": "Admin bilan bog'lanish",
+    "supportDescription": "Savol, taklif yoki muammo haqida yozing. Xabar bot orqali admin'ga yuboriladi.",
+    "supportPlaceholder": "Masalan: e'lon joylashtirishda muammo bor...",
+    "supportSend": "Xabar yuborish",
+    "supportSent": "Xabaringiz yuborildi. Tez orada javob beramiz.",
+    "supportSendFailed": "Xabarni yuborib bo'lmadi"
   },
   "seller": {
     "title": "Sotuvchi",
@@ -240,7 +248,17 @@
     "statActive": "Faol",
     "statFeatured": "Tanlangan",
     "statBanned": "Bloklangan",
-    "statFavorites": "Sevimlilar"
+    "statFavorites": "Sevimlilar",
+    "broadcastTitle": "Broadcast",
+    "broadcastDescription": "Barcha ro'yxatdan o'tgan foydalanuvchilarga bot orqali xabar yuboring.",
+    "broadcastPlaceholder": "Masalan: Yangi e'lonlar qo'shildi, Mini App'ni ochib ko'ring!",
+    "broadcastSend": "Hammaga yuborish",
+    "broadcastConfirm": "Bu xabarni barcha foydalanuvchilarga yuborasizmi?",
+    "broadcastSuccess": "Broadcast yuborildi",
+    "broadcastResult": "Jami: {total} · Yetkazildi: {sent} · Botni ochmagan: {notStarted} · Xato: {failed}",
+    "broadcastFailed": "Broadcast yuborib bo'lmadi",
+    "broadcastLoadingRecipients": "Qabul qiluvchilar hisoblanmoqda...",
+    "broadcastRecipients": "{count, plural, one {# foydalanuvchiga yuboriladi} other {# foydalanuvchiga yuboriladi}}"
   },
   "fuel": {
     "gasoline": "Benzin",
