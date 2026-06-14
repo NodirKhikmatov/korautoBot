@@ -20,6 +20,7 @@ import {
   getMessageByTelegramMessageId,
   getOrCreateConversation,
 } from "@/services/conversations";
+import { canContactListing } from "@/lib/listing/status";
 import { getCarForContact } from "@/services/cars";
 import { getTelegramContactUrl } from "@/lib/telegram/contact";
 import { getPhoneContactUrl } from "@/lib/contact/phone";
@@ -44,7 +45,7 @@ export async function contactSeller(
 ): Promise<ContactSellerResult> {
   const car = await getCarForContact(carId);
 
-  if (!car || !car.isActive) {
+  if (!car || !canContactListing(car)) {
     throw new MessagingError("Car not found", 404, "CAR_NOT_FOUND");
   }
 
@@ -156,7 +157,7 @@ export async function relayConversationReply(input: {
 
   const conversation = context.conversation;
 
-  if (!conversation.car.isActive) {
+  if (!canContactListing(conversation.car)) {
     return false;
   }
 

@@ -49,7 +49,7 @@ export async function getConversationById(
 }
 
 export type ConversationWithContext = Conversation & {
-  car: { id: string; title: string; isActive: boolean };
+  car: { id: string; title: string; isActive: boolean; soldAt: Date | null };
   buyer: {
     id: string;
     telegramId: number;
@@ -78,6 +78,7 @@ export async function getConversationWithContext(
             id: true,
             title: true,
             isActive: true,
+            soldAt: true,
           },
         },
         buyer: {
@@ -123,6 +124,7 @@ export async function getMessageByTelegramMessageId(
                 id: true,
                 title: true,
                 isActive: true,
+                soldAt: true,
               },
             },
             buyer: {

@@ -59,11 +59,13 @@ export function CarCard({
             </div>
           )}
           <div className="absolute right-2 top-2">
-            <FavoriteButton
-              carId={car.id}
-              className="h-8 w-8 border-0 bg-foreground/40 text-background backdrop-blur-sm hover:bg-foreground/60"
-              variant="ghost"
-            />
+            {!sold && (
+              <FavoriteButton
+                carId={car.id}
+                className="h-8 w-8 border-0 bg-foreground/40 text-background backdrop-blur-sm hover:bg-foreground/60"
+                variant="ghost"
+              />
+            )}
           </div>
         </div>
 

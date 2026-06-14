@@ -86,7 +86,7 @@ export function CarDetailView({ carId }: { carId: string }) {
             />
           </div>
           <div className="flex shrink-0 gap-1">
-            {isAuthenticated && (
+            {isAuthenticated && !sold && (
               <FavoriteButton carId={listing.id} className="h-10 w-10" />
             )}
             <Button

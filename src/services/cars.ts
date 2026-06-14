@@ -263,6 +263,7 @@ export type CarForContact = {
   userId: string;
   title: string;
   isActive: boolean;
+  soldAt: Date | null;
   seller: {
     id: string;
     telegramId: number;
@@ -283,6 +284,7 @@ export async function getCarForContact(carId: string): Promise<CarForContact | n
         userId: true,
         title: true,
         isActive: true,
+        soldAt: true,
       },
       with: {
         user: {
@@ -307,6 +309,7 @@ export async function getCarForContact(carId: string): Promise<CarForContact | n
       userId: car.userId,
       title: car.title,
       isActive: car.isActive,
+      soldAt: car.soldAt,
       seller: car.user,
     };
   });
