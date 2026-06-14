@@ -1,5 +1,5 @@
 import { MessagingError } from "@/lib/messaging/errors";
-import { resolveBotLocaleFromTelegram } from "@/lib/messaging/bot-messages";
+import { resolveBotWelcomeLocale } from "@/lib/messaging/bot-messages";
 import {
   formatBuyerReplyMessage,
   formatConversationStartMessage,
@@ -226,7 +226,7 @@ export async function handleBotWelcome(
   telegramUserId: number,
   languageCode?: string | null,
 ): Promise<void> {
-  const locale = resolveBotLocaleFromTelegram(languageCode);
+  const locale = resolveBotWelcomeLocale(languageCode);
 
   await sendTelegramMessage(telegramUserId, formatWelcomeMessage(locale));
 }

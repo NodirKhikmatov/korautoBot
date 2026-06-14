@@ -277,6 +277,23 @@ export function resolveBotLocaleFromTelegram(
   return defaultLocale;
 }
 
+/** Welcome uses app default (uz). English Telegram locale maps to uz too. */
+export function resolveBotWelcomeLocale(
+  languageCode?: string | null,
+): Locale {
+  const code = languageCode?.split("-")[0]?.toLowerCase();
+
+  if (!code || code === "en") {
+    return defaultLocale;
+  }
+
+  if (isLocale(code)) {
+    return code;
+  }
+
+  return defaultLocale;
+}
+
 export function getBotMessages(locale?: string | null): BotMessageSet {
   return botMessages[resolveBotLocale(locale)];
 }
