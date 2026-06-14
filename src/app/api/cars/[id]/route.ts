@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { handleRouteError } from "@/lib/api/handle-route-error";
 import { handleAuthRouteError } from "@/lib/auth/handle-auth-route-error";
 import { requireAuth } from "@/lib/auth/require-auth";
+import { isListingSold } from "@/lib/listing/status";
 import { getCarById, softDeleteCar } from "@/services/cars";
 
 interface RouteContext {
@@ -14,7 +15,13 @@ export async function GET(_request: Request, context: RouteContext) {
     const { id } = await context.params;
     const car = await getCarById(id);
 
-    if (!car || !car.isActive) {
+    if (!car) {
+      return NextResponse.json({ error: "Car not found" }, { status: 404 });
+    }
+
+    const sold = isListingSold(car);
+
+    if (!car.isActive && !sold) {
       return NextResponse.json({ error: "Car not found" }, { status: 404 });
     }
 

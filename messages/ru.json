@@ -104,6 +104,15 @@
     "mileagePlaceholder": "45000",
     "locationPlaceholder": "Сеул",
     "descriptionPlaceholder": "Состояние, особенности, история...",
+    "contactPhone": "Номер телефона",
+    "contactPhonePlaceholder": "+998901234567",
+    "contactPhoneHint": "Необязательно. Покупатели смогут позвонить, если нет username в Telegram.",
+    "sold": "Продано",
+    "soldDescription": "Этот автомобиль продан. Посмотрите похожие объявления.",
+    "soldDescriptionOwner": "Отмечено как проданное. Покупатели больше не могут связаться.",
+    "markSold": "Отметить как проданное",
+    "relist": "Снова выставить",
+    "statusUpdateFailed": "Не удалось обновить статус",
     "addPhotoRequired": "Добавьте хотя бы одно фото",
     "invalidFormData": "Некорректные данные формы",
     "createFailed": "Не удалось создать объявление",
@@ -175,13 +184,23 @@
       "ko": "한국어",
       "uz": "Oʻzbek",
       "ru": "Русский"
-    }
+    },
+    "phone": "Номер телефона",
+    "phoneDescription": "Необязательно. Покупатели смогут позвонить, если нет username в Telegram.",
+    "phonePlaceholder": "+998901234567",
+    "phoneCurrent": "Сохранён: {phone}",
+    "phoneSaved": "Номер телефона сохранён",
+    "phoneSaveFailed": "Не удалось сохранить номер",
+    "savePhone": "Сохранить номер"
   },
   "seller": {
     "title": "Продавец",
     "telegram": "Telegram",
     "contactSeller": "Связаться с продавцом",
-    "noUsername": "У этого продавца нет публичного username в Telegram."
+    "sendInquiry": "Отправить запрос",
+    "inquiryHint": "Сообщение отправляется через бота. Продавец ответит в Telegram.",
+    "inquiryPlaceholder": "Здравствуйте, меня интересует этот автомобиль. Он ещё продаётся?",
+    "inquirySent": "Запрос отправлен. Откройте чат с ботом, чтобы получать ответы."
   },
   "admin": {
     "title": "Админ",

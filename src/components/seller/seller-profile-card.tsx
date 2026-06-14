@@ -7,6 +7,7 @@ import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { getDisplayName } from "@/lib/format";
 import { formatTelegramUsername } from "@/lib/telegram/contact";
+import { formatPhoneDisplay } from "@/lib/contact/phone";
 import type { SellerProfile } from "@/types";
 
 export function SellerProfileCard({ seller }: { seller: SellerProfile }) {
@@ -21,6 +22,8 @@ export function SellerProfileCard({ seller }: { seller: SellerProfile }) {
   const usernameLabel = seller.username
     ? formatTelegramUsername(seller.username)
     : null;
+
+  const phoneLabel = seller.phone ? formatPhoneDisplay(seller.phone) : null;
 
   return (
     <div className="rounded-2xl border border-border/60 bg-card/50 p-4">
@@ -45,6 +48,11 @@ export function SellerProfileCard({ seller }: { seller: SellerProfile }) {
           {usernameLabel && (
             <p className="truncate text-sm font-medium text-primary">
               {usernameLabel}
+            </p>
+          )}
+          {!usernameLabel && phoneLabel && (
+            <p className="truncate text-sm font-medium text-primary">
+              {phoneLabel}
             </p>
           )}
         </div>

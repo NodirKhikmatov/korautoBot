@@ -1,6 +1,7 @@
 "use client";
 
 import { LanguageSwitcher } from "@/components/i18n/language-switcher";
+import { ContactSettings } from "@/components/settings/contact-settings";
 import { ThemeSwitcher } from "@/components/theme/theme-switcher";
 import { PageHeader } from "@/components/layout/page-header";
 import { useTranslations } from "next-intl";
@@ -21,6 +22,7 @@ export default function SettingsPage() {
         </h2>
         <ThemeSwitcher />
         <LanguageSwitcher />
+        <ContactSettings />
       </section>
     </div>
   );

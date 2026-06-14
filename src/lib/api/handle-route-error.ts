@@ -8,6 +8,8 @@ import {
 } from "@/lib/auth/errors";
 import { FavoriteError } from "@/lib/favorites/errors";
 import { ImageUploadError } from "@/lib/images/errors";
+import { ListingError } from "@/lib/listing/errors";
+import { MessagingError } from "@/lib/messaging/errors";
 
 export function handleRouteError(
   error: unknown,
@@ -32,6 +34,20 @@ export function handleRouteError(
 
   if (error instanceof FavoriteError) {
     return NextResponse.json({ error: error.message }, { status: error.status });
+  }
+
+  if (error instanceof ListingError) {
+    return NextResponse.json(
+      { error: error.message, code: error.code },
+      { status: error.status },
+    );
+  }
+
+  if (error instanceof MessagingError) {
+    return NextResponse.json(
+      { error: error.message, code: error.code },
+      { status: error.status },
+    );
   }
 
   if (error instanceof ZodError) {

@@ -6,6 +6,7 @@ import {
   TRANSMISSION_TYPES,
 } from "@/lib/constants";
 import { SEARCH_PAGE_SIZE } from "@/lib/search/constants";
+import { optionalPhoneFieldSchema } from "@/schemas/user";
 
 export const carImageInputSchema = z.object({
   url: z.string().url(),
@@ -24,6 +25,10 @@ export const createCarSchema = z.object({
   description: z.string().max(2000).optional(),
   location: z.string().max(100).optional(),
   images: z.array(carImageInputSchema).min(1).max(MAX_IMAGES_PER_LISTING),
+});
+
+export const createListingSchema = createCarSchema.extend({
+  phone: optionalPhoneFieldSchema,
 });
 
 export const updateCarSchema = createCarSchema.partial();
