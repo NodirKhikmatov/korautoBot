@@ -2,7 +2,8 @@
 
 import { Loader2, MessageCircle, X } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 import { AuthGate } from "@/components/auth/auth-gate";
 import { Button } from "@/components/ui/button";
@@ -32,6 +33,7 @@ export function ContactSellerButton({
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [success, setSuccess] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const {
     hasDirectChat,
     openDirectChat,
@@ -40,6 +42,23 @@ export function ContactSellerButton({
     error,
     clearError,
   } = useContactSeller(carId, username, phone);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [open]);
 
   async function handleDirectContact() {
     setSuccess(false);
@@ -70,6 +89,75 @@ export function ContactSellerButton({
       // Error state handled in hook
     }
   }
+
+  const inquiryModal =
+    open && !hasDirectChat ? (
+      <div
+        className="fixed inset-0 z-[200] flex items-end justify-center bg-black/50 p-4 pb-[calc(4rem+env(safe-area-inset-bottom,0px)+0.75rem)] sm:items-center sm:pb-4"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="contact-seller-title"
+      >
+        <div className="max-h-[min(85dvh,calc(var(--tg-viewport-height,100dvh)-8rem))] w-full max-w-md overflow-y-auto rounded-2xl border bg-background p-4 shadow-lg sm:max-h-[85dvh]">
+          <div className="mb-3 flex items-start justify-between gap-3">
+            <div className="space-y-1">
+              <h3 id="contact-seller-title" className="font-semibold">
+                {t("contactSeller")}
+              </h3>
+              <p className="text-sm text-muted-foreground">{carTitle}</p>
+            </div>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="shrink-0 rounded-xl"
+              onClick={() => setOpen(false)}
+              disabled={isSubmitting}
+            >
+              <X className="h-5 w-5" />
+            </Button>
+          </div>
+
+          <p className="mb-3 text-sm text-muted-foreground">
+            {t("inquiryHint")}
+          </p>
+
+          <Textarea
+            value={message}
+            onChange={(event) => setMessage(event.target.value)}
+            placeholder={t("inquiryPlaceholder")}
+            rows={4}
+            maxLength={2000}
+            disabled={isSubmitting}
+            className="mb-4 resize-none rounded-xl"
+          />
+
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              className="flex-1 rounded-xl"
+              onClick={() => setOpen(false)}
+              disabled={isSubmitting}
+            >
+              {tCommon("cancel")}
+            </Button>
+            <Button
+              type="button"
+              className="flex-1 rounded-xl font-semibold"
+              onClick={handleSubmit}
+              disabled={isSubmitting || !message.trim()}
+            >
+              {isSubmitting ? (
+                <Loader2 className="h-5 w-5 animate-spin" />
+              ) : (
+                t("sendInquiry")
+              )}
+            </Button>
+          </div>
+        </div>
+      </div>
+    ) : null;
 
   return (
     <AuthGate messageKey="signInToContinue">
@@ -105,66 +193,7 @@ export function ContactSellerButton({
         )}
       </div>
 
-      {open && !hasDirectChat && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4 sm:items-center">
-          <div className="w-full max-w-md rounded-2xl border bg-background p-4 shadow-lg">
-            <div className="mb-3 flex items-start justify-between gap-3">
-              <div className="space-y-1">
-                <h3 className="font-semibold">{t("contactSeller")}</h3>
-                <p className="text-sm text-muted-foreground">{carTitle}</p>
-              </div>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="shrink-0 rounded-xl"
-                onClick={() => setOpen(false)}
-                disabled={isSubmitting}
-              >
-                <X className="h-5 w-5" />
-              </Button>
-            </div>
-
-            <p className="mb-3 text-sm text-muted-foreground">
-              {t("inquiryHint")}
-            </p>
-
-            <Textarea
-              value={message}
-              onChange={(event) => setMessage(event.target.value)}
-              placeholder={t("inquiryPlaceholder")}
-              rows={4}
-              maxLength={2000}
-              disabled={isSubmitting}
-              className="mb-4 resize-none rounded-xl"
-            />
-
-            <div className="flex gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                className="flex-1 rounded-xl"
-                onClick={() => setOpen(false)}
-                disabled={isSubmitting}
-              >
-                {tCommon("cancel")}
-              </Button>
-              <Button
-                type="button"
-                className="flex-1 rounded-xl font-semibold"
-                onClick={handleSubmit}
-                disabled={isSubmitting || !message.trim()}
-              >
-                {isSubmitting ? (
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                ) : (
-                  t("sendInquiry")
-                )}
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+      {mounted ? createPortal(inquiryModal, document.body) : null}
     </AuthGate>
   );
 }

@@ -5,6 +5,7 @@ import { ArrowRight } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { AdminStatsGrid } from "@/components/admin/admin-stats-grid";
+import { AdminBroadcastForm } from "@/components/admin/admin-broadcast-form";
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { useAdminStats } from "@/hooks/use-admin";
@@ -21,6 +22,8 @@ export default function AdminDashboardPage() {
       />
 
       <AdminStatsGrid stats={data?.stats} isLoading={isLoading} />
+
+      <AdminBroadcastForm />
 
       <div className="grid gap-2">
         <Button asChild variant="outline" className="h-11 rounded-xl justify-between">

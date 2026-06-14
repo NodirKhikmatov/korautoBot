@@ -191,7 +191,15 @@
     "phoneCurrent": "Сохранён: {phone}",
     "phoneSaved": "Номер телефона сохранён",
     "phoneSaveFailed": "Не удалось сохранить номер",
-    "savePhone": "Сохранить номер"
+    "savePhone": "Сохранить номер",
+    "supportSection": "Поддержка",
+    "supportButton": "Связаться с админом",
+    "supportTitle": "Связаться с админом",
+    "supportDescription": "Отправьте вопрос, предложение или сообщите о проблеме. Сообщение будет доставлено админу через бота.",
+    "supportPlaceholder": "Например: не получается разместить объявление...",
+    "supportSend": "Отправить сообщение",
+    "supportSent": "Сообщение отправлено. Мы скоро ответим.",
+    "supportSendFailed": "Не удалось отправить сообщение"
   },
   "seller": {
     "title": "Продавец",
@@ -240,7 +248,17 @@
     "statActive": "Активные",
     "statFeatured": "Избранные",
     "statBanned": "Заблокированные",
-    "statFavorites": "Избранное"
+    "statFavorites": "Избранное",
+    "broadcastTitle": "Рассылка",
+    "broadcastDescription": "Отправить сообщение всем зарегистрированным пользователям через бота.",
+    "broadcastPlaceholder": "Например: новые объявления уже в Mini App!",
+    "broadcastSend": "Отправить всем",
+    "broadcastConfirm": "Отправить это сообщение всем пользователям?",
+    "broadcastSuccess": "Рассылка отправлена",
+    "broadcastResult": "Всего: {total} · Доставлено: {sent} · Бот не запущен: {notStarted} · Ошибки: {failed}",
+    "broadcastFailed": "Не удалось отправить рассылку",
+    "broadcastLoadingRecipients": "Подсчёт получателей...",
+    "broadcastRecipients": "Будет отправлено {count, plural, one {# пользователю} few {# пользователям} many {# пользователям} other {# пользователям}}"
   },
   "fuel": {
     "gasoline": "Бензин",

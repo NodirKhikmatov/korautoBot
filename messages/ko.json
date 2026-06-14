@@ -191,7 +191,15 @@
     "phoneCurrent": "저장됨: {phone}",
     "phoneSaved": "전화번호가 저장되었습니다",
     "phoneSaveFailed": "전화번호를 저장하지 못했습니다",
-    "savePhone": "번호 저장"
+    "savePhone": "번호 저장",
+    "supportSection": "지원",
+    "supportButton": "관리자에게 문의",
+    "supportTitle": "관리자에게 문의",
+    "supportDescription": "질문, 제안 또는 문제를 보내세요. 메시지는 봇을 통해 관리자에게 전달됩니다.",
+    "supportPlaceholder": "예: 매물 등록에 문제가 있습니다...",
+    "supportSend": "메시지 보내기",
+    "supportSent": "메시지가 전송되었습니다. 곧 답변드리겠습니다.",
+    "supportSendFailed": "메시지를 보내지 못했습니다"
   },
   "seller": {
     "title": "판매자",
@@ -240,7 +248,17 @@
     "statActive": "활성",
     "statFeatured": "추천",
     "statBanned": "차단",
-    "statFavorites": "즐겨찾기"
+    "statFavorites": "즐겨찾기",
+    "broadcastTitle": "브로드캐스트",
+    "broadcastDescription": "등록된 모든 사용자에게 봇으로 메시지를 보냅니다.",
+    "broadcastPlaceholder": "예: 새 매물이 등록되었습니다. Mini App을 확인하세요!",
+    "broadcastSend": "전체 발송",
+    "broadcastConfirm": "모든 사용자에게 이 메시지를 보내시겠습니까?",
+    "broadcastSuccess": "브로드캐스트가 전송되었습니다",
+    "broadcastResult": "전체: {total} · 전달: {sent} · 봇 미시작: {notStarted} · 실패: {failed}",
+    "broadcastFailed": "브로드캐스트를 보내지 못했습니다",
+    "broadcastLoadingRecipients": "수신자 계산 중...",
+    "broadcastRecipients": "{count, plural, one {#명에게 발송} other {#명에게 발송}}"
   },
   "fuel": {
     "gasoline": "가솔린",

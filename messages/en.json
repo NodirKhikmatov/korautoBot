@@ -191,7 +191,15 @@
     "phoneCurrent": "Saved: {phone}",
     "phoneSaved": "Phone number saved",
     "phoneSaveFailed": "Could not save phone number",
-    "savePhone": "Save phone"
+    "savePhone": "Save phone",
+    "supportSection": "Support",
+    "supportButton": "Contact admin",
+    "supportTitle": "Contact admin",
+    "supportDescription": "Send a question, suggestion, or report an issue. Your message is delivered to admin via the bot.",
+    "supportPlaceholder": "e.g. I have trouble posting a listing...",
+    "supportSend": "Send message",
+    "supportSent": "Your message was sent. We will get back to you soon.",
+    "supportSendFailed": "Could not send message"
   },
   "seller": {
     "title": "Seller",
@@ -240,7 +248,17 @@
     "statActive": "Active",
     "statFeatured": "Featured",
     "statBanned": "Banned",
-    "statFavorites": "Favorites"
+    "statFavorites": "Favorites",
+    "broadcastTitle": "Broadcast",
+    "broadcastDescription": "Send a message to all registered users via the bot.",
+    "broadcastPlaceholder": "e.g. New listings are live — open the Mini App!",
+    "broadcastSend": "Send to everyone",
+    "broadcastConfirm": "Send this message to all users?",
+    "broadcastSuccess": "Broadcast sent",
+    "broadcastResult": "Total: {total} · Delivered: {sent} · Bot not started: {notStarted} · Failed: {failed}",
+    "broadcastFailed": "Could not send broadcast",
+    "broadcastLoadingRecipients": "Counting recipients...",
+    "broadcastRecipients": "Will be sent to {count, plural, one {# user} other {# users}}"
   },
   "fuel": {
     "gasoline": "Gasoline",

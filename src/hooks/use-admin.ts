@@ -122,3 +122,42 @@ export function useAdminMutations() {
 
   return { deleteCar, featureCar, banUser, updateCar };
 }
+
+type AdminBroadcastPreviewResponse = {
+  recipients: number;
+};
+
+type AdminBroadcastResponse = {
+  success: true;
+  result: {
+    total: number;
+    sent: number;
+    failed: number;
+    notStarted: number;
+  };
+};
+
+export function useAdminBroadcast() {
+  const recipientsQuery = useQuery({
+    queryKey: ["admin", "broadcast", "recipients"],
+    queryFn: () =>
+      apiFetch<AdminBroadcastPreviewResponse>("/api/admin/broadcast"),
+    staleTime: 30 * 1000,
+  });
+
+  const broadcastMutation = useMutation({
+    mutationFn: (message: string) =>
+      apiFetch<AdminBroadcastResponse>("/api/admin/broadcast", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message }),
+      }),
+  });
+
+  return {
+    recipients: recipientsQuery.data?.recipients ?? 0,
+    isLoadingRecipients: recipientsQuery.isLoading,
+    broadcast: broadcastMutation.mutateAsync,
+    isBroadcasting: broadcastMutation.isPending,
+  };
+}
