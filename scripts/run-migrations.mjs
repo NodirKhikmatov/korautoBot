@@ -4,16 +4,22 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 import pg from "pg";
 
-const connectionString = process.env.DATABASE_URL;
+import {
+  normalizePgConnectionString,
+  pgConnectionStringUsesSsl,
+} from "./lib/normalize-connection-string.mjs";
 
-if (!connectionString) {
+const rawConnectionString = process.env.DATABASE_URL;
+
+if (!rawConnectionString) {
   console.error("DATABASE_URL is not set");
   process.exit(1);
 }
 
+const connectionString = normalizePgConnectionString(rawConnectionString);
 const useSsl =
   process.env.DATABASE_SSL === "true" ||
-  connectionString.includes("sslmode=require");
+  pgConnectionStringUsesSsl(connectionString);
 
 const pool = new pg.Pool({
   connectionString,

@@ -1,6 +1,11 @@
 import { config } from "dotenv";
 import pg from "pg";
 
+import {
+  normalizePgConnectionString,
+  pgConnectionStringUsesSsl,
+} from "./normalize-connection-string.mjs";
+
 config({ path: ".env.local" });
 config({ path: ".env" });
 
@@ -13,14 +18,14 @@ export function getConnectionString() {
     throw new Error("DATABASE_URL is not set");
   }
 
-  return connectionString;
+  return normalizePgConnectionString(connectionString);
 }
 
 export function createPgClient() {
   const connectionString = getConnectionString();
   const useSsl =
     process.env.DATABASE_SSL === "true" ||
-    connectionString.includes("sslmode=require");
+    pgConnectionStringUsesSsl(connectionString);
 
   return new Client({
     connectionString,
