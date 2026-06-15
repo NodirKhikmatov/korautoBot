@@ -26,6 +26,7 @@ LABEL org.opencontainers.image.title="korea-auto-market-migrate"
 COPY package.json package-lock.json ./
 RUN npm ci --omit=dev
 COPY drizzle ./drizzle
+COPY scripts/lib ./scripts/lib
 COPY scripts/run-migrations.mjs ./scripts/run-migrations.mjs
 ENV NODE_ENV=production
 CMD ["node", "scripts/run-migrations.mjs"]
