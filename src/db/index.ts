@@ -2,20 +2,26 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 
+import {
+  normalizePgConnectionString,
+  pgConnectionStringUsesSsl,
+} from "@/lib/db/normalize-connection-string";
+
 import * as schema from "./schema";
 
 type Database = NodePgDatabase<typeof schema>;
 
 function createPool(): Pool {
-  const connectionString = process.env.DATABASE_URL;
+  const rawConnectionString = process.env.DATABASE_URL;
 
-  if (!connectionString) {
+  if (!rawConnectionString) {
     throw new Error("DATABASE_URL is not set");
   }
 
+  const connectionString = normalizePgConnectionString(rawConnectionString);
   const useSsl =
     process.env.DATABASE_SSL === "true" ||
-    /sslmode=(require|verify-full|verify-ca|prefer)/i.test(connectionString);
+    pgConnectionStringUsesSsl(connectionString);
 
   return new Pool({
     connectionString,

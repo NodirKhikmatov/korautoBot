@@ -34,11 +34,12 @@ export function openPhoneContact(phone: string): boolean {
 
   const webApp = window.Telegram?.WebApp;
 
-  if (webApp?.openLink) {
-    webApp.openLink(url);
-  } else {
-    window.location.href = url;
-  }
+  // Telegram WebApp.openLink only supports http/https — not tel:.
+  const link = document.createElement("a");
+  link.href = url;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
 
   webApp?.HapticFeedback?.impactOccurred("light");
   return true;
