@@ -46,6 +46,7 @@ export const users = pgTable(
     lastName: text("last_name"),
     photoUrl: text("photo_url"),
     phone: text("phone"),
+    botStartedAt: timestamp("bot_started_at", { withTimezone: true }),
     isAdmin: boolean("is_admin").notNull().default(false),
     bannedAt: timestamp("banned_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true })

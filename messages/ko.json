@@ -20,7 +20,11 @@
     "backToApp": "앱으로 돌아가기",
     "loadError": "목록을 불러올 수 없습니다",
     "loadErrorDescription": "연결을 확인하고 다시 시도하세요.",
-    "requestFailed": "요청 실패"
+    "requestFailed": "요청 실패",
+    "dismiss": "닫기",
+    "botStartTitle": "봇 알림 켜기",
+    "botStartHint": "브로드캐스트와 답장을 받으려면 봇을 열고 Start를 한 번 누르세요.",
+    "botStartAction": "봇 열기"
   },
   "nav": {
     "home": "홈",

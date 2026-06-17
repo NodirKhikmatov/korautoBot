@@ -2,6 +2,7 @@
 
 import { DevAuthPrompt } from "@/components/auth/dev-auth-prompt";
 import { BottomNav } from "@/components/layout/bottom-nav";
+import { BotStartBanner } from "@/components/notifications/bot-start-banner";
 
 export default function MainLayout({
   children,
@@ -19,6 +20,7 @@ export default function MainLayout({
         style={{ paddingTop: "max(1rem, env(safe-area-inset-top))" }}
       >
         <DevAuthPrompt />
+        <BotStartBanner />
         {children}
       </main>
       <BottomNav />

@@ -5,9 +5,11 @@ import { users } from "@/db/schema";
 import { formatBroadcastMessage } from "@/lib/messaging/format";
 import { MessagingError } from "@/lib/messaging/errors";
 import { sendTelegramMessage } from "@/lib/telegram/bot-api";
+import { markBotChatStarted } from "@/services/users";
 
-const BATCH_SIZE = 25;
-const BATCH_DELAY_MS = 1000;
+/** ~20 messages/sec — stays under Telegram bulk limits */
+const MESSAGE_INTERVAL_MS = 50;
+const SEND_MAX_RETRIES = 5;
 
 export type BroadcastResult = {
   total: number;
@@ -58,32 +60,41 @@ export async function sendBroadcastToAllUsers(
   let failed = 0;
   let notStarted = 0;
 
-  for (let index = 0; index < recipientIds.length; index += BATCH_SIZE) {
-    const batch = recipientIds.slice(index, index + BATCH_SIZE);
+  for (let index = 0; index < recipientIds.length; index += 1) {
+    const telegramId = recipientIds[index]!;
 
-    const results = await Promise.allSettled(
-      batch.map((telegramId) => sendTelegramMessage(telegramId, text)),
-    );
+    let delivered = false;
 
-    for (const result of results) {
-      if (result.status === "fulfilled") {
-        sent += 1;
-        continue;
-      }
-
+    try {
+      await sendTelegramMessage(telegramId, text, {
+        maxRetries: SEND_MAX_RETRIES,
+      });
+      sent += 1;
+      delivered = true;
+    } catch (error) {
       if (
-        result.reason instanceof MessagingError &&
-        result.reason.code === "BOT_CHAT_NOT_STARTED"
+        error instanceof MessagingError &&
+        error.code === "BOT_CHAT_NOT_STARTED"
       ) {
         notStarted += 1;
-        continue;
+      } else {
+        failed += 1;
+        if (process.env.NODE_ENV !== "test") {
+          console.error("[broadcast] failed to send", {
+            telegramId,
+            code: error instanceof MessagingError ? error.code : "UNKNOWN",
+            message: error instanceof Error ? error.message : String(error),
+          });
+        }
       }
-
-      failed += 1;
     }
 
-    if (index + BATCH_SIZE < recipientIds.length) {
-      await delay(BATCH_DELAY_MS);
+    if (delivered) {
+      void markBotChatStarted(telegramId);
+    }
+
+    if (index + 1 < recipientIds.length) {
+      await delay(MESSAGE_INTERVAL_MS);
     }
   }
 

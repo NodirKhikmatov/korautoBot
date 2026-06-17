@@ -20,7 +20,11 @@
     "backToApp": "Back to app",
     "loadError": "Could not load listings",
     "loadErrorDescription": "Check your connection and try again.",
-    "requestFailed": "Request failed"
+    "requestFailed": "Request failed",
+    "dismiss": "Dismiss",
+    "botStartTitle": "Enable bot notifications",
+    "botStartHint": "Open the bot and tap Start once to receive broadcast messages and seller replies.",
+    "botStartAction": "Open bot"
   },
   "nav": {
     "home": "Home",

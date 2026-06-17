@@ -4,6 +4,8 @@ import type {
 } from "@/lib/telegram/bot-types";
 import { MessagingError } from "@/lib/messaging/errors";
 
+const DEFAULT_MAX_RETRIES = 5;
+
 function getBotToken(): string {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   if (!token) {
@@ -12,42 +14,76 @@ function getBotToken(): string {
   return token;
 }
 
-export async function sendTelegramMessage(
-  chatId: number,
-  text: string,
-): Promise<TelegramSendMessageResult> {
-  const token = getBotToken();
-  const response = await fetch(
-    `https://api.telegram.org/bot${token}/sendMessage`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text,
-      }),
-    },
-  );
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
 
-  const data = (await response.json()) as TelegramApiResponse<TelegramSendMessageResult>;
-
-  if (!data.ok || !data.result) {
-    if (data.error_code === 403) {
-      throw new MessagingError(
-        "User has not started the bot yet",
-        422,
-        "BOT_CHAT_NOT_STARTED",
-      );
-    }
-
-    throw new MessagingError(
-      data.description ?? "Failed to send Telegram message",
-      502,
-      "BOT_SEND_FAILED",
+function classifySendError(
+  data: TelegramApiResponse<TelegramSendMessageResult>,
+): MessagingError {
+  if (data.error_code === 403) {
+    return new MessagingError(
+      data.description ?? "User has not started the bot yet",
+      422,
+      "BOT_CHAT_NOT_STARTED",
     );
   }
 
-  return data.result;
+  if (data.error_code === 429) {
+    return new MessagingError(
+      data.description ?? "Telegram rate limit exceeded",
+      429,
+      "BOT_RATE_LIMITED",
+    );
+  }
+
+  return new MessagingError(
+    data.description ?? "Failed to send Telegram message",
+    502,
+    "BOT_SEND_FAILED",
+  );
+}
+
+export async function sendTelegramMessage(
+  chatId: number,
+  text: string,
+  options?: { maxRetries?: number },
+): Promise<TelegramSendMessageResult> {
+  const token = getBotToken();
+  const maxRetries = options?.maxRetries ?? DEFAULT_MAX_RETRIES;
+  let attempt = 0;
+
+  while (true) {
+    attempt += 1;
+
+    const response = await fetch(
+      `https://api.telegram.org/bot${token}/sendMessage`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text,
+        }),
+      },
+    );
+
+    const data = (await response.json()) as TelegramApiResponse<TelegramSendMessageResult>;
+
+    if (data.ok && data.result) {
+      return data.result;
+    }
+
+    if (data.error_code === 429 && attempt < maxRetries) {
+      const retryAfterMs = (data.parameters?.retry_after ?? 1) * 1000 + 250;
+      await delay(retryAfterMs);
+      continue;
+    }
+
+    throw classifySendError(data);
+  }
 }
 
 export function getTelegramBotChatUrl(

@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 
 import { handleRouteError } from "@/lib/api/handle-route-error";
+
+export const maxDuration = 300;
 import { requireAdmin } from "@/lib/auth/require-admin";
 import { adminBroadcastSchema } from "@/schemas/admin";
 import {

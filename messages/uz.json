@@ -20,7 +20,11 @@
     "backToApp": "Ilovaga qaytish",
     "loadError": "E'lonlarni yuklab bo'lmadi",
     "loadErrorDescription": "Ulanishni tekshiring va qayta urinib ko'ring.",
-    "requestFailed": "So'rov muvaffaqiyatsiz"
+    "requestFailed": "So'rov muvaffaqiyatsiz",
+    "dismiss": "Yopish",
+    "botStartTitle": "Bot xabarlarini yoqing",
+    "botStartHint": "Broadcast va javoblarni olish uchun botni ochib Start tugmasini bir marta bosing.",
+    "botStartAction": "Botni ochish"
   },
   "nav": {
     "home": "Bosh",

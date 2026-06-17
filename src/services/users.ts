@@ -69,6 +69,25 @@ export async function getUserById(userId: string): Promise<User | null> {
   });
 }
 
+export async function markBotChatStarted(telegramId: number): Promise<void> {
+  try {
+    await withBypassRls(async (tx) => {
+      await tx
+        .update(users)
+        .set({
+          botStartedAt: new Date(),
+          updatedAt: new Date(),
+        })
+        .where(eq(users.telegramId, telegramId));
+    });
+  } catch (error) {
+    console.warn("[users] markBotChatStarted failed", {
+      telegramId,
+      message: error instanceof Error ? error.message : String(error),
+    });
+  }
+}
+
 export async function updateUserPhone(
   userId: string,
   phone: string | null,

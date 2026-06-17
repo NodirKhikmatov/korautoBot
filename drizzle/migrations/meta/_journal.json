@@ -71,6 +71,13 @@
       "when": 1740900000000,
       "tag": "0009_car_seller_contact",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1741000000000,
+      "tag": "0010_user_bot_started",
+      "breakpoints": true
     }
   ]
 }

@@ -14,6 +14,7 @@ import {
   handleConversationStart,
   relayConversationReply,
 } from "@/services/messaging";
+import { markBotChatStarted } from "@/services/users";
 
 function verifyWebhookSecret(request: Request): boolean {
   const secret = process.env.TELEGRAM_WEBHOOK_SECRET;
@@ -43,6 +44,8 @@ export async function POST(request: Request) {
     }
 
     if (text.startsWith("/start")) {
+      await markBotChatStarted(message.from.id);
+
       const payload = text.split(/\s+/)[1];
       const conversationId = parseConversationStartParam(payload);
 
