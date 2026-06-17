@@ -1,20 +1,20 @@
-import { Send } from "lucide-react";
+import { Phone, Send } from "lucide-react";
 
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { getDisplayName } from "@/lib/format";
 import { formatTelegramUsername } from "@/lib/telegram/contact";
-import type { SellerProfile } from "@/types";
+import type { EffectiveSeller } from "@/lib/seller/effective-seller";
 
-export function SellerProfileCard({ seller }: { seller: SellerProfile }) {
-  const displayName = getDisplayName(
-    seller.firstName,
-    seller.lastName,
-    seller.username,
-  );
+export function SellerProfileCard({ seller }: { seller: EffectiveSeller }) {
+  const displayName = seller.isExternal
+    ? (seller.firstName ?? "Seller")
+    : getDisplayName(seller.firstName, seller.lastName, seller.username) ||
+      "Seller";
   const usernameLabel = seller.username
     ? formatTelegramUsername(seller.username)
     : null;
+
   return (
     <div className="rounded-2xl border border-border/60 bg-card/50 p-4">
       <div className="flex items-center gap-3">
@@ -27,17 +27,37 @@ export function SellerProfileCard({ seller }: { seller: SellerProfile }) {
         <div className="min-w-0 flex-1 space-y-1">
           <div className="flex items-center gap-2">
             <p className="truncate font-semibold">{displayName}</p>
-            <Badge
-              variant="secondary"
-              className="shrink-0 gap-1 border-primary/20 bg-primary/10 text-[10px] text-primary"
-            >
-              <Send className="h-3 w-3" />
-              Telegram
-            </Badge>
+            {seller.isExternal ? (
+              <Badge
+                variant="secondary"
+                className="shrink-0 rounded-md px-1.5 py-0 text-[10px]"
+              >
+                External
+              </Badge>
+            ) : (
+              <Badge
+                variant="secondary"
+                className="shrink-0 gap-1 border-primary/20 bg-primary/10 text-[10px] text-primary"
+              >
+                <Send className="h-3 w-3" />
+                Telegram
+              </Badge>
+            )}
           </div>
           {usernameLabel && (
             <p className="truncate text-sm font-medium text-primary">
               {usernameLabel}
+            </p>
+          )}
+          {seller.telegramId && !usernameLabel && (
+            <p className="truncate text-sm text-muted-foreground">
+              Telegram ID: {seller.telegramId}
+            </p>
+          )}
+          {seller.phone && (
+            <p className="flex items-center gap-1 truncate text-sm text-muted-foreground">
+              <Phone className="h-3.5 w-3.5 shrink-0" />
+              {seller.phone}
             </p>
           )}
         </div>

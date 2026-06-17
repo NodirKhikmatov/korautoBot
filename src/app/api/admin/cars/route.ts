@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 
 import { handleRouteError } from "@/lib/api/handle-route-error";
 import { requireAdmin } from "@/lib/auth/require-admin";
-import { adminListQuerySchema } from "@/schemas/admin";
-import { listAdminCars } from "@/services/admin";
+import { adminCreateCarSchema, adminListQuerySchema } from "@/schemas/admin";
+import { adminCreateCar, listAdminCars } from "@/services/admin";
 
 export async function GET(request: Request) {
   try {
@@ -20,5 +20,18 @@ export async function GET(request: Request) {
     return NextResponse.json(result);
   } catch (error) {
     return handleRouteError(error, "Admin list cars error");
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    const admin = await requireAdmin();
+    const body = await request.json();
+    const input = adminCreateCarSchema.parse(body);
+    const car = await adminCreateCar(admin.id, input);
+
+    return NextResponse.json({ car }, { status: 201 });
+  } catch (error) {
+    return handleRouteError(error, "Admin create car error", "Failed to create listing");
   }
 }

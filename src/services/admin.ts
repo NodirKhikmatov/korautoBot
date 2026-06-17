@@ -14,6 +14,8 @@ import { withBypassRls } from "@/db/context";
 import { cars, favorites, users } from "@/db/schema";
 import { attachCoverImages } from "@/lib/db/attach-cover-images";
 import { toIlikeContainsPattern } from "@/lib/db/escape-ilike";
+import type { AdminCreateCarInput } from "@/schemas/admin";
+import { createCar } from "@/services/cars";
 import type { AdminStats, CarWithImages, CarWithSeller, User } from "@/types";
 
 export type AdminCarListItem = CarWithImages & {
@@ -23,6 +25,32 @@ export type AdminCarListItem = CarWithImages & {
 export type AdminUserListItem = User & {
   listingCount: number;
 };
+
+export async function adminCreateCar(
+  importerUserId: string,
+  input: AdminCreateCarInput,
+): Promise<CarWithSeller> {
+  const {
+    isActive,
+    isFeatured,
+    seller_display_name,
+    seller_username,
+    seller_telegram_id,
+    seller_phone,
+    ...carData
+  } = input;
+
+  return createCar(importerUserId, carData, {
+    isActive,
+    isFeatured,
+    seller: {
+      sellerDisplayName: seller_display_name ?? null,
+      sellerUsername: seller_username ?? null,
+      sellerTelegramId: seller_telegram_id ?? null,
+      sellerPhone: seller_phone ?? null,
+    },
+  });
+}
 
 export async function getAdminStats(): Promise<AdminStats> {
   return withBypassRls(async (tx) => {
@@ -158,6 +186,10 @@ type AdminUpdateCarInput = {
   location?: string | null;
   isActive?: boolean;
   isFeatured?: boolean;
+  seller_display_name?: string | null;
+  seller_username?: string | null;
+  seller_telegram_id?: number | null;
+  seller_phone?: string | null;
 };
 
 export async function adminUpdateCar(
@@ -179,6 +211,16 @@ export async function adminUpdateCar(
     if (input.location !== undefined) updates.location = input.location;
     if (input.isActive !== undefined) updates.isActive = input.isActive;
     if (input.isFeatured !== undefined) updates.isFeatured = input.isFeatured;
+    if (input.seller_display_name !== undefined) {
+      updates.sellerDisplayName = input.seller_display_name;
+    }
+    if (input.seller_username !== undefined) {
+      updates.sellerUsername = input.seller_username;
+    }
+    if (input.seller_telegram_id !== undefined) {
+      updates.sellerTelegramId = input.seller_telegram_id;
+    }
+    if (input.seller_phone !== undefined) updates.sellerPhone = input.seller_phone;
 
     const [updated] = await tx
       .update(cars)

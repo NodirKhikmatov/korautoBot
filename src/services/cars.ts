@@ -31,6 +31,19 @@ import { validateUserImagePair } from "@/services/image-upload";
 
 type CreateCarInput = z.infer<typeof createCarSchema>;
 
+export type SellerContactFields = {
+  sellerDisplayName?: string | null;
+  sellerUsername?: string | null;
+  sellerTelegramId?: number | null;
+  sellerPhone?: string | null;
+};
+
+type CreateCarOptions = {
+  isActive?: boolean;
+  isFeatured?: boolean;
+  seller?: SellerContactFields;
+};
+
 function toTsQuery(search: string): string {
   return search
     .trim()
@@ -233,9 +246,11 @@ export async function getCarById(carId: string): Promise<CarWithSeller | null> {
 export async function createCar(
   userId: string,
   input: CreateCarInput,
+  options: CreateCarOptions = {},
 ): Promise<CarWithSeller> {
   return withBypassRls(async (tx) => {
     const { images, ...carData } = input;
+    const seller = options.seller;
 
     for (const image of images) {
       validateUserImagePair(userId, image.url, image.thumbnailUrl);
@@ -255,7 +270,12 @@ export async function createCar(
         transmission: carData.transmission,
         description: carData.description ?? null,
         location: carData.location ?? null,
-        isActive: true,
+        sellerDisplayName: seller?.sellerDisplayName ?? null,
+        sellerUsername: seller?.sellerUsername ?? null,
+        sellerTelegramId: seller?.sellerTelegramId ?? null,
+        sellerPhone: seller?.sellerPhone ?? null,
+        isActive: options.isActive ?? true,
+        isFeatured: options.isFeatured ?? false,
       })
       .returning();
 

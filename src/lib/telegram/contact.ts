@@ -32,3 +32,21 @@ export function openTelegramContact(username: string): boolean {
   webApp?.HapticFeedback?.impactOccurred("light");
   return true;
 }
+
+export function getTelegramIdContactUrl(telegramId: number): string {
+  return `tg://user?id=${telegramId}`;
+}
+
+export function openTelegramContactById(telegramId: number): boolean {
+  const url = getTelegramIdContactUrl(telegramId);
+  const webApp = window.Telegram?.WebApp;
+
+  if (webApp?.openTelegramLink) {
+    webApp.openTelegramLink(url);
+  } else {
+    window.open(url, "_blank", "noopener,noreferrer");
+  }
+
+  webApp?.HapticFeedback?.impactOccurred("light");
+  return true;
+}

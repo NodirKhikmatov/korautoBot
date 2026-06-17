@@ -14,6 +14,7 @@ import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/hooks/use-auth";
 import { useCar } from "@/hooks/use-car";
 import { useTelegramBackButton } from "@/hooks/use-telegram-back-button";
+import { getEffectiveSeller } from "@/lib/seller/effective-seller";
 
 export function CarDetailView({ carId }: { carId: string }) {
   const router = useRouter();
@@ -43,6 +44,7 @@ export function CarDetailView({ carId }: { carId: string }) {
   }
 
   const car = data.car;
+  const seller = getEffectiveSeller(car);
 
   function handleShare() {
     const url = `${window.location.origin}/car/${car.id}`;
@@ -94,8 +96,12 @@ export function CarDetailView({ carId }: { carId: string }) {
 
       <div className="space-y-3">
         <h2 className="text-sm font-semibold">Seller</h2>
-        <SellerProfileCard seller={car.user} />
-        <ContactSellerButton username={car.user.username} />
+        <SellerProfileCard seller={seller} />
+        <ContactSellerButton
+          username={seller.username}
+          telegramId={seller.telegramId}
+          phone={seller.phone}
+        />
       </div>
     </div>
   );

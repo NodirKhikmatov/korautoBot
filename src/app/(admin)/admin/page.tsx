@@ -21,6 +21,12 @@ export default function AdminDashboardPage() {
       <AdminStatsGrid stats={data?.stats} isLoading={isLoading} />
 
       <div className="grid gap-2">
+        <Button asChild className="h-11 rounded-xl justify-between">
+          <Link href="/admin/listings/create">
+            Import listing from another app
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </Button>
         <Button asChild variant="outline" className="h-11 rounded-xl justify-between">
           <Link href="/admin/listings">
             Manage listings

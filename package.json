@@ -6,6 +6,7 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
+    "start:local": "next start -H 127.0.0.1 -p 3000",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
     "format": "prettier --write .",
@@ -16,6 +17,7 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:apply-0001": "node scripts/apply-migration-0001.mjs",
+    "db:apply-0005": "node scripts/apply-migration-0005.mjs",
     "db:sync-journal": "node scripts/sync-migration-journal.mjs",
     "db:fix": "node scripts/db-fix.mjs"
   },

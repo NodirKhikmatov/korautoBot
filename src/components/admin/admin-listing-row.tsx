@@ -7,6 +7,7 @@ import { Pencil, Sparkles, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getDisplayName } from "@/lib/format";
+import { getEffectiveSeller } from "@/lib/seller/effective-seller";
 import { formatPrice } from "@/lib/utils";
 import type { AdminCarListItem } from "@/services/admin";
 
@@ -24,11 +25,10 @@ export function AdminListingRow({
   isDeleting?: boolean;
 }) {
   const cover = car.carImages[0];
-  const sellerName = getDisplayName(
-    car.user.firstName,
-    car.user.lastName,
-    car.user.username,
-  );
+  const seller = getEffectiveSeller(car);
+  const sellerName = seller.isExternal
+    ? seller.firstName
+    : getDisplayName(seller.firstName, seller.lastName, seller.username);
 
   return (
     <div className="rounded-2xl border border-border/60 bg-card/50 p-3">
@@ -68,7 +68,8 @@ export function AdminListingRow({
           </p>
           <p className="truncate text-xs text-muted-foreground">
             {sellerName}
-            {car.user.username ? ` · @${car.user.username}` : ""}
+            {seller.username ? ` · @${seller.username}` : ""}
+            {seller.isExternal ? " · External" : ""}
           </p>
         </div>
       </div>

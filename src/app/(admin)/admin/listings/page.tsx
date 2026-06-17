@@ -1,7 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
-import { Car, Search } from "lucide-react";
+import { Car, Plus, Search } from "lucide-react";
 
 import { AdminListingRow } from "@/components/admin/admin-listing-row";
 import { EmptyState } from "@/components/layout/empty-state";
@@ -43,6 +44,14 @@ export default function AdminListingsPage() {
       <PageHeader
         title="Listings"
         subtitle={total > 0 ? `${total} total listings` : "All marketplace listings"}
+        action={
+          <Button asChild size="sm" className="h-9 rounded-xl">
+            <Link href="/admin/listings/create">
+              <Plus className="h-4 w-4" />
+              Import
+            </Link>
+          </Button>
+        }
       />
 
       <form onSubmit={handleSearch} className="flex gap-2">

@@ -75,6 +75,10 @@ export const cars = pgTable(
     transmission: transmissionEnum("transmission").notNull(),
     description: text("description"),
     location: text("location"),
+    sellerDisplayName: text("seller_display_name"),
+    sellerUsername: text("seller_username"),
+    sellerTelegramId: bigint("seller_telegram_id", { mode: "number" }),
+    sellerPhone: text("seller_phone"),
     isActive: boolean("is_active").notNull().default(true),
     isFeatured: boolean("is_featured").notNull().default(false),
     createdAt: timestamp("created_at", { withTimezone: true })
@@ -96,6 +100,7 @@ export const cars = pgTable(
     index("idx_cars_fuel_type").on(table.fuelType),
     index("idx_cars_transmission").on(table.transmission),
     index("idx_cars_location").on(table.location),
+    index("idx_cars_seller_username").on(table.sellerUsername),
     index("idx_cars_created_at").on(table.createdAt),
     index("idx_cars_is_featured").on(table.isFeatured),
     index("idx_cars_featured_list")

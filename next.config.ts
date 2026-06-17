@@ -19,6 +19,7 @@ const r2Hostname = getR2ImageHostname();
 const nextConfig: NextConfig = {
   outputFileTracingRoot: process.cwd(),
   poweredByHeader: false,
+  serverExternalPackages: ["ws", "@neondatabase/serverless"],
   images: {
     remotePatterns: [
       {

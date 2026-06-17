@@ -120,5 +120,15 @@ export function useAdminMutations() {
     onSuccess: invalidateAdmin,
   });
 
-  return { deleteCar, featureCar, banUser, updateCar };
+  const createCar = useMutation({
+    mutationFn: (data: Record<string, unknown>) =>
+      apiFetch<{ car: CarWithSeller }>("/api/admin/cars", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      }),
+    onSuccess: invalidateAdmin,
+  });
+
+  return { deleteCar, featureCar, banUser, updateCar, createCar };
 }

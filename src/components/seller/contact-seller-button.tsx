@@ -1,6 +1,6 @@
 "use client";
 
-import { MessageCircle } from "lucide-react";
+import { MessageCircle, Phone } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useContactSeller } from "@/hooks/use-contact-seller";
@@ -8,24 +8,34 @@ import { cn } from "@/lib/utils";
 
 export function ContactSellerButton({
   username,
+  telegramId,
+  phone,
   className,
   size = "lg",
   fullWidth = true,
 }: {
   username?: string | null;
+  telegramId?: number | null;
+  phone?: string | null;
   className?: string;
   size?: "default" | "lg" | "sm";
   fullWidth?: boolean;
 }) {
-  const { canContact, contactSeller } = useContactSeller(username);
+  const { canContact, contactSeller, contactLabel } = useContactSeller({
+    username,
+    telegramId,
+    phone,
+  });
 
   if (!canContact) {
     return (
       <p className="text-center text-sm text-muted-foreground">
-        This seller has no public Telegram username.
+        This seller has no contact information.
       </p>
     );
   }
+
+  const Icon = phone?.trim() && !username && !telegramId ? Phone : MessageCircle;
 
   return (
     <Button
@@ -39,8 +49,8 @@ export function ContactSellerButton({
       )}
       onClick={() => contactSeller()}
     >
-      <MessageCircle className="h-5 w-5" />
-      Contact Seller
+      <Icon className="h-5 w-5" />
+      {contactLabel}
     </Button>
   );
 }
