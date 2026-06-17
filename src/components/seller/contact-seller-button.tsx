@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2, MessageCircle, X } from "lucide-react";
+import { Loader2, MessageCircle, Phone, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
@@ -15,6 +15,7 @@ export function ContactSellerButton({
   carId,
   carTitle,
   username,
+  telegramId,
   phone,
   className,
   size = "lg",
@@ -23,6 +24,7 @@ export function ContactSellerButton({
   carId: string;
   carTitle: string;
   username?: string | null;
+  telegramId?: number | null;
   phone?: string | null;
   className?: string;
   size?: "default" | "lg" | "sm";
@@ -41,7 +43,7 @@ export function ContactSellerButton({
     isSubmitting,
     error,
     clearError,
-  } = useContactSeller(carId, username, phone);
+  } = useContactSeller(carId, username, phone, telegramId);
 
   useEffect(() => {
     setMounted(true);
@@ -89,6 +91,9 @@ export function ContactSellerButton({
       // Error state handled in hook
     }
   }
+
+  const DirectIcon =
+    phone?.trim() && !username && !telegramId ? Phone : MessageCircle;
 
   const inquiryModal =
     open && !hasDirectChat ? (
@@ -159,6 +164,46 @@ export function ContactSellerButton({
       </div>
     ) : null;
 
+  if (!hasDirectChat && !open) {
+    return (
+      <AuthGate messageKey="signInToContinue">
+        <div className="space-y-2">
+          <Button
+            type="button"
+            size={size}
+            className={cn(
+              "rounded-xl font-semibold",
+              fullWidth && "w-full",
+              size === "lg" && "h-12 text-base",
+              className,
+            )}
+            onClick={handleOpenInquiry}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              <MessageCircle className="h-5 w-5" />
+            )}
+            {t("contactSeller")}
+          </Button>
+
+          {success && (
+            <p className="text-center text-sm text-muted-foreground">
+              {t("inquirySent")}
+            </p>
+          )}
+
+          {error && (
+            <p className="text-center text-sm text-destructive">{error}</p>
+          )}
+        </div>
+
+        {mounted ? createPortal(inquiryModal, document.body) : null}
+      </AuthGate>
+    );
+  }
+
   return (
     <AuthGate messageKey="signInToContinue">
       <div className="space-y-2">
@@ -177,7 +222,7 @@ export function ContactSellerButton({
           {isSubmitting ? (
             <Loader2 className="h-5 w-5 animate-spin" />
           ) : (
-            <MessageCircle className="h-5 w-5" />
+            <DirectIcon className="h-5 w-5" />
           )}
           {t("contactSeller")}
         </Button>

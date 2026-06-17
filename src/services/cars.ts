@@ -31,8 +31,25 @@ import type {
 } from "@/types";
 import { validateUserImagePair } from "@/services/image-upload";
 import { publicListingWhere } from "@/lib/listing/queries";
+import {
+  getEffectiveSeller,
+  hasSellerOverride,
+} from "@/lib/seller/effective-seller";
 
 type CreateCarInput = z.infer<typeof createCarSchema>;
+
+export type SellerContactFields = {
+  sellerDisplayName?: string | null;
+  sellerUsername?: string | null;
+  sellerTelegramId?: number | null;
+  sellerPhone?: string | null;
+};
+
+type CreateCarOptions = {
+  isActive?: boolean;
+  isFeatured?: boolean;
+  seller?: SellerContactFields;
+};
 
 function toTsQuery(search: string): string {
   return search
@@ -272,6 +289,8 @@ export type CarForContact = {
     lastName: string | null;
     phone: string | null;
   };
+  isExternalSeller: boolean;
+  externalTelegramId: number | null;
 };
 
 export async function getCarForContact(carId: string): Promise<CarForContact | null> {
@@ -285,6 +304,10 @@ export async function getCarForContact(carId: string): Promise<CarForContact | n
         title: true,
         isActive: true,
         soldAt: true,
+        sellerDisplayName: true,
+        sellerUsername: true,
+        sellerTelegramId: true,
+        sellerPhone: true,
       },
       with: {
         user: {
@@ -304,13 +327,26 @@ export async function getCarForContact(carId: string): Promise<CarForContact | n
       return null;
     }
 
+    const effective = getEffectiveSeller(car);
+
     return {
       id: car.id,
       userId: car.userId,
       title: car.title,
       isActive: car.isActive,
       soldAt: car.soldAt,
-      seller: car.user,
+      seller: {
+        id: car.user.id,
+        telegramId: hasSellerOverride(car)
+          ? (car.sellerTelegramId ?? car.user.telegramId)
+          : car.user.telegramId,
+        username: effective.username,
+        firstName: effective.firstName,
+        lastName: effective.lastName,
+        phone: effective.phone,
+      },
+      isExternalSeller: effective.isExternal,
+      externalTelegramId: effective.isExternal ? effective.telegramId : null,
     };
   });
 }
@@ -318,9 +354,11 @@ export async function getCarForContact(carId: string): Promise<CarForContact | n
 export async function createCar(
   userId: string,
   input: CreateCarInput,
+  options: CreateCarOptions = {},
 ): Promise<CarWithSeller> {
   return withBypassRls(async (tx) => {
     const { images, ...carData } = input;
+    const seller = options.seller;
 
     for (const image of images) {
       validateUserImagePair(userId, image.url, image.thumbnailUrl);
@@ -340,7 +378,12 @@ export async function createCar(
         transmission: carData.transmission,
         description: carData.description ?? null,
         location: carData.location ?? null,
-        isActive: true,
+        sellerDisplayName: seller?.sellerDisplayName ?? null,
+        sellerUsername: seller?.sellerUsername ?? null,
+        sellerTelegramId: seller?.sellerTelegramId ?? null,
+        sellerPhone: seller?.sellerPhone ?? null,
+        isActive: options.isActive ?? true,
+        isFeatured: options.isFeatured ?? false,
       })
       .returning();
 

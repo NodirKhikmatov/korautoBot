@@ -1,7 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
-import { Car, Search } from "lucide-react";
+import { Car, Plus, Search } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { AdminListingRow } from "@/components/admin/admin-listing-row";
@@ -50,6 +51,14 @@ export default function AdminListingsPage() {
           total > 0
             ? t("totalListings", { count: total })
             : t("listingsSubtitle")
+        }
+        action={
+          <Button asChild size="sm" className="h-9 rounded-xl">
+            <Link href="/admin/listings/create">
+              <Plus className="h-4 w-4" />
+              {t("importListing")}
+            </Link>
+          </Button>
         }
       />
 

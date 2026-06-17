@@ -208,7 +208,8 @@
     "sendInquiry": "So'rov yuborish",
     "inquiryHint": "Xabaringiz bot orqali yuboriladi. Sotuvchi Telegramda javob beradi.",
     "inquiryPlaceholder": "Salom, bu mashina qiziqtiradi. Hali sotuvdami?",
-    "inquirySent": "So'rov yuborildi. Javoblarni olish uchun bot chatini oching."
+    "inquirySent": "So'rov yuborildi. Javoblarni olish uchun bot chatini oching.",
+    "telegramId": "Telegram ID {id}"
   },
   "admin": {
     "title": "Admin",
@@ -221,6 +222,8 @@
     "overviewTitle": "Umumiy",
     "overviewSubtitle": "Platforma statistikasi bir ko'rinishda",
     "manageListings": "E'lonlarni boshqarish",
+    "importListing": "Import",
+    "externalSeller": "Tashqi",
     "manageUsers": "Foydalanuvchilarni boshqarish",
     "listingsTitle": "E'lonlar",
     "listingsSubtitle": "Barcha bozor e'lonlari",

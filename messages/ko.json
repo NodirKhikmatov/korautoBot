@@ -208,7 +208,8 @@
     "sendInquiry": "문의 보내기",
     "inquiryHint": "메시지는 봇을 통해 전달됩니다. 판매자는 Telegram에서 답장합니다.",
     "inquiryPlaceholder": "안녕하세요, 이 차에 관심이 있습니다. 아직 판매 중인가요?",
-    "inquirySent": "문의가 전송되었습니다. 봇 채팅을 열어 답장을 받으세요."
+    "inquirySent": "문의가 전송되었습니다. 봇 채팅을 열어 답장을 받으세요.",
+    "telegramId": "Telegram ID {id}"
   },
   "admin": {
     "title": "관리자",
@@ -221,6 +222,8 @@
     "overviewTitle": "개요",
     "overviewSubtitle": "플랫폼 통계 한눈에 보기",
     "manageListings": "매물 관리",
+    "importListing": "가져오기",
+    "externalSeller": "외부",
     "manageUsers": "사용자 관리",
     "listingsTitle": "매물",
     "listingsSubtitle": "모든 마켓플레이스 매물",

@@ -208,7 +208,8 @@
     "sendInquiry": "Send inquiry",
     "inquiryHint": "Your message is sent through our bot. The seller will reply in Telegram.",
     "inquiryPlaceholder": "Hi, I'm interested in this car. Is it still available?",
-    "inquirySent": "Inquiry sent. Open the bot chat to receive replies."
+    "inquirySent": "Inquiry sent. Open the bot chat to receive replies.",
+    "telegramId": "Telegram ID {id}"
   },
   "admin": {
     "title": "Admin",
@@ -221,6 +222,8 @@
     "overviewTitle": "Overview",
     "overviewSubtitle": "Platform statistics at a glance",
     "manageListings": "Manage listings",
+    "importListing": "Import",
+    "externalSeller": "External",
     "manageUsers": "Manage users",
     "listingsTitle": "Listings",
     "listingsSubtitle": "All marketplace listings",

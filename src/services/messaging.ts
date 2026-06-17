@@ -23,7 +23,7 @@ import {
 } from "@/services/conversations";
 import { canContactListing } from "@/lib/listing/status";
 import { getCarForContact } from "@/services/cars";
-import { getTelegramContactUrl } from "@/lib/telegram/contact";
+import { getTelegramContactUrl, getTelegramIdContactUrl } from "@/lib/telegram/contact";
 import { getPhoneContactUrl } from "@/lib/contact/phone";
 import { defaultLocale, type Locale } from "@/i18n/config";
 import type { User } from "@/types";
@@ -73,6 +73,17 @@ export async function contactSeller(
     return {
       mode: "phone",
       directChatUrl: getPhoneContactUrl(sellerPhone),
+      viewCount: analytics.viewCount,
+      contactCount: analytics.contactCount,
+    };
+  }
+
+  if (car.isExternalSeller && car.externalTelegramId) {
+    const analytics = await recordCarContact(car.id, buyer.id);
+
+    return {
+      mode: "telegram",
+      directChatUrl: getTelegramIdContactUrl(car.externalTelegramId),
       viewCount: analytics.viewCount,
       contactCount: analytics.contactCount,
     };

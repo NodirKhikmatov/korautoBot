@@ -5,7 +5,10 @@ import { useCallback, useMemo, useState } from "react";
 import { ApiError, apiFetch } from "@/lib/api/fetch";
 import { openPhoneContact } from "@/lib/contact/phone";
 import { openTelegramBotChat } from "@/lib/telegram/bot-chat";
-import { openTelegramContact } from "@/lib/telegram/contact";
+import {
+  openTelegramContact,
+  openTelegramContactById,
+} from "@/lib/telegram/contact";
 
 type ContactSellerResponse = {
   mode: "telegram" | "phone" | "bot";
@@ -21,12 +24,13 @@ export function useContactSeller(
   carId: string,
   username?: string | null,
   phone?: string | null,
+  telegramId?: number | null,
 ) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const hasDirectChat = useMemo(
-    () => Boolean(username?.trim() || phone?.trim()),
-    [username, phone],
+    () => Boolean(username?.trim() || phone?.trim() || telegramId),
+    [username, phone, telegramId],
   );
 
   const openDirectChat = useCallback(async () => {
@@ -49,6 +53,8 @@ export function useContactSeller(
 
       if (result.mode === "telegram" && username?.trim()) {
         openTelegramContact(username);
+      } else if (telegramId) {
+        openTelegramContactById(telegramId);
       } else if (result.mode === "phone" && phone?.trim()) {
         openPhoneContact(phone);
       }
@@ -66,7 +72,7 @@ export function useContactSeller(
     } finally {
       setIsSubmitting(false);
     }
-  }, [carId, hasDirectChat, phone, username]);
+  }, [carId, hasDirectChat, phone, telegramId, username]);
 
   const sendInquiry = useCallback(
     async (message: string) => {

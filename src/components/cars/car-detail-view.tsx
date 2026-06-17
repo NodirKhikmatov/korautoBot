@@ -20,6 +20,7 @@ import { useCar } from "@/hooks/use-car";
 import { useRecordCarView } from "@/hooks/use-record-car-view";
 import { useTelegramBackButton } from "@/hooks/use-telegram-back-button";
 import { isListingSold } from "@/lib/listing/status";
+import { getEffectiveSeller } from "@/lib/seller/effective-seller";
 
 export function CarDetailView({ carId }: { carId: string }) {
   const t = useTranslations("listing");
@@ -43,7 +44,7 @@ export function CarDetailView({ carId }: { carId: string }) {
     );
   }
 
-  if (isError || !data?.car) {
+  if (isError || !car) {
     return (
       <div className="flex min-h-[50vh] flex-col items-center justify-center gap-2 text-center">
         <p className="font-semibold">{t("notFound")}</p>
@@ -54,7 +55,8 @@ export function CarDetailView({ carId }: { carId: string }) {
     );
   }
 
-  const listing = data.car;
+  const listing = car;
+  const seller = getEffectiveSeller(listing);
   const isOwner = isAuthenticated && user?.id === listing.userId;
   const sold = isListingSold(listing);
 
@@ -125,18 +127,17 @@ export function CarDetailView({ carId }: { carId: string }) {
       )}
 
       {!sold && (
-        <>
-          <div className="space-y-3">
-            <h2 className="text-sm font-semibold">{tSeller("title")}</h2>
-            <SellerProfileCard seller={listing.user} />
-            <ContactSellerButton
-              carId={listing.id}
-              carTitle={listing.title}
-              username={listing.user.username}
-              phone={listing.user.phone}
-            />
-          </div>
-        </>
+        <div className="space-y-3">
+          <h2 className="text-sm font-semibold">{tSeller("title")}</h2>
+          <SellerProfileCard seller={seller} />
+          <ContactSellerButton
+            carId={listing.id}
+            carTitle={listing.title}
+            username={seller.username}
+            telegramId={seller.telegramId}
+            phone={seller.phone}
+          />
+        </div>
       )}
     </div>
   );

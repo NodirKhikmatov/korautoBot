@@ -20,7 +20,7 @@ const r2Hostname = getR2ImageHostname();
 const nextConfig: NextConfig = {
   output: "standalone",
   outputFileTracingRoot: process.cwd(),
-  serverExternalPackages: ["sharp"],
+  serverExternalPackages: ["sharp", "pg"],
   poweredByHeader: false,
   images: {
     remotePatterns: [

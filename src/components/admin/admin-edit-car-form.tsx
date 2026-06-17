@@ -39,6 +39,14 @@ export function AdminEditCarForm({ car }: { car: CarWithSeller }) {
   const [location, setLocation] = useState(car.location ?? "");
   const [isActive, setIsActive] = useState(car.isActive);
   const [isFeatured, setIsFeatured] = useState(car.isFeatured);
+  const [sellerDisplayName, setSellerDisplayName] = useState(
+    car.sellerDisplayName ?? "",
+  );
+  const [sellerUsername, setSellerUsername] = useState(car.sellerUsername ?? "");
+  const [sellerTelegramId, setSellerTelegramId] = useState(
+    car.sellerTelegramId ? String(car.sellerTelegramId) : "",
+  );
+  const [sellerPhone, setSellerPhone] = useState(car.sellerPhone ?? "");
 
   useEffect(() => {
     setTitle(car.title);
@@ -53,6 +61,10 @@ export function AdminEditCarForm({ car }: { car: CarWithSeller }) {
     setLocation(car.location ?? "");
     setIsActive(car.isActive);
     setIsFeatured(car.isFeatured);
+    setSellerDisplayName(car.sellerDisplayName ?? "");
+    setSellerUsername(car.sellerUsername ?? "");
+    setSellerTelegramId(car.sellerTelegramId ? String(car.sellerTelegramId) : "");
+    setSellerPhone(car.sellerPhone ?? "");
   }, [car]);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -72,6 +84,10 @@ export function AdminEditCarForm({ car }: { car: CarWithSeller }) {
       location: location || null,
       isActive,
       isFeatured,
+      seller_display_name: sellerDisplayName || null,
+      seller_username: sellerUsername || null,
+      seller_telegram_id: sellerTelegramId ? Number(sellerTelegramId) : null,
+      seller_phone: sellerPhone || null,
     };
 
     const parsed = adminUpdateCarSchema.safeParse(payload);
@@ -91,6 +107,49 @@ export function AdminEditCarForm({ car }: { car: CarWithSeller }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="space-y-4 rounded-2xl border border-border/60 bg-card/50 p-4">
+        <h3 className="font-semibold">Seller contact</h3>
+        <div className="space-y-1.5">
+          <Label htmlFor="sellerDisplayName">Seller name</Label>
+          <Input
+            id="sellerDisplayName"
+            value={sellerDisplayName}
+            onChange={(e) => setSellerDisplayName(e.target.value)}
+            className="h-11 rounded-xl bg-card/50"
+          />
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1.5">
+            <Label htmlFor="sellerUsername">Telegram username</Label>
+            <Input
+              id="sellerUsername"
+              value={sellerUsername}
+              onChange={(e) => setSellerUsername(e.target.value)}
+              className="h-11 rounded-xl bg-card/50"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="sellerTelegramId">Telegram ID</Label>
+            <Input
+              id="sellerTelegramId"
+              type="number"
+              value={sellerTelegramId}
+              onChange={(e) => setSellerTelegramId(e.target.value)}
+              className="h-11 rounded-xl bg-card/50"
+            />
+          </div>
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="sellerPhone">Phone</Label>
+          <Input
+            id="sellerPhone"
+            value={sellerPhone}
+            onChange={(e) => setSellerPhone(e.target.value)}
+            className="h-11 rounded-xl bg-card/50"
+          />
+        </div>
+      </div>
+
       <div className="space-y-1.5">
         <Label htmlFor="title">{t("title")}</Label>
         <Input
