@@ -48,8 +48,8 @@ export async function processImageBuffer(
       .resize({
         width: IMAGE_THUMB_WIDTH,
         height: IMAGE_THUMB_WIDTH,
-        fit: "cover",
-        position: "centre",
+        fit: "inside",
+        withoutEnlargement: true,
       })
       .webp({ quality: IMAGE_THUMB_QUALITY, effort: 4 })
       .toBuffer();

@@ -8,6 +8,8 @@ import {
 } from "@/lib/auth/errors";
 import { FavoriteError } from "@/lib/favorites/errors";
 import { ImageUploadError } from "@/lib/images/errors";
+import { ListingError } from "@/lib/listing/errors";
+import { MessagingError } from "@/lib/messaging/errors";
 
 export function handleRouteError(
   error: unknown,
@@ -34,11 +36,33 @@ export function handleRouteError(
     return NextResponse.json({ error: error.message }, { status: error.status });
   }
 
+  if (error instanceof ListingError) {
+    return NextResponse.json(
+      { error: error.message, code: error.code },
+      { status: error.status },
+    );
+  }
+
+  if (error instanceof MessagingError) {
+    return NextResponse.json(
+      { error: error.message, code: error.code },
+      { status: error.status },
+    );
+  }
+
   if (error instanceof ZodError) {
     return NextResponse.json(
       { error: "Invalid request", details: error.flatten() },
       { status: 400 },
     );
+  }
+
+  if (
+    error instanceof Error &&
+    (error.message.includes("R2") ||
+      error.message.includes("environment variables are not configured"))
+  ) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
   console.error(logLabel, error);

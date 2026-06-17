@@ -1,6 +1,7 @@
 "use client";
 
 import { Heart, Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
@@ -18,6 +19,7 @@ export function FavoriteButton({
   size?: "icon" | "sm";
   variant?: "outline" | "ghost";
 }) {
+  const t = useTranslations("favorites");
   const { isAuthenticated } = useAuth();
   const { isFavorite, toggleFavorite, isToggling } = useFavorites(isAuthenticated);
 
@@ -47,7 +49,9 @@ export function FavoriteButton({
       )}
       onClick={handleClick}
       disabled={isToggling}
-      aria-label={favorited ? "Remove from favorites" : "Add to favorites"}
+      aria-label={
+        favorited ? t("removeFromFavorites") : t("addToFavorites")
+      }
     >
       {isToggling ? (
         <Loader2 className="h-4 w-4 animate-spin" />

@@ -1,6 +1,7 @@
 "use client";
 
 import { ShieldBan, ShieldCheck } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -17,11 +18,11 @@ export function AdminUserRow({
   onBan: (userId: string, banned: boolean) => void;
   isBanning?: boolean;
 }) {
-  const displayName = getDisplayName(
-    user.firstName,
-    user.lastName,
-    user.username,
-  );
+  const t = useTranslations("admin");
+  const tCommon = useTranslations("common");
+  const displayName =
+    getDisplayName(user.firstName, user.lastName, user.username) ||
+    tCommon("user");
   const isBanned = Boolean(user.bannedAt);
 
   return (
@@ -37,11 +38,13 @@ export function AdminUserRow({
           <div className="flex flex-wrap items-center gap-1.5">
             <p className="truncate font-semibold">{displayName}</p>
             {user.isAdmin && (
-              <Badge className="rounded-md px-1.5 py-0 text-[10px]">Admin</Badge>
+              <Badge className="rounded-md px-1.5 py-0 text-[10px]">
+                {t("adminBadge")}
+              </Badge>
             )}
             {isBanned && (
               <Badge variant="destructive" className="rounded-md px-1.5 py-0 text-[10px]">
-                Banned
+                {t("bannedBadge")}
               </Badge>
             )}
           </div>
@@ -49,7 +52,10 @@ export function AdminUserRow({
             <p className="text-sm text-muted-foreground">@{user.username}</p>
           )}
           <p className="text-xs text-muted-foreground">
-            {user.listingCount} listings · ID {user.telegramId}
+            {t("listingsCount", {
+              count: user.listingCount,
+              telegramId: user.telegramId,
+            })}
           </p>
         </div>
       </div>
@@ -64,12 +70,12 @@ export function AdminUserRow({
         {isBanned ? (
           <>
             <ShieldCheck className="h-3.5 w-3.5" />
-            Unban user
+            {t("unbanUser")}
           </>
         ) : (
           <>
             <ShieldBan className="h-3.5 w-3.5" />
-            Ban user
+            {t("banUser")}
           </>
         )}
       </Button>

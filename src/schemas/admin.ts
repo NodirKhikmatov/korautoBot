@@ -47,23 +47,6 @@ export const adminBanUserSchema = z.object({
   banned: z.boolean(),
 });
 
-export const sellerContactSchema = z
-  .object({
-    seller_display_name: z.string().max(100).optional().nullable(),
-    seller_username: optionalSellerUsername,
-    seller_telegram_id: z.number().int().positive().optional().nullable(),
-    seller_phone: z.string().max(20).optional().nullable(),
-  })
-  .refine(
-    (data) =>
-      Boolean(
-        data.seller_username ||
-          data.seller_telegram_id ||
-          data.seller_phone?.trim(),
-      ),
-    { message: "Provide seller Telegram username, Telegram ID, or phone" },
-  );
-
 export const adminCreateCarSchema = createCarSchema
   .extend({
     isActive: z.boolean().optional(),
@@ -84,3 +67,11 @@ export const adminCreateCarSchema = createCarSchema
   );
 
 export type AdminCreateCarInput = z.infer<typeof adminCreateCarSchema>;
+
+export const adminBroadcastSchema = z.object({
+  message: z
+    .string()
+    .trim()
+    .min(1, "Message is required")
+    .max(4000, "Message is too long"),
+});

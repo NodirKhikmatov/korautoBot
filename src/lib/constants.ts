@@ -12,6 +12,8 @@ export const ALLOWED_IMAGE_TYPES = [
   "image/webp",
 ] as const;
 
+export type AllowedImageType = typeof ALLOWED_IMAGE_TYPES[number];
+
 export const CAR_BRANDS = [
   "Hyundai",
   "Kia",

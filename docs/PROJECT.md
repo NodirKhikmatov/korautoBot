@@ -24,15 +24,35 @@ Build a marketplace for buying and selling used cars in South Korea.
 - Seller Contact
 - Admin Dashboard
 
+## Messaging System
+
+Users can contact sellers through the Telegram Bot.
+
+No Telegram username required.
+
+No internal realtime chat.
+
+The bot acts as a message relay between buyers and sellers.
+
+### Benefits
+
+- Works without username
+- Privacy friendly
+- Simple MVP implementation
+- Low infrastructure cost
+
 ## Infrastructure
 
 | Layer | Technology |
 |-------|------------|
 | Frontend | Next.js |
-| Database | Neon PostgreSQL |
+| Database | PostgreSQL (Vultr VPS) |
 | ORM | Drizzle |
 | Storage | Cloudflare R2 |
-| Deployment | Vercel |
+| Reverse proxy | Nginx |
+| Containers | Docker + Docker Compose |
+| CI/CD | GitHub Actions |
+| Deployment | Vultr VPS |
 
 ## Priority
 

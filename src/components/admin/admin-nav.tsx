@@ -9,24 +9,27 @@ import {
   LayoutDashboard,
   Users,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { cn } from "@/lib/utils";
 
 type NavItem = {
   href: string;
-  label: string;
+  labelKey: "overview" | "listings" | "users";
   icon: typeof LayoutDashboard;
   exact?: boolean;
 };
 
 const NAV_ITEMS: NavItem[] = [
-  { href: "/admin", label: "Overview", icon: LayoutDashboard, exact: true },
-  { href: "/admin/listings", label: "Listings", icon: Car },
-  { href: "/admin/users", label: "Users", icon: Users },
+  { href: "/admin", labelKey: "overview", icon: LayoutDashboard, exact: true },
+  { href: "/admin/listings", labelKey: "listings", icon: Car },
+  { href: "/admin/users", labelKey: "users", icon: Users },
 ];
 
 export function AdminNav() {
   const pathname = usePathname();
+  const t = useTranslations("admin");
+  const tCommon = useTranslations("common");
 
   return (
     <header className="sticky top-0 z-40 -mx-4 border-b border-border/60 bg-background/95 px-4 pb-3 backdrop-blur-md">
@@ -37,15 +40,15 @@ export function AdminNav() {
         <Link
           href="/"
           className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-border/60 bg-card/50 text-muted-foreground transition-colors hover:text-foreground"
-          aria-label="Back to app"
+          aria-label={tCommon("backToApp")}
         >
           <ArrowLeft className="h-4 w-4" />
         </Link>
         <div className="min-w-0">
           <p className="text-xs font-medium uppercase tracking-wider text-primary">
-            Admin
+            {t("title")}
           </p>
-          <h1 className="text-lg font-bold leading-tight">Dashboard</h1>
+          <h1 className="text-lg font-bold leading-tight">{t("dashboard")}</h1>
         </div>
       </div>
 
@@ -68,7 +71,7 @@ export function AdminNav() {
               )}
             >
               <Icon className="h-4 w-4" />
-              {item.label}
+              {t(item.labelKey)}
             </Link>
           );
         })}

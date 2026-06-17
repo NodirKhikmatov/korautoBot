@@ -10,18 +10,19 @@ import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useAdminMutations } from "@/hooks/use-admin";
+import { useTranslatedFormat } from "@/hooks/use-translated-format";
 import {
   CAR_BRANDS,
   FUEL_TYPES,
   TRANSMISSION_TYPES,
 } from "@/lib/constants";
-import { formatFuelType, formatTransmission } from "@/lib/format";
 import { adminCreateCarSchema } from "@/schemas/admin";
 import type { UploadedCarImage } from "@/types";
 
 export function AdminCreateListingForm() {
   const router = useRouter();
   const { createCar } = useAdminMutations();
+  const { formatFuelType, formatTransmission } = useTranslatedFormat();
   const [error, setError] = useState<string | null>(null);
   const [images, setImages] = useState<UploadedCarImage[]>([]);
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -9,16 +10,19 @@ import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useAdminMutations } from "@/hooks/use-admin";
+import { useTranslatedFormat } from "@/hooks/use-translated-format";
 import {
   CAR_BRANDS,
   FUEL_TYPES,
   TRANSMISSION_TYPES,
 } from "@/lib/constants";
-import { formatFuelType, formatTransmission } from "@/lib/format";
 import { adminUpdateCarSchema } from "@/schemas/admin";
 import type { CarWithSeller } from "@/types";
 
 export function AdminEditCarForm({ car }: { car: CarWithSeller }) {
+  const t = useTranslations("listing");
+  const tCommon = useTranslations("common");
+  const { formatFuelType, formatTransmission } = useTranslatedFormat();
   const router = useRouter();
   const { updateCar } = useAdminMutations();
   const [error, setError] = useState<string | null>(null);
@@ -89,7 +93,7 @@ export function AdminEditCarForm({ car }: { car: CarWithSeller }) {
     const parsed = adminUpdateCarSchema.safeParse(payload);
 
     if (!parsed.success) {
-      setError(parsed.error.errors[0]?.message ?? "Invalid form data");
+      setError(parsed.error.errors[0]?.message ?? t("invalidFormData"));
       return;
     }
 
@@ -97,7 +101,7 @@ export function AdminEditCarForm({ car }: { car: CarWithSeller }) {
       await updateCar.mutateAsync({ carId: car.id, data: parsed.data });
       router.push("/admin/listings");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to update listing");
+      setError(err instanceof Error ? err.message : t("updateFailed"));
     }
   }
 
@@ -147,7 +151,7 @@ export function AdminEditCarForm({ car }: { car: CarWithSeller }) {
       </div>
 
       <div className="space-y-1.5">
-        <Label htmlFor="title">Title</Label>
+        <Label htmlFor="title">{t("title")}</Label>
         <Input
           id="title"
           value={title}
@@ -159,7 +163,7 @@ export function AdminEditCarForm({ car }: { car: CarWithSeller }) {
 
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1.5">
-          <Label>Brand</Label>
+          <Label>{t("brand")}</Label>
           <Select
             value={brand}
             onChange={(e) => setBrand(e.target.value)}
@@ -171,7 +175,7 @@ export function AdminEditCarForm({ car }: { car: CarWithSeller }) {
           </Select>
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="model">Model</Label>
+          <Label htmlFor="model">{t("model")}</Label>
           <Input
             id="model"
             value={model}
@@ -184,7 +188,7 @@ export function AdminEditCarForm({ car }: { car: CarWithSeller }) {
 
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1.5">
-          <Label htmlFor="year">Year</Label>
+          <Label htmlFor="year">{t("year")}</Label>
           <Input
             id="year"
             type="number"
@@ -195,7 +199,7 @@ export function AdminEditCarForm({ car }: { car: CarWithSeller }) {
           />
         </div>
         <div className="space-y-1.5">
-          <Label htmlFor="price">Price (₩)</Label>
+          <Label htmlFor="price">{t("priceWithCurrency")}</Label>
           <Input
             id="price"
             type="number"
@@ -209,7 +213,7 @@ export function AdminEditCarForm({ car }: { car: CarWithSeller }) {
 
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1.5">
-          <Label htmlFor="mileage">Mileage (km)</Label>
+          <Label htmlFor="mileage">{t("mileageWithUnit")}</Label>
           <Input
             id="mileage"
             type="number"
@@ -220,7 +224,7 @@ export function AdminEditCarForm({ car }: { car: CarWithSeller }) {
           />
         </div>
         <div className="space-y-1.5">
-          <Label>Fuel</Label>
+          <Label>{t("fuel")}</Label>
           <Select
             value={fuelType}
             onChange={(e) => setFuelType(e.target.value as typeof fuelType)}
@@ -233,21 +237,23 @@ export function AdminEditCarForm({ car }: { car: CarWithSeller }) {
       </div>
 
       <div className="space-y-1.5">
-        <Label>Transmission</Label>
+        <Label>{t("transmission")}</Label>
         <Select
           value={transmission}
           onChange={(e) =>
             setTransmission(e.target.value as typeof transmission)
           }
         >
-          {TRANSMISSION_TYPES.map((t) => (
-            <option key={t} value={t}>{formatTransmission(t)}</option>
+          {TRANSMISSION_TYPES.map((trans) => (
+            <option key={trans} value={trans}>
+              {formatTransmission(trans)}
+            </option>
           ))}
         </Select>
       </div>
 
       <div className="space-y-1.5">
-        <Label htmlFor="location">Location</Label>
+        <Label htmlFor="location">{t("location")}</Label>
         <Input
           id="location"
           value={location}
@@ -257,7 +263,7 @@ export function AdminEditCarForm({ car }: { car: CarWithSeller }) {
       </div>
 
       <div className="space-y-1.5">
-        <Label htmlFor="description">Description</Label>
+        <Label htmlFor="description">{t("description")}</Label>
         <Textarea
           id="description"
           value={description}
@@ -274,7 +280,7 @@ export function AdminEditCarForm({ car }: { car: CarWithSeller }) {
             onChange={(e) => setIsActive(e.target.checked)}
             className="h-4 w-4 rounded border-border"
           />
-          Active listing
+          {t("activeListing")}
         </label>
         <label className="flex items-center gap-2 rounded-xl border border-border/60 bg-card/50 px-3 py-3 text-sm">
           <input
@@ -283,7 +289,7 @@ export function AdminEditCarForm({ car }: { car: CarWithSeller }) {
             onChange={(e) => setIsFeatured(e.target.checked)}
             className="h-4 w-4 rounded border-border"
           />
-          Featured
+          {t("featured")}
         </label>
       </div>
 
@@ -298,14 +304,14 @@ export function AdminEditCarForm({ car }: { car: CarWithSeller }) {
           className="h-11 rounded-xl"
           onClick={() => router.back()}
         >
-          Cancel
+          {tCommon("cancel")}
         </Button>
         <Button
           type="submit"
           className="h-11 rounded-xl"
           disabled={updateCar.isPending}
         >
-          {updateCar.isPending ? "Saving…" : "Save changes"}
+          {updateCar.isPending ? t("saving") : t("saveChanges")}
         </Button>
       </div>
     </form>

@@ -27,6 +27,7 @@ function Avatar({
           src={src}
           alt={alt}
           fill
+          unoptimized
           className="object-cover"
           sizes="48px"
         />

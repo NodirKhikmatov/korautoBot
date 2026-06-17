@@ -4,13 +4,14 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { z } from "zod";
 
 import { apiFetch } from "@/lib/api/fetch";
-import type { createCarSchema } from "@/schemas/car";
-import type { CarWithSeller } from "@/types";
+import type { createListingSchema } from "@/schemas/car";
+import type { CarWithSeller, User } from "@/types";
 
-type CreateCarInput = z.infer<typeof createCarSchema>;
+type CreateCarInput = z.infer<typeof createListingSchema>;
 
 type CreateCarResponse = {
   car: CarWithSeller;
+  user?: User;
 };
 
 export function useCreateCar() {

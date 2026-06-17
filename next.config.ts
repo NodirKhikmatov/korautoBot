@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import createNextIntlPlugin from "next-intl/plugin";
 
 function getR2ImageHostname(): string | undefined {
   const publicUrl = process.env.R2_PUBLIC_URL;
@@ -17,9 +18,10 @@ function getR2ImageHostname(): string | undefined {
 const r2Hostname = getR2ImageHostname();
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   outputFileTracingRoot: process.cwd(),
+  serverExternalPackages: ["sharp", "pg"],
   poweredByHeader: false,
-  serverExternalPackages: ["ws", "@neondatabase/serverless"],
   images: {
     remotePatterns: [
       {
@@ -57,4 +59,6 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+const withNextIntl = createNextIntlPlugin();
+
+export default withNextIntl(nextConfig);

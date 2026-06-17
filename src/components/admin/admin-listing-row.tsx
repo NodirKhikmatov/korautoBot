@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { Pencil, Sparkles, Trash2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
+import { CarImage } from "@/components/cars/car-image";
+import { ListingStats } from "@/components/cars/listing-stats";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getDisplayName } from "@/lib/format";
@@ -24,27 +26,32 @@ export function AdminListingRow({
   isFeaturing?: boolean;
   isDeleting?: boolean;
 }) {
+  const t = useTranslations("listing");
+  const tAdmin = useTranslations("admin");
+  const tCommon = useTranslations("common");
   const cover = car.carImages[0];
   const seller = getEffectiveSeller(car);
   const sellerName = seller.isExternal
-    ? seller.firstName
-    : getDisplayName(seller.firstName, seller.lastName, seller.username);
+    ? (seller.firstName ?? tCommon("user"))
+    : getDisplayName(seller.firstName, seller.lastName, seller.username) ||
+      tCommon("user");
 
   return (
     <div className="rounded-2xl border border-border/60 bg-card/50 p-3">
       <div className="flex gap-3">
         <div className="relative h-20 w-24 shrink-0 overflow-hidden rounded-xl bg-muted">
           {cover ? (
-            <Image
-              src={cover.thumbnailUrl ?? cover.url}
-              alt={car.title}
-              fill
-              className="object-cover"
+            <CarImage
+              src={cover.url ?? cover.thumbnailUrl}
+              alt={t("coverPhotoAlt", { title: car.title })}
+              width={96}
+              height={80}
+              className="h-full w-full object-contain"
               sizes="96px"
             />
           ) : (
             <div className="flex h-full items-center justify-center text-xs text-muted-foreground">
-              No photo
+              {tCommon("noPhoto")}
             </div>
           )}
         </div>
@@ -53,12 +60,12 @@ export function AdminListingRow({
           <div className="flex flex-wrap items-center gap-1.5">
             {car.isFeatured && (
               <Badge className="rounded-md px-1.5 py-0 text-[10px]">
-                Featured
+                {t("featured")}
               </Badge>
             )}
             {!car.isActive && (
               <Badge variant="secondary" className="rounded-md px-1.5 py-0 text-[10px]">
-                Hidden
+                {t("hidden")}
               </Badge>
             )}
           </div>
@@ -69,8 +76,13 @@ export function AdminListingRow({
           <p className="truncate text-xs text-muted-foreground">
             {sellerName}
             {seller.username ? ` · @${seller.username}` : ""}
-            {seller.isExternal ? " · External" : ""}
+            {seller.isExternal ? ` · ${tAdmin("externalSeller")}` : ""}
           </p>
+          <ListingStats
+            viewCount={car.viewCount}
+            contactCount={car.contactCount}
+            size="xs"
+          />
         </div>
       </div>
 
@@ -83,7 +95,7 @@ export function AdminListingRow({
         >
           <Link href={`/admin/listings/${car.id}`}>
             <Pencil className="h-3.5 w-3.5" />
-            Edit
+            {tCommon("edit")}
           </Link>
         </Button>
         <Button
@@ -94,7 +106,7 @@ export function AdminListingRow({
           onClick={() => onFeature(car.id, !car.isFeatured)}
         >
           <Sparkles className="h-3.5 w-3.5" />
-          {car.isFeatured ? "Unfeature" : "Feature"}
+          {car.isFeatured ? t("unfeature") : t("feature")}
         </Button>
         <Button
           variant="outline"
@@ -104,7 +116,7 @@ export function AdminListingRow({
           onClick={() => onDelete(car.id)}
         >
           <Trash2 className="h-3.5 w-3.5" />
-          Delete
+          {tCommon("delete")}
         </Button>
       </div>
     </div>

@@ -55,6 +55,11 @@ interface TelegramWebApp {
   ready: () => void;
   expand: () => void;
   close: () => void;
+  setHeaderColor: (color: string) => void;
+  setBackgroundColor: (color: string) => void;
+  setBottomBarColor?: (color: string) => void;
+  viewportStableHeight?: number;
+  viewportHeight?: number;
   colorScheme: "light" | "dark";
   themeParams: TelegramThemeParams;
   BackButton: TelegramBackButton;
@@ -63,6 +68,7 @@ interface TelegramWebApp {
   onEvent: (eventType: string, callback: () => void) => void;
   offEvent: (eventType: string, callback: () => void) => void;
   openTelegramLink: (url: string) => void;
+  openLink?: (url: string, options?: { try_instant_view?: boolean }) => void;
 }
 
 interface Window {

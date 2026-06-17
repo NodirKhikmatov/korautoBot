@@ -1,6 +1,6 @@
 # Database Architecture
 
-Neon PostgreSQL + Drizzle ORM. Optimized for **100k+ users**, **fast search**, **low cost**.
+PostgreSQL (Vultr VPS) + Drizzle ORM + `pg` driver. Optimized for **100k+ users**, **fast search**, **low cost**.
 
 ## Entity Relationship
 
@@ -75,7 +75,7 @@ Application helper: `src/db/context.ts`
 | `car_images` | Images of visible cars | Owner or server |
 | `favorites` | Own favorites only | Own favorites only |
 
-**Note:** Neon owner role bypasses RLS by default. Policies apply when using a limited runtime role or `FORCE ROW LEVEL SECURITY`.
+**Note:** The database superuser bypasses RLS by default. Policies apply when using a limited runtime role or `FORCE ROW LEVEL SECURITY`.
 
 ## Constraints
 
@@ -87,7 +87,7 @@ Application helper: `src/db/context.ts`
 ## Migrations
 
 ```bash
-# Fresh Neon project (no schema yet)
+# Fresh PostgreSQL database (no schema yet)
 npm run db:migrate
 
 # Dev: push Drizzle schema directly (skips migration journal)

@@ -41,7 +41,35 @@
       "idx": 5,
       "version": "7",
       "when": 1740500000000,
-      "tag": "0005_car_seller_contact",
+      "tag": "0005_listing_analytics",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1740600000000,
+      "tag": "0006_bot_messaging",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1740700000000,
+      "tag": "0007_user_phone",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1740800000000,
+      "tag": "0008_listing_sold",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1740900000000,
+      "tag": "0009_car_seller_contact",
       "breakpoints": true
     }
   ]

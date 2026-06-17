@@ -9,24 +9,34 @@ type UploadImagesResponse = {
   images: UploadedCarImage[];
 };
 
+export type UploadErrorCode =
+  | "noFilesSelected"
+  | "maxImagesAllowed"
+  | "uploadFailed";
+
+export class UploadError extends Error {
+  constructor(public code: UploadErrorCode) {
+    super(code);
+    this.name = "UploadError";
+  }
+}
+
 async function parseError(response: Response): Promise<string> {
   const data = (await response.json().catch(() => null)) as
     | { error?: string }
     | null;
-  return data?.error ?? "Upload failed";
+  return data?.error ?? "uploadFailed";
 }
 
 export function useImageUpload() {
   const uploadMutation = useMutation({
     mutationFn: async (files: File[]): Promise<UploadedCarImage[]> => {
       if (files.length === 0) {
-        throw new Error("No files selected");
+        throw new UploadError("noFilesSelected");
       }
 
       if (files.length > MAX_IMAGES_PER_LISTING) {
-        throw new Error(
-          `Maximum ${MAX_IMAGES_PER_LISTING} images allowed`,
-        );
+        throw new UploadError("maxImagesAllowed");
       }
 
       const formData = new FormData();
@@ -41,7 +51,11 @@ export function useImageUpload() {
       });
 
       if (!response.ok) {
-        throw new Error(await parseError(response));
+        const message = await parseError(response);
+        if (message === "uploadFailed") {
+          throw new UploadError("uploadFailed");
+        }
+        throw new Error(message);
       }
 
       const data = (await response.json()) as UploadImagesResponse;
@@ -59,7 +73,11 @@ export function useImageUpload() {
       });
 
       if (!response.ok) {
-        throw new Error(await parseError(response));
+        const message = await parseError(response);
+        if (message === "uploadFailed") {
+          throw new UploadError("uploadFailed");
+        }
+        throw new Error(message);
       }
     },
   });

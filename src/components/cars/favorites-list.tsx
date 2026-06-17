@@ -1,9 +1,11 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { Heart, Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
+import { CarImage } from "@/components/cars/car-image";
+import { ListingStats } from "@/components/cars/listing-stats";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useFavorites } from "@/hooks/use-favorites";
@@ -13,7 +15,7 @@ import type { CarWithImages } from "@/types";
 function getCoverImage(car: CarWithImages): string | null {
   const sorted = [...car.carImages].sort((a, b) => a.sortOrder - b.sortOrder);
   const first = sorted[0];
-  return first?.thumbnailUrl ?? first?.url ?? null;
+  return first?.url ?? first?.thumbnailUrl ?? null;
 }
 
 export function FavoritesList() {
@@ -46,6 +48,7 @@ function FavoriteListItem({
   onRemove: () => void;
   isRemoving: boolean;
 }) {
+  const t = useTranslations("common");
   const cover = getCoverImage(car);
 
   return (
@@ -57,16 +60,17 @@ function FavoriteListItem({
         className="relative h-20 w-28 shrink-0 overflow-hidden rounded-xl bg-muted"
       >
         {cover ? (
-          <Image
+          <CarImage
             src={cover}
-            alt={car.title}
-            fill
-            className="object-cover"
+            alt={`${car.title} — ${car.brand} ${car.model}`}
+            width={112}
+            height={80}
+            className="h-full w-full object-contain"
             sizes="112px"
           />
         ) : (
           <div className="flex h-full items-center justify-center text-xs text-muted-foreground">
-            No photo
+            {t("noPhoto")}
           </div>
         )}
       </Link>
@@ -82,6 +86,12 @@ function FavoriteListItem({
             </p>
           </Link>
         </div>
+
+        <ListingStats
+          viewCount={car.viewCount}
+          contactCount={car.contactCount}
+          size="xs"
+        />
 
         <div className="flex items-center justify-between gap-2">
           <div className="flex flex-wrap items-center gap-2">
@@ -102,7 +112,7 @@ function FavoriteListItem({
             ) : (
               <Heart className="h-3 w-3 fill-primary text-primary" />
             )}
-            Remove
+            {t("remove")}
           </Button>
         </div>
       </div>

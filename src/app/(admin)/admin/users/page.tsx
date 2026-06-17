@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Search, Users } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { AdminUserRow } from "@/components/admin/admin-user-row";
 import { EmptyState } from "@/components/layout/empty-state";
@@ -12,6 +13,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAdminMutations, useAdminUsers } from "@/hooks/use-admin";
 
 export default function AdminUsersPage() {
+  const t = useTranslations("admin");
+  const tCommon = useTranslations("common");
   const [search, setSearch] = useState("");
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
@@ -30,16 +33,19 @@ export default function AdminUsersPage() {
   }
 
   async function handleBan(userId: string, banned: boolean) {
-    const action = banned ? "ban" : "unban";
-    if (!confirm(`Are you sure you want to ${action} this user?`)) return;
+    if (!confirm(banned ? t("banConfirm") : t("unbanConfirm"))) return;
     await banUser.mutateAsync({ userId, banned });
   }
 
   return (
     <div className="space-y-4">
       <PageHeader
-        title="Users"
-        subtitle={total > 0 ? `${total} registered users` : "All platform users"}
+        title={t("usersTitle")}
+        subtitle={
+          total > 0
+            ? t("registeredUsers", { count: total })
+            : t("usersSubtitle")
+        }
       />
 
       <form onSubmit={handleSearch} className="flex gap-2">
@@ -48,12 +54,12 @@ export default function AdminUsersPage() {
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by name, username, Telegram ID…"
+            placeholder={t("searchUsersPlaceholder")}
             className="h-11 rounded-xl bg-card/50 pl-9"
           />
         </div>
         <Button type="submit" className="h-11 rounded-xl px-4">
-          Go
+          {tCommon("go")}
         </Button>
       </form>
 
@@ -68,16 +74,18 @@ export default function AdminUsersPage() {
       {isError && (
         <EmptyState
           icon={Users}
-          title="Could not load users"
-          description="Check your connection and try again."
+          title={t("loadUsersError")}
+          description={tCommon("loadErrorDescription")}
         />
       )}
 
       {!isLoading && !isError && users.length === 0 && (
         <EmptyState
           icon={Users}
-          title="No users found"
-          description={query ? "Try a different search term." : "No users registered yet."}
+          title={t("noUsersFound")}
+          description={
+            query ? t("tryDifferentSearch") : t("noUsersRegistered")
+          }
         />
       )}
 
@@ -102,7 +110,7 @@ export default function AdminUsersPage() {
             disabled={page <= 1}
             onClick={() => setPage((p) => p - 1)}
           >
-            Previous
+            {tCommon("previous")}
           </Button>
           <Button
             variant="outline"
@@ -110,7 +118,7 @@ export default function AdminUsersPage() {
             disabled={!hasMore}
             onClick={() => setPage((p) => p + 1)}
           >
-            Next
+            {tCommon("next")}
           </Button>
         </div>
       )}

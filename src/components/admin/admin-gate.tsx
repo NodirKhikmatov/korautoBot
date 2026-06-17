@@ -2,12 +2,15 @@
 
 import Link from "next/link";
 import { Loader2, ShieldAlert } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { AuthGate } from "@/components/auth/auth-gate";
 import { Button } from "@/components/ui/button";
 import { useAdminAccess } from "@/hooks/use-admin";
 
 function AdminAccessCheck({ children }: { children: React.ReactNode }) {
+  const t = useTranslations("admin");
+  const tCommon = useTranslations("common");
   const { data, isLoading, isError } = useAdminAccess();
 
   if (isLoading) {
@@ -25,13 +28,11 @@ function AdminAccessCheck({ children }: { children: React.ReactNode }) {
           <ShieldAlert className="h-7 w-7 text-destructive" />
         </div>
         <div className="space-y-1">
-          <h2 className="text-lg font-semibold">Admin access required</h2>
-          <p className="text-sm text-muted-foreground">
-            Your account does not have permission to view this area.
-          </p>
+          <h2 className="text-lg font-semibold">{t("accessRequired")}</h2>
+          <p className="text-sm text-muted-foreground">{t("accessDenied")}</p>
         </div>
         <Button asChild variant="outline" className="rounded-xl">
-          <Link href="/">Back to app</Link>
+          <Link href="/">{tCommon("backToApp")}</Link>
         </Button>
       </div>
     );
@@ -42,7 +43,7 @@ function AdminAccessCheck({ children }: { children: React.ReactNode }) {
 
 export function AdminGate({ children }: { children: React.ReactNode }) {
   return (
-    <AuthGate message="Sign in with Telegram to access the admin dashboard">
+    <AuthGate messageKey="signInForAdmin">
       <AdminAccessCheck>{children}</AdminAccessCheck>
     </AuthGate>
   );

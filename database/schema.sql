@@ -1,5 +1,5 @@
 -- =============================================================================
--- Korea Auto Market — PostgreSQL Schema (Neon)
+-- Korea Auto Market — PostgreSQL Schema (Vultr VPS)
 -- Tables: users, cars, car_images, favorites
 -- Optimized for: 100k+ users, fast search, low cost
 -- =============================================================================

@@ -1,3 +1,5 @@
+import { eq } from "drizzle-orm";
+
 import { withBypassRls } from "@/db/context";
 import { users } from "@/db/schema";
 import type { User } from "@/types";
@@ -64,5 +66,27 @@ export async function getUserById(userId: string): Promise<User | null> {
     });
 
     return user ?? null;
+  });
+}
+
+export async function updateUserPhone(
+  userId: string,
+  phone: string | null,
+): Promise<User> {
+  return withBypassRls(async (tx) => {
+    const [user] = await tx
+      .update(users)
+      .set({
+        phone,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, userId))
+      .returning();
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    return user;
   });
 }

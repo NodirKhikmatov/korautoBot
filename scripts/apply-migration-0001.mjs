@@ -1,8 +1,6 @@
 import { readFileSync } from "node:fs";
-import { config } from "dotenv";
-import { neon } from "@neondatabase/serverless";
 
-config({ path: ".env.local" });
+import { withPgClient } from "./lib/pg.mjs";
 
 const SKIPPABLE_CODES = new Set([
   "42710", // duplicate_object (type, constraint, policy)
@@ -10,13 +8,6 @@ const SKIPPABLE_CODES = new Set([
   "42723", // duplicate_function
 ]);
 
-const connectionString = process.env.DATABASE_URL;
-
-if (!connectionString) {
-  throw new Error("DATABASE_URL is not set in .env.local");
-}
-
-const sql = neon(connectionString);
 const migrationPath = "drizzle/migrations/0001_architecture_enhancements.sql";
 const raw = readFileSync(migrationPath, "utf8");
 
@@ -28,23 +19,25 @@ const statements = raw
 let applied = 0;
 let skipped = 0;
 
-for (const statement of statements) {
-  const preview = statement.slice(0, 70).replace(/\s+/g, " ");
+await withPgClient(async (client) => {
+  for (const statement of statements) {
+    const preview = statement.slice(0, 70).replace(/\s+/g, " ");
 
-  try {
-    await sql(statement);
-    console.log(`Applied: ${preview}...`);
-    applied += 1;
-  } catch (error) {
-    if (error && SKIPPABLE_CODES.has(error.code)) {
-      console.log(`Skipped (exists): ${preview}...`);
-      skipped += 1;
-      continue;
+    try {
+      await client.query(statement);
+      console.log(`Applied: ${preview}...`);
+      applied += 1;
+    } catch (error) {
+      if (error && SKIPPABLE_CODES.has(error.code)) {
+        console.log(`Skipped (exists): ${preview}...`);
+        skipped += 1;
+        continue;
+      }
+
+      throw error;
     }
-
-    throw error;
   }
-}
+});
 
 console.log(
   `Migration 0001 finished. Applied: ${applied}, skipped: ${skipped}.`,

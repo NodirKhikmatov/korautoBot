@@ -21,6 +21,26 @@ function getR2PublicBaseUrl(): string {
     throw new ImageUploadError("R2 is not configured", 500);
   }
 
+  try {
+    const hostname = new URL(publicUrl).hostname;
+
+    if (
+      hostname === "dash.cloudflare.com" ||
+      hostname.endsWith(".cloudflare.com")
+    ) {
+      throw new ImageUploadError(
+        "R2_PUBLIC_URL must be https://pub-xxxx.r2.dev (bucket public URL), not the Cloudflare dashboard",
+        500,
+      );
+    }
+  } catch (error) {
+    if (error instanceof ImageUploadError) {
+      throw error;
+    }
+
+    throw new ImageUploadError("R2_PUBLIC_URL is not a valid URL", 500);
+  }
+
   return publicUrl.replace(/\/$/, "");
 }
 

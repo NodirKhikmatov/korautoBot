@@ -7,11 +7,19 @@ export type EffectiveSeller = SellerProfile & {
   isExternal: boolean;
 };
 
-type CarWithUser = Car & {
+type CarWithUser = Pick<
+  Car,
+  "sellerDisplayName" | "sellerUsername" | "sellerTelegramId" | "sellerPhone"
+> & {
   user: Pick<SellerProfile, "id"> & Partial<Omit<SellerProfile, "id">>;
 };
 
-export function hasSellerOverride(car: Car): boolean {
+export function hasSellerOverride(
+  car: Pick<
+    Car,
+    "sellerDisplayName" | "sellerUsername" | "sellerTelegramId" | "sellerPhone"
+  >,
+): boolean {
   return Boolean(
     car.sellerDisplayName?.trim() ||
       car.sellerUsername?.trim() ||
@@ -28,7 +36,7 @@ export function getEffectiveSeller(car: CarWithUser): EffectiveSeller {
       firstName: car.user.firstName ?? null,
       lastName: car.user.lastName ?? null,
       photoUrl: car.user.photoUrl ?? null,
-      phone: null,
+      phone: car.user.phone ?? null,
       telegramId: null,
       isExternal: false,
     };

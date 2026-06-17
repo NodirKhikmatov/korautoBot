@@ -5,6 +5,28 @@ import {
 } from "@aws-sdk/client-s3";
 
 import { WEBP_CONTENT_TYPE } from "@/lib/images/constants";
+import { toR2UploadError } from "@/lib/r2/errors";
+
+function assertR2PublicUrl(publicUrl: string): void {
+  try {
+    const hostname = new URL(publicUrl).hostname;
+
+    if (
+      hostname === "dash.cloudflare.com" ||
+      hostname.endsWith(".cloudflare.com")
+    ) {
+      throw new Error(
+        "R2_PUBLIC_URL must be the bucket public URL (https://pub-xxxx.r2.dev), not the Cloudflare dashboard",
+      );
+    }
+  } catch (error) {
+    if (error instanceof Error && error.message.includes("R2_PUBLIC_URL")) {
+      throw error;
+    }
+
+    throw new Error("R2_PUBLIC_URL is not a valid URL");
+  }
+}
 
 function getR2Config() {
   const accountId = process.env.R2_ACCOUNT_ID;
@@ -22,6 +44,8 @@ function getR2Config() {
   ) {
     throw new Error("R2 environment variables are not configured");
   }
+
+  assertR2PublicUrl(publicUrl);
 
   return {
     accountId,
@@ -59,15 +83,19 @@ export async function uploadObject(
   const { bucketName } = getR2Config();
   const client = createR2Client();
 
-  await client.send(
-    new PutObjectCommand({
-      Bucket: bucketName,
-      Key: key,
-      Body: body,
-      ContentType: contentType,
-      CacheControl: "public, max-age=31536000, immutable",
-    }),
-  );
+  try {
+    await client.send(
+      new PutObjectCommand({
+        Bucket: bucketName,
+        Key: key,
+        Body: body,
+        ContentType: contentType,
+        CacheControl: "public, max-age=31536000, immutable",
+      }),
+    );
+  } catch (error) {
+    throw toR2UploadError(error);
+  }
 }
 
 export async function deleteObject(key: string): Promise<void> {

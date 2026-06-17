@@ -12,10 +12,12 @@ import {
   or,
   sql,
 } from "drizzle-orm";
+import { unstable_cache } from "next/cache";
 import type { z } from "zod";
 
 import { withBypassRls } from "@/db/context";
 import { carImages, cars } from "@/db/schema";
+import { revalidateCarsCache } from "@/lib/cache/cars";
 import { attachCoverImages } from "@/lib/db/attach-cover-images";
 import { toIlikeContainsPattern } from "@/lib/db/escape-ilike";
 import { DEFAULT_PAGE_SIZE } from "@/lib/constants";
@@ -28,6 +30,11 @@ import type {
   CarsListResult,
 } from "@/types";
 import { validateUserImagePair } from "@/services/image-upload";
+import { publicListingWhere } from "@/lib/listing/queries";
+import {
+  getEffectiveSeller,
+  hasSellerOverride,
+} from "@/lib/seller/effective-seller";
 
 type CreateCarInput = z.infer<typeof createCarSchema>;
 
@@ -55,7 +62,7 @@ function toTsQuery(search: string): string {
 }
 
 function buildCarFilterConditions(filters: CarFilters) {
-  const conditions = [eq(cars.isActive, true), isNull(cars.deletedAt)];
+  const conditions = [publicListingWhere()];
 
   if (filters.search) {
     const pattern = toIlikeContainsPattern(filters.search);
@@ -128,7 +135,9 @@ function buildCarFilterConditions(filters: CarFilters) {
   return and(...conditions);
 }
 
-export async function getCars(
+const CARS_LIST_CACHE_SECONDS = 60;
+
+async function getCarsFromDb(
   filters: CarFilters = {},
   page = 1,
   limit = DEFAULT_PAGE_SIZE,
@@ -143,7 +152,7 @@ export async function getCars(
         .select()
         .from(cars)
         .where(where)
-        .orderBy(desc(cars.isFeatured), desc(cars.createdAt))
+        .orderBy(desc(cars.isActive), desc(cars.isFeatured), desc(cars.createdAt))
         .limit(limit)
         .offset(offset),
     ]);
@@ -161,9 +170,21 @@ export async function getCars(
   });
 }
 
-export async function getFeaturedCars(
-  limit = 6,
-): Promise<CarWithImages[]> {
+export async function getCars(
+  filters: CarFilters = {},
+  page = 1,
+  limit = DEFAULT_PAGE_SIZE,
+): Promise<CarsListResult> {
+  const cacheKey = JSON.stringify({ filters, page, limit });
+
+  return unstable_cache(
+    () => getCarsFromDb(filters, page, limit),
+    ["cars-list", cacheKey],
+    { revalidate: CARS_LIST_CACHE_SECONDS, tags: ["cars"] },
+  )();
+}
+
+async function getFeaturedCarsFromDb(limit = 6): Promise<CarWithImages[]> {
   return withBypassRls(async (tx) => {
     const carsData = await tx
       .select()
@@ -182,11 +203,21 @@ export async function getFeaturedCars(
   });
 }
 
+export async function getFeaturedCars(
+  limit = 6,
+): Promise<CarWithImages[]> {
+  return unstable_cache(
+    () => getFeaturedCarsFromDb(limit),
+    ["cars-featured", String(limit)],
+    { revalidate: CARS_LIST_CACHE_SECONDS, tags: ["cars"] },
+  )();
+}
+
 export async function getCarFilterOptions(
   brand?: string,
 ): Promise<CarFilterOptions> {
   return withBypassRls(async (tx) => {
-    const baseWhere = and(eq(cars.isActive, true), isNull(cars.deletedAt));
+    const baseWhere = publicListingWhere();
 
     const brandRows = await tx
       .selectDistinct({ value: cars.brand })
@@ -234,12 +265,89 @@ export async function getCarById(carId: string): Promise<CarWithSeller | null> {
             firstName: true,
             lastName: true,
             photoUrl: true,
+            phone: true,
           },
         },
       },
     });
 
     return (car as CarWithSeller | undefined) ?? null;
+  });
+}
+
+export type CarForContact = {
+  id: string;
+  userId: string;
+  title: string;
+  isActive: boolean;
+  soldAt: Date | null;
+  seller: {
+    id: string;
+    telegramId: number;
+    username: string | null;
+    firstName: string | null;
+    lastName: string | null;
+    phone: string | null;
+  };
+  isExternalSeller: boolean;
+  externalTelegramId: number | null;
+};
+
+export async function getCarForContact(carId: string): Promise<CarForContact | null> {
+  return withBypassRls(async (tx) => {
+    const car = await tx.query.cars.findFirst({
+      where: (table, { and, eq, isNull }) =>
+        and(eq(table.id, carId), isNull(table.deletedAt)),
+      columns: {
+        id: true,
+        userId: true,
+        title: true,
+        isActive: true,
+        soldAt: true,
+        sellerDisplayName: true,
+        sellerUsername: true,
+        sellerTelegramId: true,
+        sellerPhone: true,
+      },
+      with: {
+        user: {
+          columns: {
+            id: true,
+            telegramId: true,
+            username: true,
+            firstName: true,
+            lastName: true,
+            phone: true,
+          },
+        },
+      },
+    });
+
+    if (!car) {
+      return null;
+    }
+
+    const effective = getEffectiveSeller(car);
+
+    return {
+      id: car.id,
+      userId: car.userId,
+      title: car.title,
+      isActive: car.isActive,
+      soldAt: car.soldAt,
+      seller: {
+        id: car.user.id,
+        telegramId: hasSellerOverride(car)
+          ? (car.sellerTelegramId ?? car.user.telegramId)
+          : car.user.telegramId,
+        username: effective.username,
+        firstName: effective.firstName,
+        lastName: effective.lastName,
+        phone: effective.phone,
+      },
+      isExternalSeller: effective.isExternal,
+      externalTelegramId: effective.isExternal ? effective.telegramId : null,
+    };
   });
 }
 
@@ -303,6 +411,7 @@ export async function createCar(
             firstName: true,
             lastName: true,
             photoUrl: true,
+            phone: true,
           },
         },
       },
@@ -311,6 +420,8 @@ export async function createCar(
     if (!result) {
       throw new Error("Failed to fetch created car");
     }
+
+    revalidateCarsCache();
 
     return result as CarWithSeller;
   });
@@ -330,6 +441,8 @@ export async function softDeleteCar(
       })
       .where(and(eq(cars.id, carId), eq(cars.userId, userId)));
   });
+
+  revalidateCarsCache();
 }
 
 export async function getUserCars(userId: string): Promise<CarWithImages[]> {

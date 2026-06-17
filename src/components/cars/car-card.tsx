@@ -1,35 +1,51 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { Calendar, Gauge, MapPin } from "lucide-react";
 
+import { CarImage } from "@/components/cars/car-image";
+import { ListingStats } from "@/components/cars/listing-stats";
+import { SoldBadge } from "@/components/cars/sold-badge";
 import { FavoriteButton } from "@/components/cars/favorite-button";
 import { Badge } from "@/components/ui/badge";
 import { formatMileage, formatPrice } from "@/lib/utils";
+import { isListingSold } from "@/lib/listing/status";
 import type { CarWithImages } from "@/types";
 
 function getCoverImage(car: CarWithImages): string | null {
   const sorted = [...car.carImages].sort((a, b) => a.sortOrder - b.sortOrder);
   const first = sorted[0];
+  // Grid cards render small (≤400px); prefer the lightweight thumbnail.
   return first?.thumbnailUrl ?? first?.url ?? null;
 }
 
-export function CarCard({ car }: { car: CarWithImages }) {
+export function CarCard({
+  car,
+  priority = false,
+  showStats = true,
+}: {
+  car: CarWithImages;
+  priority?: boolean;
+  showStats?: boolean;
+}) {
   const cover = getCoverImage(car);
+  const coverAlt = `${car.title} — ${car.brand} ${car.model} ${car.year}`;
+  const sold = isListingSold(car);
 
   return (
     <Link href={`/car/${car.id}`} className="group block">
       <article
-        className="overflow-hidden rounded-2xl border border-border/60 bg-card shadow-sm transition-all duration-300 group-hover:border-primary/30 group-hover:shadow-md group-active:scale-[0.98]"
+        className={`overflow-hidden rounded-2xl border border-border/60 bg-card shadow-sm transition-all duration-300 group-hover:border-primary/30 group-hover:shadow-md group-active:scale-[0.98] ${sold ? "opacity-80" : ""}`}
       >
         <div className="relative aspect-[16/10] overflow-hidden bg-muted">
           {cover ? (
-            <Image
+            <CarImage
               src={cover}
-              alt={car.title}
-              fill
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
+              alt={coverAlt}
+              width={640}
+              height={400}
+              priority={priority}
+              className={`h-full w-full object-contain ${sold ? "grayscale-[35%]" : ""}`}
               sizes="(max-width: 768px) 50vw, 33vw"
             />
           ) : (
@@ -37,28 +53,31 @@ export function CarCard({ car }: { car: CarWithImages }) {
               <CarPlaceholderIcon />
             </div>
           )}
-          <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/50 to-transparent" />
+          {sold && (
+            <div className="absolute left-2 top-2">
+              <SoldBadge car={car} />
+            </div>
+          )}
           <div className="absolute right-2 top-2">
-            <FavoriteButton
-              carId={car.id}
-              className="h-8 w-8 border-0 bg-black/40 text-white backdrop-blur-sm hover:bg-black/60 hover:text-white"
-              variant="ghost"
-            />
-          </div>
-          <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between gap-2">
-            <Badge
-              className="border-0 bg-black/50 text-white backdrop-blur-sm"
-              variant="secondary"
-            >
-              {car.brand}
-            </Badge>
-            <span className="text-sm font-bold text-white drop-shadow">
-              {formatPrice(car.price)}
-            </span>
+            {!sold && (
+              <FavoriteButton
+                carId={car.id}
+                className="h-8 w-8 border-0 bg-foreground/40 text-background backdrop-blur-sm hover:bg-foreground/60"
+                variant="ghost"
+              />
+            )}
           </div>
         </div>
 
         <div className="space-y-2 p-3">
+          <div className="flex items-start justify-between gap-2">
+            <p className="text-sm font-bold tabular-nums leading-tight text-primary">
+              {formatPrice(car.price)}
+            </p>
+            <Badge variant="secondary" className="shrink-0 text-[10px]">
+              {car.brand}
+            </Badge>
+          </div>
           <h3 className="line-clamp-1 font-semibold leading-tight">
             {car.title}
           </h3>
@@ -81,6 +100,13 @@ export function CarCard({ car }: { car: CarWithImages }) {
               </span>
             )}
           </div>
+          {showStats && (
+            <ListingStats
+              viewCount={car.viewCount}
+              contactCount={car.contactCount}
+              size="xs"
+            />
+          )}
         </div>
       </article>
     </Link>

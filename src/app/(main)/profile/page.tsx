@@ -1,7 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { Car, Heart, LogOut, PlusCircle, Shield } from "lucide-react";
+import {
+  Car,
+  Heart,
+  LogOut,
+  PlusCircle,
+  Settings,
+  Shield,
+} from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { AuthGate } from "@/components/auth/auth-gate";
 import { CarGrid, CarGridSkeleton } from "@/components/cars/car-grid";
@@ -16,17 +24,18 @@ import { useMyCars } from "@/hooks/use-my-cars";
 import { getDisplayName } from "@/lib/format";
 
 function ProfileContent() {
+  const t = useTranslations("profile");
+  const tListing = useTranslations("listing");
+  const tCommon = useTranslations("common");
   const { user, logout } = useAuth();
   const { data: adminAccess } = useAdminAccess();
   const { data, isLoading } = useMyCars();
 
   if (!user) return null;
 
-  const displayName = getDisplayName(
-    user.firstName,
-    user.lastName,
-    user.username,
-  );
+  const displayName =
+    getDisplayName(user.firstName, user.lastName, user.username) ||
+    tCommon("user");
   const myCars = data?.cars ?? [];
 
   return (
@@ -54,7 +63,7 @@ function ProfileContent() {
         >
           <Link href="/create">
             <PlusCircle className="h-4 w-4" />
-            New listing
+            {tListing("create")}
           </Link>
         </Button>
         <Button
@@ -64,7 +73,17 @@ function ProfileContent() {
         >
           <Link href="/favorites">
             <Heart className="h-4 w-4" />
-            Favorites
+            {t("favorites")}
+          </Link>
+        </Button>
+        <Button
+          asChild
+          variant="outline"
+          className="h-11 rounded-xl justify-start gap-2"
+        >
+          <Link href="/settings">
+            <Settings className="h-4 w-4" />
+            {t("settings")}
           </Link>
         </Button>
         {adminAccess?.isAdmin && (
@@ -75,7 +94,7 @@ function ProfileContent() {
           >
             <Link href="/admin">
               <Shield className="h-4 w-4" />
-              Admin dashboard
+              {t("adminDashboard")}
             </Link>
           </Button>
         )}
@@ -85,11 +104,11 @@ function ProfileContent() {
 
       <section className="space-y-4">
         <PageHeader
-          title="My listings"
+          title={t("myListings")}
           subtitle={
             myCars.length > 0
-              ? `${myCars.length} active listings`
-              : "Cars you've posted"
+              ? t("activeListings", { count: myCars.length })
+              : t("myListingsSubtitle")
           }
         />
 
@@ -98,12 +117,14 @@ function ProfileContent() {
         {!isLoading && myCars.length === 0 && (
           <EmptyState
             icon={Car}
-            title="No listings yet"
-            description="Create your first listing to start selling."
+            title={t("noListingsTitle")}
+            description={t("noListingsDescription")}
           />
         )}
 
-        {!isLoading && myCars.length > 0 && <CarGrid cars={myCars} />}
+        {!isLoading && myCars.length > 0 && (
+          <CarGrid cars={myCars} />
+        )}
       </section>
 
       <Button
@@ -112,7 +133,7 @@ function ProfileContent() {
         onClick={() => logout()}
       >
         <LogOut className="h-4 w-4" />
-        Sign out
+        {t("signOut")}
       </Button>
     </div>
   );
@@ -120,7 +141,7 @@ function ProfileContent() {
 
 export default function ProfilePage() {
   return (
-    <AuthGate message="Sign in with Telegram to view your profile">
+    <AuthGate messageKey="signInForProfile">
       <ProfileContent />
     </AuthGate>
   );
