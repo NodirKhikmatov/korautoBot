@@ -241,10 +241,19 @@ export async function handleBotWelcome(
   languageCode?: string | null,
 ): Promise<void> {
   const locale = resolveBotWelcomeLocale(languageCode);
+  const text = formatWelcomeMessage(locale);
 
-  await sendTelegramMessage(telegramUserId, formatWelcomeMessage(locale), {
-    replyMarkup: buildWelcomeReplyMarkup(locale),
-  });
+  try {
+    await sendTelegramMessage(telegramUserId, text, {
+      replyMarkup: buildWelcomeReplyMarkup(locale),
+    });
+  } catch (error) {
+    console.error("[bot] welcome with buttons failed, sending plain text", {
+      telegramUserId,
+      message: error instanceof Error ? error.message : String(error),
+    });
+    await sendTelegramMessage(telegramUserId, text);
+  }
 }
 
 export async function handleBotInsurance(
@@ -254,9 +263,17 @@ export async function handleBotInsurance(
   const locale = resolveBotWelcomeLocale(languageCode);
   const message = getBotMessages(locale).insuranceWelcome;
 
-  await sendTelegramMessage(telegramUserId, message, {
-    replyMarkup: buildInsuranceCalculatorReplyMarkup(locale),
-  });
+  try {
+    await sendTelegramMessage(telegramUserId, message, {
+      replyMarkup: buildInsuranceCalculatorReplyMarkup(locale),
+    });
+  } catch (error) {
+    console.error("[bot] insurance with button failed, sending plain text", {
+      telegramUserId,
+      message: error instanceof Error ? error.message : String(error),
+    });
+    await sendTelegramMessage(telegramUserId, message);
+  }
 }
 
 export async function handleConversationStart(

@@ -1,10 +1,10 @@
 import type {
   TelegramApiResponse,
+  TelegramInlineKeyboardButton,
   TelegramReplyMarkup,
   TelegramSendMessageResult,
 } from "@/lib/telegram/bot-types";
 import { getBotMessages } from "@/lib/messaging/bot-messages";
-import { getInsuranceWebAppUrl } from "@/lib/insurance/urls";
 import { MessagingError } from "@/lib/messaging/errors";
 
 const DEFAULT_MAX_RETRIES = 5;
@@ -16,6 +16,39 @@ export type SendTelegramMessageOptions = {
 
 export function getPublicAppUrl(): string {
   return process.env.NEXT_PUBLIC_APP_URL?.trim() || "https://t.me";
+}
+
+function isHttpsMiniAppUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === "https:" && parsed.hostname !== "t.me";
+  } catch {
+    return false;
+  }
+}
+
+/** Telegram allows at most one web_app button per message — use url for extras. */
+function buildMiniAppLaunchButton(
+  text: string,
+  options: {
+    appPath?: string;
+    startParam?: string;
+    allowWebApp?: boolean;
+  } = {},
+): TelegramInlineKeyboardButton {
+  const base = getPublicAppUrl().replace(/\/$/, "");
+  const webAppUrl = options.appPath ? `${base}${options.appPath}` : base;
+  const deepLink = getTelegramMiniAppUrl(options.startParam);
+
+  if (options.allowWebApp !== false && isHttpsMiniAppUrl(webAppUrl)) {
+    return { text, web_app: { url: webAppUrl } };
+  }
+
+  if (deepLink.startsWith("https://t.me/")) {
+    return { text, url: deepLink };
+  }
+
+  return { text, url: webAppUrl };
 }
 
 export function getTelegramMiniAppUrl(startParam?: string): string {
@@ -39,12 +72,7 @@ export function buildOpenAppReplyMarkup(
 
   return {
     inline_keyboard: [
-      [
-        {
-          text: buttonText,
-          web_app: { url: getPublicAppUrl() },
-        },
-      ],
+      [buildMiniAppLaunchButton(buttonText, { allowWebApp: true })],
     ],
   };
 }
@@ -57,10 +85,11 @@ export function buildInsuranceCalculatorReplyMarkup(
   return {
     inline_keyboard: [
       [
-        {
-          text: buttonText,
-          web_app: { url: getInsuranceWebAppUrl() },
-        },
+        buildMiniAppLaunchButton(buttonText, {
+          appPath: "/tools/insurance",
+          startParam: "insurance",
+          allowWebApp: true,
+        }),
       ],
     ],
   };
@@ -70,20 +99,19 @@ export function buildWelcomeReplyMarkup(
   locale?: string | null,
 ): TelegramReplyMarkup {
   const messages = getBotMessages(locale);
+  const mainButton = buildMiniAppLaunchButton(messages.openAppButton, {
+    allowWebApp: true,
+  });
 
   return {
     inline_keyboard: [
+      [mainButton],
       [
-        {
-          text: messages.openAppButton,
-          web_app: { url: getPublicAppUrl() },
-        },
-      ],
-      [
-        {
-          text: messages.insuranceButton,
-          web_app: { url: getInsuranceWebAppUrl() },
-        },
+        buildMiniAppLaunchButton(messages.insuranceButton, {
+          appPath: "/tools/insurance",
+          startParam: "insurance",
+          allowWebApp: false,
+        }),
       ],
     ],
   };
@@ -174,6 +202,12 @@ export async function sendTelegramMessage(
       await delay(retryAfterMs);
       continue;
     }
+
+    console.error("[telegram] sendMessage failed", {
+      chatId,
+      errorCode: data.error_code,
+      description: data.description,
+    });
 
     throw classifySendError(data);
   }
