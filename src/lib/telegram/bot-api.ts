@@ -94,31 +94,6 @@ export function buildInsuranceCalculatorReplyMarkup(
   };
 }
 
-export function buildWelcomeReplyMarkup(
-  locale?: string | null,
-  botUsername?: string | null,
-): TelegramReplyMarkup {
-  const messages = getBotMessages(locale);
-  const mainButton = buildMiniAppLaunchButton(messages.openAppButton, {
-    allowWebApp: true,
-    botUsername,
-  });
-
-  return {
-    inline_keyboard: [
-      [mainButton],
-      [
-        buildMiniAppLaunchButton(messages.insuranceButton, {
-          appPath: "/tools/insurance",
-          startParam: "insurance",
-          allowWebApp: false,
-          botUsername,
-        }),
-      ],
-    ],
-  };
-}
-
 function getBotToken(): string {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   if (!token) {

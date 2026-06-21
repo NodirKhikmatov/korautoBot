@@ -13,7 +13,6 @@ import {
   getTelegramBotChatUrl,
   getTelegramBotUsername,
   sendTelegramMessage,
-  buildWelcomeReplyMarkup,
   buildInsuranceCalculatorReplyMarkup,
 } from "@/lib/telegram/bot-api";
 import { resolveTelegramBotUsername } from "@/lib/telegram/mini-app-url";
@@ -242,20 +241,9 @@ export async function handleBotWelcome(
   languageCode?: string | null,
 ): Promise<void> {
   const locale = resolveBotWelcomeLocale(languageCode);
-  const botUsername = await resolveTelegramBotUsername();
-  const text = formatWelcomeMessage(locale, botUsername);
+  const text = formatWelcomeMessage(locale);
 
-  try {
-    await sendTelegramMessage(telegramUserId, text, {
-      replyMarkup: buildWelcomeReplyMarkup(locale, botUsername),
-    });
-  } catch (error) {
-    console.error("[bot] welcome with buttons failed, sending plain text", {
-      telegramUserId,
-      message: error instanceof Error ? error.message : String(error),
-    });
-    await sendTelegramMessage(telegramUserId, text);
-  }
+  await sendTelegramMessage(telegramUserId, text);
 }
 
 export async function handleBotInsurance(
