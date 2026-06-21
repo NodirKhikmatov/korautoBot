@@ -13,6 +13,7 @@ import {
   getTelegramBotChatUrl,
   getTelegramBotUsername,
   sendTelegramMessage,
+  buildOpenAppReplyMarkup,
 } from "@/lib/telegram/bot-api";
 import { recordCarContact } from "@/services/car-analytics";
 import {
@@ -239,7 +240,9 @@ export async function handleBotWelcome(
 ): Promise<void> {
   const locale = resolveBotWelcomeLocale(languageCode);
 
-  await sendTelegramMessage(telegramUserId, formatWelcomeMessage(locale));
+  await sendTelegramMessage(telegramUserId, formatWelcomeMessage(locale), {
+    replyMarkup: buildOpenAppReplyMarkup(locale),
+  });
 }
 
 export async function handleConversationStart(

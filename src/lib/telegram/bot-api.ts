@@ -1,10 +1,52 @@
 import type {
   TelegramApiResponse,
+  TelegramReplyMarkup,
   TelegramSendMessageResult,
 } from "@/lib/telegram/bot-types";
+import { getBotMessages } from "@/lib/messaging/bot-messages";
 import { MessagingError } from "@/lib/messaging/errors";
 
 const DEFAULT_MAX_RETRIES = 5;
+
+export type SendTelegramMessageOptions = {
+  maxRetries?: number;
+  replyMarkup?: TelegramReplyMarkup;
+};
+
+export function getPublicAppUrl(): string {
+  return process.env.NEXT_PUBLIC_APP_URL?.trim() || "https://t.me";
+}
+
+export function getTelegramMiniAppUrl(startParam?: string): string {
+  const username = getTelegramBotUsername();
+  if (!username) {
+    return getPublicAppUrl();
+  }
+
+  const base = `https://t.me/${username}/app`;
+  if (!startParam?.trim()) {
+    return base;
+  }
+
+  return `${base}?startapp=${encodeURIComponent(startParam.trim())}`;
+}
+
+export function buildOpenAppReplyMarkup(
+  locale?: string | null,
+): TelegramReplyMarkup {
+  const buttonText = getBotMessages(locale).openAppButton;
+
+  return {
+    inline_keyboard: [
+      [
+        {
+          text: buttonText,
+          web_app: { url: getPublicAppUrl() },
+        },
+      ],
+    ],
+  };
+}
 
 function getBotToken(): string {
   const token = process.env.TELEGRAM_BOT_TOKEN;
@@ -49,7 +91,7 @@ function classifySendError(
 export async function sendTelegramMessage(
   chatId: number,
   text: string,
-  options?: { maxRetries?: number },
+  options?: SendTelegramMessageOptions,
 ): Promise<TelegramSendMessageResult> {
   const token = getBotToken();
   const maxRetries = options?.maxRetries ?? DEFAULT_MAX_RETRIES;
@@ -58,15 +100,25 @@ export async function sendTelegramMessage(
   while (true) {
     attempt += 1;
 
+    const body: {
+      chat_id: number;
+      text: string;
+      reply_markup?: TelegramReplyMarkup;
+    } = {
+      chat_id: chatId,
+      text,
+    };
+
+    if (options?.replyMarkup) {
+      body.reply_markup = options.replyMarkup;
+    }
+
     const response = await fetch(
       `https://api.telegram.org/bot${token}/sendMessage`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          chat_id: chatId,
-          text,
-        }),
+        body: JSON.stringify(body),
       },
     );
 

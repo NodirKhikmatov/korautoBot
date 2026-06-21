@@ -90,14 +90,8 @@ export function formatSellerFollowUpMessage(
   ].join("\n");
 }
 
-function getPublicAppUrl(): string {
-  return process.env.NEXT_PUBLIC_APP_URL?.trim() || "https://t.me";
-}
-
 export function formatWelcomeMessage(locale?: string | null): string {
-  const template = getBotMessages(locale).welcome;
-
-  return template.replaceAll("{appUrl}", getPublicAppUrl());
+  return getBotMessages(locale).welcome;
 }
 
 export function formatAdminSupportMessage(

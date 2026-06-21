@@ -37,3 +37,13 @@ export interface TelegramApiResponse<T> {
     retry_after?: number;
   };
 }
+
+export interface TelegramInlineKeyboardButton {
+  text: string;
+  url?: string;
+  web_app?: { url: string };
+}
+
+export interface TelegramReplyMarkup {
+  inline_keyboard: TelegramInlineKeyboardButton[][];
+}

@@ -15,6 +15,7 @@ export async function POST() {
     firstName: "Dev",
     lastName: "Browser",
     photoUrl: null,
+    isAdmin: true,
   });
 
   await setSessionUserId(user.id);

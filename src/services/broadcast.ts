@@ -4,7 +4,10 @@ import { withBypassRls } from "@/db/context";
 import { users } from "@/db/schema";
 import { formatBroadcastMessage } from "@/lib/messaging/format";
 import { MessagingError } from "@/lib/messaging/errors";
-import { sendTelegramMessage } from "@/lib/telegram/bot-api";
+import {
+  buildOpenAppReplyMarkup,
+  sendTelegramMessage,
+} from "@/lib/telegram/bot-api";
 import { markBotChatStarted } from "@/services/users";
 
 /** ~20 messages/sec — stays under Telegram bulk limits */
@@ -56,6 +59,7 @@ export async function sendBroadcastToAllUsers(
   }
 
   const text = formatBroadcastMessage(trimmed);
+  const replyMarkup = buildOpenAppReplyMarkup();
   let sent = 0;
   let failed = 0;
   let notStarted = 0;
@@ -68,6 +72,7 @@ export async function sendBroadcastToAllUsers(
     try {
       await sendTelegramMessage(telegramId, text, {
         maxRetries: SEND_MAX_RETRIES,
+        replyMarkup,
       });
       sent += 1;
       delivered = true;

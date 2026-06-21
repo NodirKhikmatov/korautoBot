@@ -10,6 +10,7 @@ export interface UpsertTelegramUserInput {
   firstName?: string | null;
   lastName?: string | null;
   photoUrl?: string | null;
+  isAdmin?: boolean;
 }
 
 export async function upsertTelegramUser(
@@ -24,6 +25,7 @@ export async function upsertTelegramUser(
         firstName: input.firstName ?? null,
         lastName: input.lastName ?? null,
         photoUrl: input.photoUrl ?? null,
+        isAdmin: input.isAdmin ?? false,
       })
       .onConflictDoUpdate({
         target: users.telegramId,
@@ -32,6 +34,7 @@ export async function upsertTelegramUser(
           firstName: input.firstName ?? null,
           lastName: input.lastName ?? null,
           photoUrl: input.photoUrl ?? null,
+          ...(input.isAdmin !== undefined ? { isAdmin: input.isAdmin } : {}),
           updatedAt: new Date(),
         },
       })

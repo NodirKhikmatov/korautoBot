@@ -20,6 +20,7 @@ type BotMessageSet = {
     connected: string;
     replyHint: string;
   };
+  openAppButton: string;
   welcome: string;
 };
 
@@ -44,6 +45,7 @@ const botMessages: Record<Locale, BotMessageSet> = {
       connected: "e'loni bo'yicha suhbatga ulandingiz.",
       replyHint: "Suhbatni davom ettirish uchun bot xabarlariga javob yozing.",
     },
+    openAppButton: "📱 Mashinalarni ko'rish",
     welcome: [
       "🚗 Mashina sotmoqchimisiz yoki sotib olmoqchimisiz?",
       "",
@@ -54,8 +56,7 @@ const botMessages: Record<Locale, BotMessageSet> = {
       "✅ Rasmlar va ma'lumotlarni ko'ring",
       "✅ Tez va qulay foydalanish",
       "",
-      "📱 Mini App: {appUrl}",
-      "(yoki bot menyusidagi «Open App» tugmasini bosing)",
+      "👇 Ilovani ochish uchun pastdagi tugmani bosing:",
       "",
       "━━━━━━━━━━━━━━━━",
       "📖 Botdan qanday foydalaniladi?",
@@ -102,6 +103,7 @@ const botMessages: Record<Locale, BotMessageSet> = {
       connected: "You are connected to the conversation about",
       replyHint: "Reply to bot messages to continue the conversation.",
     },
+    openAppButton: "📱 Browse listings",
     welcome: [
       "🚗 Looking to sell or buy a car?",
       "",
@@ -112,8 +114,7 @@ const botMessages: Record<Locale, BotMessageSet> = {
       "✅ View photos and details",
       "✅ Fast and easy to use",
       "",
-      "📱 Mini App: {appUrl}",
-      "(or tap «Open App» in the bot menu)",
+      "👇 Tap the button below to open the app:",
       "",
       "━━━━━━━━━━━━━━━━",
       "📖 How to use this bot",
@@ -160,6 +161,7 @@ const botMessages: Record<Locale, BotMessageSet> = {
       connected: "매물 대화에 연결되었습니다",
       replyHint: "대화를 계속하려면 봇 메시지에 답장하세요.",
     },
+    openAppButton: "📱 매물 보기",
     welcome: [
       "🚗 차를 팔거나 사고 싶으신가요?",
       "",
@@ -170,8 +172,7 @@ const botMessages: Record<Locale, BotMessageSet> = {
       "✅ 사진 및 상세 정보 확인",
       "✅ 빠르고 편리한 이용",
       "",
-      "📱 Mini App: {appUrl}",
-      "(또는 봇 메뉴의 «Open App» 버튼)",
+      "👇 아래 버튼을 눌러 앱을 여세요:",
       "",
       "━━━━━━━━━━━━━━━━",
       "📖 봇 사용 방법",
@@ -218,6 +219,7 @@ const botMessages: Record<Locale, BotMessageSet> = {
       connected: "Вы подключены к диалогу по объявлению",
       replyHint: "Отвечайте на сообщения бота, чтобы продолжить диалог.",
     },
+    openAppButton: "📱 Смотреть объявления",
     welcome: [
       "🚗 Хотите продать или купить машину?",
       "",
@@ -228,8 +230,7 @@ const botMessages: Record<Locale, BotMessageSet> = {
       "✅ Фото и подробная информация",
       "✅ Быстро и удобно",
       "",
-      "📱 Mini App: {appUrl}",
-      "(или кнопка «Open App» в меню бота)",
+      "👇 Нажмите кнопку ниже, чтобы открыть приложение:",
       "",
       "━━━━━━━━━━━━━━━━",
       "📖 Как пользоваться ботом",
