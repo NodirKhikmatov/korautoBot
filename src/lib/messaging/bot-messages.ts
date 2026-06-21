@@ -21,6 +21,8 @@ type BotMessageSet = {
     replyHint: string;
   };
   openAppButton: string;
+  insuranceButton: string;
+  insuranceWelcome: string;
   welcome: string;
 };
 
@@ -46,6 +48,14 @@ const botMessages: Record<Locale, BotMessageSet> = {
       replyHint: "Suhbatni davom ettirish uchun bot xabarlariga javob yozing.",
     },
     openAppButton: "📱 Mashinalarni ko'rish",
+    insuranceButton: "🧮 Sug'urta kalkulyatori",
+    insuranceWelcome: [
+      "🧮 Avtosug'urta kalkulyatori",
+      "",
+      "Koreya avtosug'urtasi (자동차보험) uchun taxminiy oylik va yillik premiyani hisoblang.",
+      "",
+      "👇 Pastdagi tugmani bosing:",
+    ].join("\n"),
     welcome: [
       "🚗 Mashina sotmoqchimisiz yoki sotib olmoqchimisiz?",
       "",
@@ -104,6 +114,14 @@ const botMessages: Record<Locale, BotMessageSet> = {
       replyHint: "Reply to bot messages to continue the conversation.",
     },
     openAppButton: "📱 Browse listings",
+    insuranceButton: "🧮 Insurance calculator",
+    insuranceWelcome: [
+      "🧮 Auto Insurance Calculator",
+      "",
+      "Estimate monthly and yearly Korean auto insurance (자동차보험) premiums.",
+      "",
+      "👇 Tap the button below:",
+    ].join("\n"),
     welcome: [
       "🚗 Looking to sell or buy a car?",
       "",
@@ -162,6 +180,14 @@ const botMessages: Record<Locale, BotMessageSet> = {
       replyHint: "대화를 계속하려면 봇 메시지에 답장하세요.",
     },
     openAppButton: "📱 매물 보기",
+    insuranceButton: "🧮 자동차보험 계산",
+    insuranceWelcome: [
+      "🧮 자동차보험료 계산기",
+      "",
+      "차량 정보로 월·연간 예상 보험료(자동차보험)를 확인하세요.",
+      "",
+      "👇 아래 버튼을 누르세요:",
+    ].join("\n"),
     welcome: [
       "🚗 차를 팔거나 사고 싶으신가요?",
       "",
@@ -220,6 +246,14 @@ const botMessages: Record<Locale, BotMessageSet> = {
       replyHint: "Отвечайте на сообщения бота, чтобы продолжить диалог.",
     },
     openAppButton: "📱 Смотреть объявления",
+    insuranceButton: "🧮 Калькулятор страховки",
+    insuranceWelcome: [
+      "🧮 Калькулятор автостраховки",
+      "",
+      "Примерная месячная и годовая премия корейской автостраховки (자동차보험).",
+      "",
+      "👇 Нажмите кнопку ниже:",
+    ].join("\n"),
     welcome: [
       "🚗 Хотите продать или купить машину?",
       "",

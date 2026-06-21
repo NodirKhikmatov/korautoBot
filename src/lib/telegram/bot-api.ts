@@ -4,6 +4,7 @@ import type {
   TelegramSendMessageResult,
 } from "@/lib/telegram/bot-types";
 import { getBotMessages } from "@/lib/messaging/bot-messages";
+import { getInsuranceWebAppUrl } from "@/lib/insurance/urls";
 import { MessagingError } from "@/lib/messaging/errors";
 
 const DEFAULT_MAX_RETRIES = 5;
@@ -42,6 +43,46 @@ export function buildOpenAppReplyMarkup(
         {
           text: buttonText,
           web_app: { url: getPublicAppUrl() },
+        },
+      ],
+    ],
+  };
+}
+
+export function buildInsuranceCalculatorReplyMarkup(
+  locale?: string | null,
+): TelegramReplyMarkup {
+  const buttonText = getBotMessages(locale).insuranceButton;
+
+  return {
+    inline_keyboard: [
+      [
+        {
+          text: buttonText,
+          web_app: { url: getInsuranceWebAppUrl() },
+        },
+      ],
+    ],
+  };
+}
+
+export function buildWelcomeReplyMarkup(
+  locale?: string | null,
+): TelegramReplyMarkup {
+  const messages = getBotMessages(locale);
+
+  return {
+    inline_keyboard: [
+      [
+        {
+          text: messages.openAppButton,
+          web_app: { url: getPublicAppUrl() },
+        },
+      ],
+      [
+        {
+          text: messages.insuranceButton,
+          web_app: { url: getInsuranceWebAppUrl() },
         },
       ],
     ],

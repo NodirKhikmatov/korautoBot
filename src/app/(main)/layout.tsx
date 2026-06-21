@@ -3,6 +3,7 @@
 import { DevAuthPrompt } from "@/components/auth/dev-auth-prompt";
 import { BottomNav } from "@/components/layout/bottom-nav";
 import { BotStartBanner } from "@/components/notifications/bot-start-banner";
+import { TelegramStartRedirect } from "@/components/tools/telegram-start-redirect";
 
 export default function MainLayout({
   children,
@@ -21,6 +22,7 @@ export default function MainLayout({
       >
         <DevAuthPrompt />
         <BotStartBanner />
+        <TelegramStartRedirect />
         {children}
       </main>
       <BottomNav />

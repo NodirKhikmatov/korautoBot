@@ -13,8 +13,10 @@ import {
   getTelegramBotChatUrl,
   getTelegramBotUsername,
   sendTelegramMessage,
-  buildOpenAppReplyMarkup,
+  buildWelcomeReplyMarkup,
+  buildInsuranceCalculatorReplyMarkup,
 } from "@/lib/telegram/bot-api";
+import { getBotMessages } from "@/lib/messaging/bot-messages";
 import { recordCarContact } from "@/services/car-analytics";
 import {
   createRelayedMessage,
@@ -241,7 +243,19 @@ export async function handleBotWelcome(
   const locale = resolveBotWelcomeLocale(languageCode);
 
   await sendTelegramMessage(telegramUserId, formatWelcomeMessage(locale), {
-    replyMarkup: buildOpenAppReplyMarkup(locale),
+    replyMarkup: buildWelcomeReplyMarkup(locale),
+  });
+}
+
+export async function handleBotInsurance(
+  telegramUserId: number,
+  languageCode?: string | null,
+): Promise<void> {
+  const locale = resolveBotWelcomeLocale(languageCode);
+  const message = getBotMessages(locale).insuranceWelcome;
+
+  await sendTelegramMessage(telegramUserId, message, {
+    replyMarkup: buildInsuranceCalculatorReplyMarkup(locale),
   });
 }
 

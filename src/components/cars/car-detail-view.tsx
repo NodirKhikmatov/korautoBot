@@ -1,8 +1,9 @@
 "use client";
 
 import { useCallback } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Loader2, Share2 } from "lucide-react";
+import { Loader2, Share2, Shield } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { CarImageGallery } from "@/components/cars/car-image-gallery";
@@ -20,6 +21,7 @@ import { useCar } from "@/hooks/use-car";
 import { useRecordCarView } from "@/hooks/use-record-car-view";
 import { useTelegramBackButton } from "@/hooks/use-telegram-back-button";
 import { isListingSold } from "@/lib/listing/status";
+import { buildInsuranceCalculatorPath } from "@/lib/insurance/urls";
 import { getEffectiveSeller } from "@/lib/seller/effective-seller";
 
 export function CarDetailView({ carId }: { carId: string }) {
@@ -104,6 +106,22 @@ export function CarDetailView({ carId }: { carId: string }) {
       </div>
 
       <CarSpecs car={listing} />
+
+      {!sold && (
+        <Button asChild variant="outline" className="w-full rounded-xl">
+          <Link
+            href={buildInsuranceCalculatorPath({
+              price: listing.price,
+              year: listing.year,
+              mileage: listing.mileage,
+            })}
+            prefetch={false}
+          >
+            <Shield className="h-4 w-4" />
+            {t("insuranceEstimate")}
+          </Link>
+        </Button>
+      )}
 
       {listing.description && (
         <div className="space-y-2">

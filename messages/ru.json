@@ -57,7 +57,10 @@
     "latestTitle": "Новые объявления",
     "latestSubtitle": "Новые предложения на рынке",
     "noListingsTitle": "Объявлений ещё нет",
-    "noListingsDescription": "Разместите первый автомобиль на маркетплейсе."
+    "noListingsDescription": "Разместите первый автомобиль на маркетплейсе.",
+    "insuranceCardTitle": "Калькулятор автостраховки",
+    "insuranceCardDescription": "Примерная премия по данным автомобиля в Корее.",
+    "insuranceCardAction": "Рассчитать"
   },
   "search": {
     "title": "Поиск",
@@ -146,7 +149,8 @@
     "noFilesSelected": "Файлы не выбраны",
     "maxImagesAllowed": "Максимум {max} изображений",
     "thumbnailAlt": "{title} миниатюра {index}",
-    "carThumbnailAlt": "Миниатюра автомобиля {index}"
+    "carThumbnailAlt": "Миниатюра автомобиля {index}",
+    "insuranceEstimate": "Расчёт страховки"
   },
   "favorites": {
     "title": "Избранное",
@@ -266,6 +270,32 @@
     "broadcastFailed": "Не удалось отправить рассылку",
     "broadcastLoadingRecipients": "Подсчёт получателей...",
     "broadcastRecipients": "Будет отправлено {count, plural, one {# пользователю} few {# пользователям} many {# пользователям} other {# пользователям}}"
+  },
+  "insurance": {
+    "title": "Калькулятор автостраховки",
+    "subtitle": "Примерная корейская автостраховка (자동차보험)",
+    "intro": "Введите данные автомобиля и водителя, чтобы увидеть примерный месячный и годовой диапазон премии.",
+    "vehiclePrice": "Цена автомобиля (₩)",
+    "year": "Год выпуска",
+    "mileage": "Пробег (km)",
+    "driverAge": "Возраст водителя",
+    "yearsLicensed": "Стаж вождения (лет)",
+    "region": "Регион",
+    "regionSeoul": "Сеул",
+    "regionGyeonggi": "Кёнги",
+    "regionOther": "Другой",
+    "accidentHistory": "История ДТП",
+    "accidentNone": "Нет",
+    "accidentOne": "1 раз",
+    "accidentMultiple": "2 раза и более",
+    "ownDamage": "Страхование своего авто (자차)",
+    "calculate": "Рассчитать",
+    "resultTitle": "Примерная премия",
+    "monthlyEstimate": "В месяц",
+    "yearlyEstimate": "В год",
+    "disclaimer": "Только справочная оценка. Фактическая премия зависит от страховщика и условий.",
+    "prefillHint": "Данные объявления",
+    "invalidForm": "Проверьте введённые данные"
   },
   "fuel": {
     "gasoline": "Бензин",

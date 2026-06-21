@@ -57,7 +57,10 @@
     "latestTitle": "Latest listings",
     "latestSubtitle": "Fresh arrivals on the market",
     "noListingsTitle": "No listings yet",
-    "noListingsDescription": "Be the first to list a car on the marketplace."
+    "noListingsDescription": "Be the first to list a car on the marketplace.",
+    "insuranceCardTitle": "Auto insurance estimate",
+    "insuranceCardDescription": "Get an approximate premium for a vehicle in Korea.",
+    "insuranceCardAction": "Calculate"
   },
   "search": {
     "title": "Search",
@@ -146,7 +149,8 @@
     "noFilesSelected": "No files selected",
     "maxImagesAllowed": "Maximum {max} images allowed",
     "thumbnailAlt": "{title} thumbnail {index}",
-    "carThumbnailAlt": "Car thumbnail {index}"
+    "carThumbnailAlt": "Car thumbnail {index}",
+    "insuranceEstimate": "Insurance estimate"
   },
   "favorites": {
     "title": "Favorites",
@@ -266,6 +270,32 @@
     "broadcastFailed": "Could not send broadcast",
     "broadcastLoadingRecipients": "Counting recipients...",
     "broadcastRecipients": "Will be sent to {count, plural, one {# user} other {# users}}"
+  },
+  "insurance": {
+    "title": "Auto Insurance Calculator",
+    "subtitle": "Estimated Korean auto insurance (자동차보험)",
+    "intro": "Enter vehicle and driver details to see an approximate monthly and yearly premium range.",
+    "vehiclePrice": "Vehicle price (₩)",
+    "year": "Model year",
+    "mileage": "Mileage (km)",
+    "driverAge": "Driver age",
+    "yearsLicensed": "Years licensed",
+    "region": "Region",
+    "regionSeoul": "Seoul",
+    "regionGyeonggi": "Gyeonggi",
+    "regionOther": "Other",
+    "accidentHistory": "Accident history",
+    "accidentNone": "None",
+    "accidentOne": "Once",
+    "accidentMultiple": "Twice or more",
+    "ownDamage": "Own-damage coverage (자차)",
+    "calculate": "Calculate premium",
+    "resultTitle": "Estimated premium",
+    "monthlyEstimate": "Monthly estimate",
+    "yearlyEstimate": "Yearly estimate",
+    "disclaimer": "Reference estimate only. Actual premiums vary by insurer, discounts, and coverage.",
+    "prefillHint": "Listing details",
+    "invalidForm": "Please check your inputs"
   },
   "fuel": {
     "gasoline": "Gasoline",

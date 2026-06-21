@@ -11,6 +11,7 @@ import {
 } from "@/services/broadcast";
 import {
   handleBotWelcome,
+  handleBotInsurance,
   handleConversationStart,
   relayConversationReply,
 } from "@/services/messaging";
@@ -55,6 +56,12 @@ export async function POST(request: Request) {
         await handleBotWelcome(message.from.id, message.from.language_code);
       }
 
+      return NextResponse.json({ ok: true });
+    }
+
+    if (text.startsWith("/insurance") || text.startsWith("/보험")) {
+      await markBotChatStarted(message.from.id);
+      await handleBotInsurance(message.from.id, message.from.language_code);
       return NextResponse.json({ ok: true });
     }
 

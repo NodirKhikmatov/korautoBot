@@ -51,6 +51,7 @@ interface TelegramWebApp {
       username?: string;
       photo_url?: string;
     };
+    start_param?: string;
   };
   ready: () => void;
   expand: () => void;
