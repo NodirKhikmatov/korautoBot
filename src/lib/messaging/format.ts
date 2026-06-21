@@ -94,13 +94,19 @@ export function formatSellerFollowUpMessage(
   ].join("\n");
 }
 
-export function formatWelcomeMessage(locale?: string | null): string {
+export function formatWelcomeMessage(
+  locale?: string | null,
+  botUsername?: string | null,
+): string {
   const template = getBotMessages(locale).welcome;
 
   return template
     .replaceAll("{appUrl}", getMiniAppWebAppUrl())
-    .replaceAll("{miniAppLink}", getTelegramMiniAppDeepLink())
-    .replaceAll("{insuranceLink}", getTelegramMiniAppDeepLink("insurance"));
+    .replaceAll("{miniAppLink}", getTelegramMiniAppDeepLink(undefined, botUsername))
+    .replaceAll(
+      "{insuranceLink}",
+      getTelegramMiniAppDeepLink("insurance", botUsername),
+    );
 }
 
 export function formatAdminSupportMessage(

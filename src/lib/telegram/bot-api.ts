@@ -35,11 +35,15 @@ function buildMiniAppLaunchButton(
     appPath?: string;
     startParam?: string;
     allowWebApp?: boolean;
+    botUsername?: string | null;
   } = {},
 ): TelegramInlineKeyboardButton {
   const base = getPublicAppUrl().replace(/\/$/, "");
   const webAppUrl = options.appPath ? `${base}${options.appPath}` : base;
-  const deepLink = getTelegramMiniAppUrl(options.startParam);
+  const deepLink = getTelegramMiniAppUrl(
+    options.startParam,
+    options.botUsername,
+  );
 
   if (options.allowWebApp !== false && isHttpsMiniAppUrl(webAppUrl)) {
     return { text, web_app: { url: webAppUrl } };
@@ -54,18 +58,25 @@ function buildMiniAppLaunchButton(
 
 export function buildOpenAppReplyMarkup(
   locale?: string | null,
+  botUsername?: string | null,
 ): TelegramReplyMarkup {
   const buttonText = getBotMessages(locale).openAppButton;
 
   return {
     inline_keyboard: [
-      [buildMiniAppLaunchButton(buttonText, { allowWebApp: true })],
+      [
+        buildMiniAppLaunchButton(buttonText, {
+          allowWebApp: true,
+          botUsername,
+        }),
+      ],
     ],
   };
 }
 
 export function buildInsuranceCalculatorReplyMarkup(
   locale?: string | null,
+  botUsername?: string | null,
 ): TelegramReplyMarkup {
   const buttonText = getBotMessages(locale).insuranceButton;
 
@@ -76,6 +87,7 @@ export function buildInsuranceCalculatorReplyMarkup(
           appPath: "/tools/insurance",
           startParam: "insurance",
           allowWebApp: true,
+          botUsername,
         }),
       ],
     ],
@@ -84,10 +96,12 @@ export function buildInsuranceCalculatorReplyMarkup(
 
 export function buildWelcomeReplyMarkup(
   locale?: string | null,
+  botUsername?: string | null,
 ): TelegramReplyMarkup {
   const messages = getBotMessages(locale);
   const mainButton = buildMiniAppLaunchButton(messages.openAppButton, {
     allowWebApp: true,
+    botUsername,
   });
 
   return {
@@ -98,6 +112,7 @@ export function buildWelcomeReplyMarkup(
           appPath: "/tools/insurance",
           startParam: "insurance",
           allowWebApp: false,
+          botUsername,
         }),
       ],
     ],

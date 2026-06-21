@@ -16,6 +16,7 @@ import {
   buildWelcomeReplyMarkup,
   buildInsuranceCalculatorReplyMarkup,
 } from "@/lib/telegram/bot-api";
+import { resolveTelegramBotUsername } from "@/lib/telegram/mini-app-url";
 import { getBotMessages } from "@/lib/messaging/bot-messages";
 import { recordCarContact } from "@/services/car-analytics";
 import {
@@ -241,11 +242,12 @@ export async function handleBotWelcome(
   languageCode?: string | null,
 ): Promise<void> {
   const locale = resolveBotWelcomeLocale(languageCode);
-  const text = formatWelcomeMessage(locale);
+  const botUsername = await resolveTelegramBotUsername();
+  const text = formatWelcomeMessage(locale, botUsername);
 
   try {
     await sendTelegramMessage(telegramUserId, text, {
-      replyMarkup: buildWelcomeReplyMarkup(locale),
+      replyMarkup: buildWelcomeReplyMarkup(locale, botUsername),
     });
   } catch (error) {
     console.error("[bot] welcome with buttons failed, sending plain text", {
@@ -261,11 +263,12 @@ export async function handleBotInsurance(
   languageCode?: string | null,
 ): Promise<void> {
   const locale = resolveBotWelcomeLocale(languageCode);
+  const botUsername = await resolveTelegramBotUsername();
   const message = getBotMessages(locale).insuranceWelcome;
 
   try {
     await sendTelegramMessage(telegramUserId, message, {
-      replyMarkup: buildInsuranceCalculatorReplyMarkup(locale),
+      replyMarkup: buildInsuranceCalculatorReplyMarkup(locale, botUsername),
     });
   } catch (error) {
     console.error("[bot] insurance with button failed, sending plain text", {

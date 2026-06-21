@@ -36,4 +36,5 @@ jobs:
           push: false
           build-args: |
             NEXT_PUBLIC_APP_URL=${{ vars.NEXT_PUBLIC_APP_URL || 'https://example.com' }}
+            NEXT_PUBLIC_TELEGRAM_BOT_USERNAME=${{ vars.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME || '' }}
           tags: korea-auto-market:ci
