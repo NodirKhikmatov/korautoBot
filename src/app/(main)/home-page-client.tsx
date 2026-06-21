@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Car, Sparkles } from "lucide-react";
+import { ArrowRight, Car, Shield, Sparkles } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { CarGrid, CarGridSkeleton } from "@/components/cars/car-grid";
@@ -38,6 +38,26 @@ export function HomePageClient() {
         <Button asChild className="mt-4 w-full rounded-xl" size="lg">
           <Link href="/search" prefetch={false}>
             {t("exploreListings")}
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </Button>
+      </section>
+
+      <section className="rounded-2xl border border-border/60 bg-card/60 p-4 backdrop-blur-sm">
+        <div className="flex items-start gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/15">
+            <Shield className="h-5 w-5 text-primary" />
+          </div>
+          <div className="min-w-0 flex-1 space-y-1">
+            <h2 className="text-sm font-semibold">{t("insuranceCardTitle")}</h2>
+            <p className="text-xs text-muted-foreground">
+              {t("insuranceCardDescription")}
+            </p>
+          </div>
+        </div>
+        <Button asChild variant="outline" className="mt-3 w-full rounded-xl">
+          <Link href="/tools/insurance" prefetch={false}>
+            {t("insuranceCardAction")}
             <ArrowRight className="h-4 w-4" />
           </Link>
         </Button>

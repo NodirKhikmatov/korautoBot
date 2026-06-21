@@ -57,7 +57,10 @@
     "latestTitle": "최신 매물",
     "latestSubtitle": "새로 등록된 차량",
     "noListingsTitle": "등록된 매물이 없습니다",
-    "noListingsDescription": "마켓플레이스에 첫 차량을 등록하세요."
+    "noListingsDescription": "마켓플레이스에 첫 차량을 등록하세요.",
+    "insuranceCardTitle": "자동차보험료 계산",
+    "insuranceCardDescription": "차량 정보로 예상 보험료를 확인하세요.",
+    "insuranceCardAction": "견적 계산하기"
   },
   "search": {
     "title": "검색",
@@ -146,7 +149,8 @@
     "noFilesSelected": "선택된 파일 없음",
     "maxImagesAllowed": "최대 {max}장까지 허용",
     "thumbnailAlt": "{title} 썸네일 {index}",
-    "carThumbnailAlt": "차량 썸네일 {index}"
+    "carThumbnailAlt": "차량 썸네일 {index}",
+    "insuranceEstimate": "자동차보험 견적"
   },
   "favorites": {
     "title": "즐겨찾기",
@@ -266,6 +270,32 @@
     "broadcastFailed": "브로드캐스트를 보내지 못했습니다",
     "broadcastLoadingRecipients": "수신자 계산 중...",
     "broadcastRecipients": "{count, plural, one {#명에게 발송} other {#명에게 발송}}"
+  },
+  "insurance": {
+    "title": "자동차보험료 계산기",
+    "subtitle": "대한민국 자동차보험 예상 견적",
+    "intro": "차량 가격, 연식, 운전자 정보를 입력하면 월·연간 예상 보험료 범위를 확인할 수 있습니다.",
+    "vehiclePrice": "차량 가격 (₩)",
+    "year": "연식 (년)",
+    "mileage": "주행거리 (km)",
+    "driverAge": "운전자 나이",
+    "yearsLicensed": "운전경력 (년)",
+    "region": "지역",
+    "regionSeoul": "서울",
+    "regionGyeonggi": "경기",
+    "regionOther": "기타",
+    "accidentHistory": "사고 이력",
+    "accidentNone": "없음",
+    "accidentOne": "1회",
+    "accidentMultiple": "2회 이상",
+    "ownDamage": "자기차량손해 (자차) 가입",
+    "calculate": "보험료 계산",
+    "resultTitle": "예상 보험료",
+    "monthlyEstimate": "월 예상 보험료",
+    "yearlyEstimate": "연 예상 보험료",
+    "disclaimer": "참고용 견적입니다. 실제 보험료는 보험사, 할인·할증 등급, 보장 범위에 따라 달라집니다.",
+    "prefillHint": "매물 정보",
+    "invalidForm": "입력값을 확인해 주세요"
   },
   "fuel": {
     "gasoline": "가솔린",

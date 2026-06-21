@@ -57,7 +57,10 @@
     "latestTitle": "So'nggi e'lonlar",
     "latestSubtitle": "Bozordagi yangi kelganlar",
     "noListingsTitle": "Hali e'lonlar yo'q",
-    "noListingsDescription": "Bozorda birinchi avtomobilni e'lon qiling."
+    "noListingsDescription": "Bozorda birinchi avtomobilni e'lon qiling.",
+    "insuranceCardTitle": "Avtosug'urta kalkulyatori",
+    "insuranceCardDescription": "Mashina ma'lumotlari bo'yicha taxminiy sug'urta hisoblang.",
+    "insuranceCardAction": "Hisoblash"
   },
   "search": {
     "title": "Qidirish",
@@ -146,7 +149,8 @@
     "noFilesSelected": "Fayl tanlanmagan",
     "maxImagesAllowed": "Maksimal {max} rasm ruxsat etilgan",
     "thumbnailAlt": "{title} eskiz {index}",
-    "carThumbnailAlt": "Avtomobil eskiz {index}"
+    "carThumbnailAlt": "Avtomobil eskiz {index}",
+    "insuranceEstimate": "Sug'urta hisoblash"
   },
   "favorites": {
     "title": "Sevimlilar",
@@ -266,6 +270,32 @@
     "broadcastFailed": "Broadcast yuborib bo'lmadi",
     "broadcastLoadingRecipients": "Qabul qiluvchilar hisoblanmoqda...",
     "broadcastRecipients": "{count, plural, one {# foydalanuvchiga yuboriladi} other {# foydalanuvchiga yuboriladi}}"
+  },
+  "insurance": {
+    "title": "Avtosug'urta kalkulyatori",
+    "subtitle": "Koreya avtosug'urtasi (자동차보험) taxminiy hisob",
+    "intro": "Mashina narxi, yili va haydovchi ma'lumotlarini kiriting — oylik va yillik taxminiy sug'urta ko'rsatiladi.",
+    "vehiclePrice": "Mashina narxi (₩)",
+    "year": "Ishlab chiqarilgan yil",
+    "mileage": "Probeg (km)",
+    "driverAge": "Haydovchi yoshi",
+    "yearsLicensed": "Haydash tajribasi (yil)",
+    "region": "Hudud",
+    "regionSeoul": "Seul",
+    "regionGyeonggi": "Gyeonggi",
+    "regionOther": "Boshqa",
+    "accidentHistory": "Baxtsiz hodisa tarixi",
+    "accidentNone": "Yo'q",
+    "accidentOne": "1 marta",
+    "accidentMultiple": "2 marta va undan ko'p",
+    "ownDamage": "O'z mashinasiga qoplama (자차)",
+    "calculate": "Hisoblash",
+    "resultTitle": "Taxminiy sug'urta",
+    "monthlyEstimate": "Oylik taxmin",
+    "yearlyEstimate": "Yillik taxmin",
+    "disclaimer": "Bu faqat taxminiy hisob. Haqiqiy premiya sug'urta kompaniyasiga bog'liq.",
+    "prefillHint": "E'lon ma'lumotlari",
+    "invalidForm": "Ma'lumotlarni tekshiring"
   },
   "fuel": {
     "gasoline": "Benzin",
