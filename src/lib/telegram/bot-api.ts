@@ -6,6 +6,11 @@ import type {
 } from "@/lib/telegram/bot-types";
 import { getBotMessages } from "@/lib/messaging/bot-messages";
 import { MessagingError } from "@/lib/messaging/errors";
+import {
+  getPublicAppUrl,
+  getTelegramBotUsername,
+  getTelegramMiniAppUrl,
+} from "@/lib/telegram/mini-app-url";
 
 const DEFAULT_MAX_RETRIES = 5;
 
@@ -13,10 +18,6 @@ export type SendTelegramMessageOptions = {
   maxRetries?: number;
   replyMarkup?: TelegramReplyMarkup;
 };
-
-export function getPublicAppUrl(): string {
-  return process.env.NEXT_PUBLIC_APP_URL?.trim() || "https://t.me";
-}
 
 function isHttpsMiniAppUrl(url: string): boolean {
   try {
@@ -49,20 +50,6 @@ function buildMiniAppLaunchButton(
   }
 
   return { text, url: webAppUrl };
-}
-
-export function getTelegramMiniAppUrl(startParam?: string): string {
-  const username = getTelegramBotUsername();
-  if (!username) {
-    return getPublicAppUrl();
-  }
-
-  const base = `https://t.me/${username}/app`;
-  if (!startParam?.trim()) {
-    return base;
-  }
-
-  return `${base}?startapp=${encodeURIComponent(startParam.trim())}`;
 }
 
 export function buildOpenAppReplyMarkup(
@@ -229,14 +216,4 @@ export function getTelegramBotChatUrl(
   return `https://t.me/${normalized}?start=${encodeURIComponent(startParam)}`;
 }
 
-export function getTelegramBotUsername(): string | null {
-  const username =
-    process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME ??
-    process.env.TELEGRAM_BOT_USERNAME;
-
-  if (!username?.trim()) {
-    return null;
-  }
-
-  return username.replace(/^@/, "").trim();
-}
+export { getPublicAppUrl, getTelegramBotUsername, getTelegramMiniAppUrl } from "@/lib/telegram/mini-app-url";

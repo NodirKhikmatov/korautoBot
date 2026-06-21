@@ -1,6 +1,10 @@
 import { getDisplayName } from "@/lib/format";
 import { formatTelegramUsername } from "@/lib/telegram/contact";
 import { getBotMessages } from "@/lib/messaging/bot-messages";
+import {
+  getMiniAppWebAppUrl,
+  getTelegramMiniAppDeepLink,
+} from "@/lib/telegram/mini-app-url";
 import type { User } from "@/types";
 
 type ContactUser = Pick<User, "firstName" | "lastName" | "username">;
@@ -91,7 +95,12 @@ export function formatSellerFollowUpMessage(
 }
 
 export function formatWelcomeMessage(locale?: string | null): string {
-  return getBotMessages(locale).welcome;
+  const template = getBotMessages(locale).welcome;
+
+  return template
+    .replaceAll("{appUrl}", getMiniAppWebAppUrl())
+    .replaceAll("{miniAppLink}", getTelegramMiniAppDeepLink())
+    .replaceAll("{insuranceLink}", getTelegramMiniAppDeepLink("insurance"));
 }
 
 export function formatAdminSupportMessage(
